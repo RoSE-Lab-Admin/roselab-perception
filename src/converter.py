@@ -5,8 +5,12 @@ import open3d as o3d
 
 import rclpy
 from rclpy.serialization import deserialize_message
+from rclpy.node import Node
 from rosbag2_py import SequentialReader, StorageOptions, StorageFilter, ConverterOptions
-from sensor_msgs.msg import PointCloud2
+import cv2
+from sensor_msgs.msg import Image, CameraInfo, PointCloud2, PointField
+from cv_bridge import CvBridge
+from message_filters import Subscriber, ApproximateTimeSynchronizer
 import sensor_msgs_py.point_cloud2 as pc2
 
 
@@ -43,11 +47,15 @@ def read_pointclouds_from_bag(bag_path, topic_name):
 
     return np.array(points), np.array(colors)
 
+# Assumes already aligned, so don't need to use camera intrinsics
 def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     # TODO - Need to support reading in Image msgs from bag for both depth and color topics, sync time, and generate point clouds using Open3D
-    return depth_images, color_images
+    storage_options = StorageOptions(uri=bag_path, storage_id='mcap')
+    converter_options = ConverterOptions('', '')
 
-def convert_rgbd_to_pointclouds(depth, color):
+    return rgbd_images
+
+def convert_rgbd_to_pointclouds(rgbd_images):
     return pcds
 
 def fuse_dynamic_pointclouds(pcds, camera_trajectory):
@@ -66,6 +74,65 @@ def save_to_pcd_or_ply(points_np, colors_np, output_file):
     else:
         raise ValueError("Output file must end in .pcd or .ply")
 
+# RGBD to PointCloud Node
+class RGBDPointCloud(Node):
+    def __init__(self):
+        super().__init__('rgbd_pointcloud_node')
+        self.bridge = CvBridge()
+
+        self.rgb_sub = Subscriber(self, Image, '/camera/color/image_raw')
+        self.depth_sub = Subscriber(self, Image, '/camera/depth/image_raw')
+        self.info_sub = Subscriber(self, CameraInfo, '/camera/depth/camera_info')
+
+        self.ts = ApproximateTimeSynchronizer(
+            [self.rgb_sub, self.depth_sub, self.info_sub], queue_size=10, slop=0.1)
+        self.ts.registerCallback(self.callback)
+
+        self.pub = self.create_publisher(PointCloud2, '/fused_point_cloud', 10)
+        self.get_logger().info('RGBD Point Cloud Node Initialized')
+
+    def callback(self, rgb_msg, depth_msg, info_msg, agg=np.mean):
+        color = self.bridge.imgmsg_to_cv2(rgb_msg, desired_encoding='bgr8')
+        depth = self.bridge.imgmsg_to_cv2(depth_msg, desired_encoding='passthrough')
+
+        fx = info_msg.k[0]
+        fy = info_msg.k[4]
+        cx = info_msg.k[2]
+        cy = info_msg.k[5]
+
+        height, width = depth.shape
+        points = []
+
+        # Conversion factor for L515 is 1 bit = 0.00025 m
+        convert_to_m_factor = 0.00025
+
+        for v in range(height):
+            for u in range(width):
+                z = depth[v, u] * convert_to_m_factor
+                if z == 0 or np.isnan(z): continue
+                x = (u - cx) * z / fx
+                y = (v - cy) * z / fy
+                b, g, r = color[v, u]
+                rgb = int(r << 16 | g << 8 | b)
+                points.append([x, y, z, rgb])
+
+        fields = [
+            PointField('x', 0, PointField.FLOAT32, 1),
+            PointField('y', 4, PointField.FLOAT32, 1),
+            PointField('z', 8, PointField.FLOAT32, 1),
+            PointField('rgb', 12, PointField.UINT32, 1),
+        ]
+
+        header = rgb_msg.header
+        pc = pc2.create_cloud(header, fields, points)
+        self.pub.publish(pc)
+
+#def main(args=None):
+#    rclpy.init(args=args)
+#    node = RGBDPointCloud()
+#    rclpy.spin(node)
+#    node.destroy_node()
+#    rclpy.shutdown()
 
 def main():
     if len(sys.argv) != 4:
