@@ -87,7 +87,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     rgbd_image  = o3d.geometry.RGBDImage.create_from_color_and_depth(
         o3d_color,
         o3d_depth,
-        depth_scale=4000,      # if depth is already in meters
+        depth_scale=1000,      # if depth is already in meters
         depth_trunc=4.0,      # max depth to keep (meters)
         convert_rgb_to_intensity=False
     )
@@ -96,7 +96,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
 
 def convert_rgbd_to_pointclouds(rgbd_image):
     intrinsics = o3d.camera.PinholeCameraIntrinsic()
-    intrinsics.set_intrinsics(640, 360, 465.443, 465.172, 302.009, 192.179)
+    intrinsics.set_intrinsics(640, 360, 450.6466369628906, 450.8058776855469, 327.085693359375, 177.85765075683594)
     pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, intrinsics)
     return pcd
 
