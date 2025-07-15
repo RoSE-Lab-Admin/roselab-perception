@@ -19,7 +19,7 @@ echo "Using calibration folder: $calibration_path"
 
 # 2. Run the MLSS calibration for 10 seconds
 echo "Running gantry_services mlss_calibration..."
-ros2 run gantry_services mlss_calibration --duration 10.0
+ros2 run gantry_services mlss_calibration #--duration 10.0
 
 # 3. Convert images to point cloud
 echo "Converting images to point cloud..."
