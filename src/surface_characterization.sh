@@ -7,11 +7,12 @@
 
 set -euo pipefail
 
-# 1. Locate the most recent subdirectory in ~/lidarcalibrations
-#    - ls -dt: sort by modification time, newest first
-#    - head -1: take the top entry
-recent_dir=$(ls -dt ~/lidarcalibrations/*/ | head -1)
-# Remove trailing slash if present
+# 1) Most recent top‐level timestamp folder
+top_ts_dir=$(ls -dt ~/lidarcalibrations/*/ | head -1)
+
+# Dive two levels down (IP folder and its only subdir)
+calibration_path=$(ls -d "${top_ts_dir}"*/*/ | head -1)
+calibration_path="${calibration_path%/}"
 calibration_path="${recent_dir%/}"
 
 echo "Using calibration folder: $calibration_path"
@@ -31,6 +32,6 @@ python3 ~/roselab-perception/src/converter.py \
 # 4. Characterize the surface from the generated point cloud
 echo "Characterizing surface..."
 python3 ~/roselab-perception/src/characterize_surface.py \
-    ~/roselab-perception/clouds/out.ply
+    ~/roselab-perception/clouds/out.ply 0 1 --local
 
 echo "Pipeline completed successfully, closing."
