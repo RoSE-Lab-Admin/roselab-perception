@@ -28,6 +28,7 @@ from cv_bridge import CvBridge
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import open3d as o3d
 
 # System/Misc
 from pathlib import Path
@@ -117,6 +118,7 @@ class OriginFusion():
 #                pbar.update(0)
 #        t.join()
         self.stack_task()
+        self.compute_pointcloud()
 
     def stack_task(self):
         # Make stacked and median images
@@ -125,6 +127,13 @@ class OriginFusion():
         stacked_depth = np.stack(self.depth_images, axis=0)
         self.median_depth_img = np.median(stacked_depth, axis=0).astype(np.uint16)
         #cv2.imwrite("/mnt/c/Users/ryan1/Downloads/img.tiff", self.median_depth_img)
+
+    def compute_pointcloud(self):
+        # Use median images to generate points and associated colors (1:1 pixels) via Open3D
+        rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(o3d.geometry.Image(self.median_color_img), o3d.geometry.Image(self.median_depth_img), depth_scale=1/0.00025, depth_trunc=5.0)
+        self.median_pointcloud = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(self.median_color_img.shape[1], self.median_color_img.shape[0], np.asarray(self.caminfo.k).reshape(3,3)))
+
+        o3d.visualization.draw_geometries([self.median_pointcloud])
 
     def PlotImages(self):
         # Plot median images
