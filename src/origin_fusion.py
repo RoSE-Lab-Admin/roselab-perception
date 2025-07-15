@@ -51,6 +51,7 @@ class OriginFusion():
                 if connection.topic == '/l515_center/aligned_depth_to_color/image_raw':
                     msg = reader.deserialize(rawdata, connection.msgtype)
                     img = message_to_cvimage(msg, '16UC1')
+                    print(self.color_images[0].shape[:2])
                     if(img.shape == self.color_images[0].shape[:2]): self.depth_images.append(img) # Take only the aligned ones
         #with AnyReader([bag2_path]) as reader2:
             # Make list of color and depth images

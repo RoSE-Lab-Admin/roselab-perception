@@ -2,6 +2,7 @@ import sys
 import struct
 import numpy as np
 import open3d as o3d
+from pathlib import Path
 
 import rclpy
 from rclpy.serialization import deserialize_message
@@ -54,7 +55,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     # Make list of color and depth images
     color_images = []
     depth_images = []
-    with AnyReader([bag_path]) as reader:
+    with AnyReader([Path(bag_path)]) as reader:
         # Make list of color and depth images
         for connection, timestamp, rawdata in reader.messages():
             # Color
@@ -78,24 +79,29 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
 
     # Convert to Open3D Image types
     o3d_color = o3d.geometry.Image(median_color_img.astype(np.uint8))
-    o3d_depth = o3d.geometry.Image(median_depth_img.astype(np.float32))
+    o3d_depth = o3d.geometry.Image(median_depth_img.astype(np.uint16))
+    #o3d_color = o3d.io.read_image(median_color_img)
+    #o3d_depth = o3d.io.read_image(median_depth_img)
 
     # Create an Open3D RGBDImage
     rgbd_image  = o3d.geometry.RGBDImage.create_from_color_and_depth(
         o3d_color,
         o3d_depth,
-        depth_scale=1.0,      # if depth is already in meters
+        depth_scale=4000,      # if depth is already in meters
         depth_trunc=4.0,      # max depth to keep (meters)
         convert_rgb_to_intensity=False
     )
 
     return rgbd_image
 
-def convert_rgbd_to_pointclouds(rgbd_images):
-    return pcds
+def convert_rgbd_to_pointclouds(rgbd_image):
+    intrinsics = o3d.camera.PinholeCameraIntrinsic()
+    intrinsics.set_intrinsics(640, 360, 465.443, 465.172, 302.009, 192.179)
+    pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, intrinsics)
+    return pcd
 
 def fuse_dynamic_pointclouds(pcds, camera_trajectory):
-    return pcd
+    return None #pcd
 
 def save_to_pcd_or_ply(points_np, colors_np, output_file):
     pcd = o3d.geometry.PointCloud()
@@ -103,6 +109,14 @@ def save_to_pcd_or_ply(points_np, colors_np, output_file):
     if colors_np.size > 0:
         pcd.colors = o3d.utility.Vector3dVector(colors_np)
 
+    if output_file.endswith(".pcd"):
+        o3d.io.write_point_cloud(output_file, pcd, write_ascii=True)
+    elif output_file.endswith(".ply"):
+        o3d.io.write_point_cloud(output_file, pcd)
+    else:
+        raise ValueError("Output file must end in .pcd or .ply")
+
+def save_pcd_as_file(pcd, output_file):
     if output_file.endswith(".pcd"):
         o3d.io.write_point_cloud(output_file, pcd, write_ascii=True)
     elif output_file.endswith(".ply"):
@@ -171,17 +185,22 @@ class RGBDPointCloud(Node):
 #    rclpy.shutdown()
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: python ros2_bag_to_pcd.py <bag_path> <pointcloud_topic> <output_file.pcd|.ply>")
+    if len(sys.argv) != 5:
+        #print("Usage: python ros2_bag_to_pcd.py <bag_path> <pointcloud_topic> <output_file.pcd|.ply>")
+        print("Usage: python ros2_bag_to_pcd.py <bag_path> <color_topic> <aligned_depth_topic> <output_file.pcd|.ply>")
         sys.exit(1)
 
     bag_path = sys.argv[1]
-    topic = sys.argv[2]
-    output_file = sys.argv[3]
+    color_topic = sys.argv[2]
+    depth_topic = sys.argv[3]
+    output_file = sys.argv[4]
 
-    points, colors = read_pointclouds_from_bag(bag_path, topic)
-    print(f"Total points extracted: {len(points)}")
-    save_to_pcd_or_ply(points, colors, output_file)
+    #points, colors = read_pointclouds_from_bag(bag_path, topic)
+    rgbd_image = read_rgbd_from_bag(bag_path, depth_topic, color_topic)
+    pcd = convert_rgbd_to_pointclouds(rgbd_image)
+    print(f"Total points extracted: {len(pcd.points)}")
+    #save_to_pcd_or_ply(points, colors, output_file)
+    save_pcd_as_file(pcd, output_file)
     print(f"Saved to: {output_file}")
 
 
