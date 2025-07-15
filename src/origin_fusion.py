@@ -130,17 +130,39 @@ class OriginFusion():
 
     def GetOrigin(self, visualize=True):
         # Get Arcuo
-        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_100)
-        detector = cv2.aruco.ArucoDetector(aruco_dict)
-        corners, ids, rejected_candidates = detector.detectMarkers(self.median_color_img)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_250)
+        params = cv2.aruco.DetectorParameters()
 
-        print(corners)
-        print(ids)
-        print(rejected_candidates)
+        # These parameters consistently find our aruco target, but perhaps my dictionary is incorrect???
+        params.adaptiveThreshConstant = 6
+        params.minMarkerPerimeterRate = 0.02
+        params.maxMarkerPerimeterRate = 3.0
+        params.polygonalApproxAccuracyRate = 0.07
+        params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX  # Improves accuracy
+
+        # Improve contrast
+        tmp = self.median_color_img.copy()
+        tmp = cv2.resize(tmp, None, fx=2., fy=2.)
+
+#        gray = cv2.cvtColor(tmp, cv2.COLOR_BGR2GRAY)
+#        gray = cv2.GaussianBlur(gray, (3,3), 0)
+#        gray = cv2.equalizeHist(gray)
+#        gray = cv2.resize(gray, None, fx=2., fy=2.)
+
+        detector = cv2.aruco.ArucoDetector(aruco_dict, params)
+#        corners, ids, rejected_candidates = detector.detectMarkers(gray) # use the contrast enhanced gray otherwise
+        corners, ids, rejected_candidates = detector.detectMarkers(tmp) # use the contrast enhanced gray otherwise
+
+#        print(corners)
+        print("Detected Aruco Target IDs: ", ids)
+#        print(rejected_candidates)
 
         if visualize:
-            cv2.aruco.drawDetectedMarkers(self.median_color_img, corners, ids)
-            plt.imshow(self.median_color_img)
+#            cv2.aruco.drawDetectedMarkers(tmp, np.asarray(rejected_candidates)/2, borderColor=(100, 0, 255))
+#            cv2.aruco.drawDetectedMarkers(tmp, np.asarray(corners)/2, ids)
+            cv2.aruco.drawDetectedMarkers(tmp, rejected_candidates, borderColor=(100, 0, 255))
+            cv2.aruco.drawDetectedMarkers(tmp, corners, ids)
+            plt.imshow(tmp)
             plt.show()
 
         # Find Static TF for aruco in world frame (frame cad)
