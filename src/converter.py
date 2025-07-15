@@ -67,7 +67,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
             if connection.topic == depth_topic:
                 msg = reader.deserialize(rawdata, connection.msgtype)
                 img = message_to_cvimage(msg, '16UC1')
-                if(img.shape == color_images[0].shape[:2]): depth_images.append(img) # Take only the aligned ones
+                if(img.shape == (360, 640)): depth_images.append(img) # Take only the aligned ones
     #storage_options = StorageOptions(uri=bag_path, storage_id='mcap')
     #converter_options = ConverterOptions('', '')
 
