@@ -14,8 +14,15 @@
 # ROS
 import rclpy
 import rosbag2_py
-from rosbags.highlevel import AnyReader
-from rosbags.image import message_to_cvimage
+
+# RH: Converting workflow to use rosbag2_py and cv_bridge
+#from rosbags.highlevel import AnyReader
+#from rosbags.image import message_to_cvimage
+
+from rclpy.serialization import deserialize_message
+from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
 # Math and Vision
 import numpy as np
@@ -28,33 +35,82 @@ import time
 import threading
 from tqdm import tqdm
 
+
 class OriginFusion():
     def __init__(self):
         self.color_images = []
         self.depth_images = []
 
-    def LoadBag(self, bag_path):
-        with AnyReader([Path(bag_path)]) as reader:
-            # Make list of color and depth images
-            for connection, timestamp, rawdata in tqdm(reader.messages(), total=2452):
-                if connection.topic == '/l515_center/color/image_raw':
-                    msg = reader.deserialize(rawdata, connection.msgtype)
-                    img = message_to_cvimage(msg, 'rgb8')
-                    self.color_images.append(img)
-                if connection.topic == '/l515_center/aligned_depth_to_color/image_raw':
-                    msg = reader.deserialize(rawdata, connection.msgtype)
-                    img = message_to_cvimage(msg, '16UC1')
-                    if(img.shape == (360,640)): self.depth_images.append(img)
+    def LoadBag(self, bag_path, color_topic, depth_topic):
+        # RH: Reformatting to use cv_bridge and rclpy, rosbag2_py interfaces for message deserialization
+#        with AnyReader([Path(bag_path)]) as reader:
+#            # Make list of color and depth images
+#            for connection, timestamp, rawdata in tqdm(reader.messages(), total=2452):
+#                if connection.topic == '/l515_center/color/image_raw':
+#                    msg = reader.deserialize(rawdata, connection.msgtype)
+#                    img = message_to_cvimage(msg, 'rgb8')
+#                    self.color_images.append(img)
+#                if connection.topic == '/l515_center/aligned_depth_to_color/image_raw':
+#                    msg = reader.deserialize(rawdata, connection.msgtype)
+#                    img = message_to_cvimage(msg, '16UC1')
+#                    if(img.shape == (360,640)): self.depth_images.append(img)
 
-        # Run your stacking and median in a thread (so we can show elapsed time)
-        t = threading.Thread(target=self.stack_task)
-        t.start()
-        with tqdm(total=0, bar_format="{desc} {elapsed}") as pbar:
-            while t.is_alive():
-                time.sleep(0.1)
-                pbar.set_description("Stacking and Getting Median")
-                pbar.update(0)
-        t.join()
+        bridge = CvBridge()
+
+        # Initialize reader
+        storage_options = StorageOptions(uri=bag_path, storage_id='mcap')
+        converter_options = ConverterOptions(input_serialization_format='cdr', output_serialization_format='cdr')
+
+        reader = SequentialReader()
+        reader.open(storage_options, converter_options)
+
+        type_map = {}
+        for topic_metadata in reader.get_all_topics_and_types():
+            type_map[topic_metadata.name] = topic_metadata.type
+
+        pbar = tqdm(total=2452, desc="Processing")
+
+        # Read messages in loop and convert with cv_bridge
+        while reader.has_next():
+            topic, data, timestamp = reader.read_next()
+
+            pbar.update(1)
+
+            if topic not in [color_topic, depth_topic]:
+                continue
+
+            # Deserialize message
+            msg_type = Image if type_map[topic] == 'sensor_msgs/msg/Image' else None
+            if not msg_type:
+                continue
+
+            msg = deserialize_message(data, msg_type)
+
+            # Convert to OpenCV image
+            if topic == color_topic:
+                self.color_images.append(bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough'))
+
+            elif topic == depth_topic:
+                img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+                if(img.shape == (360,640)):
+                    self.depth_images.append(img)
+
+#        key = cv2.waitKey(1)
+#        if key == ord('q'):
+#            break
+
+        pbar.close()
+
+#        # Run your stacking and median in a thread (so we can show elapsed time)
+#        t = threading.Thread(target=self.stack_task)
+#        t.start()
+#        with tqdm(total=0, bar_format="{desc} {elapsed}") as pbar:
+#            while t.is_alive():
+#                time.sleep(0.1)
+#                pbar.set_description("Stacking and Getting Median")
+#                pbar.update(0)
+#        t.join()
+        self.stack_task()
 
     def stack_task(self):
         # Make stacked and median images
@@ -63,7 +119,7 @@ class OriginFusion():
         stacked_depth = np.stack(self.depth_images, axis=0)
         self.median_depth_img = np.median(stacked_depth, axis=0).astype(np.uint16)
         #cv2.imwrite("/mnt/c/Users/ryan1/Downloads/img.tiff", self.median_depth_img)
-    
+
     def PlotImages(self):
         # Plot median images
         fig, axes=plt.subplots(1,2)
@@ -72,19 +128,79 @@ class OriginFusion():
         #axes[1][1].hist(self.median_depth_img.flat, bins=100)
         plt.show()
 
-    def GetOrigin(self):
+    def GetOrigin(self, visualize=True):
         # Get Arcuo
+        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_100)
+        detector = cv2.aruco.ArucoDetector(aruco_dict)
+        corners, ids, rejected_candidates = detector.detectMarkers(self.median_color_img)
 
-        # Find Static TF for arcu in world frame (frame cad)
+        print(corners)
+        print(ids)
+        print(rejected_candidates)
+
+        if visualize:
+            cv2.aruco.drawDetectedMarkers(self.median_color_img, corners, ids)
+            plt.imshow(self.median_color_img)
+            plt.show()
+
+        # Find Static TF for aruco in world frame (frame cad)
+
+
 
         # Plane fit to get normal vector (Ryan H)
-        
-        return #translation and rotation matricies
-    
+
+        # Given aruco target corners, make vector of corner indices and then use opencv's fillpoly routine to generate a mask
+        # Convert depth data to xyz points and apply SVD for eigen vector definition as with my normal calculation in the surface char module
+        # Evaluate error between normal vector and +y pose vector for good measure (dot product)
+        # Build transformation matrix for aruco in lidar frame, aka (lidar)^T_(aruco)
+
+        # Finally, find: world^T_lidar = world^T_aruco * (lidar^T_aruco)^-1
+
+        return #translation and rotation matricies for center lidar in world frame
+
+    def _detect_calibration_plate(self):
+        # RH: optional, may be nice to have. Should find corners of plate and store these on the object
+        return
+
+    def _detect_aruco(self):
+        return
+
+    def _estimate_pose_aruco(self):
+        return
+
+    def _plot_aruco(self):
+        return
+
+    def _select_flat_regions(self, interactive=True):
+        # RH: Best way to select these is still up in the air, but a manual method may do the trick...
+        if interactive:
+            # RH: Do manual polygon picking, which should give us all pixels belonging to poly (which are FULLY inside?)
+            pass
+        else:
+            # RH: Non-interactive we may just use ARUCO target plane and orientation to find approximate
+            pass
+
+        return
+
+    def _plane_fit(self, indices):
+        # RH: Given a set of points, compute the planar fit via LSQ (or some other method...)
+        return
+
 if __name__ == "__main__":
-    bag_path = "/mnt/c/Users/ryan1/Downloads/07102025_15_07_51/07102025_15_07_51/192.168.2.4:8000"
+    #bag_path = "/mnt/c/Users/ryan1/Downloads/07102025_15_07_51/07102025_15_07_51/192.168.2.4:8000"
+
+    rclpy.init()
+
+    # Get path to bag file
+    import sys
+    bag_path = sys.argv[1]
+    color_topic = sys.argv[2]
+    depth_topic = sys.argv[3]
+
     originFuser = OriginFusion()
-    originFuser.LoadBag(bag_path)
+    originFuser.LoadBag(bag_path, color_topic, depth_topic)
     originFuser.PlotImages()
     # Having the surface characterization run as its own node makes sense. Maybe i should just make this a service outright and skip the joining service.
-    #originFuser.GetOrigin()
+    originFuser.GetOrigin()
+
+    rclpy.shutdown()
