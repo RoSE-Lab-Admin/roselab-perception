@@ -21,7 +21,7 @@ import rosbag2_py
 
 from rclpy.serialization import deserialize_message
 from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge
 
 # Math and Vision
@@ -40,8 +40,9 @@ class OriginFusion():
     def __init__(self):
         self.color_images = []
         self.depth_images = []
+        self.caminfo = None
 
-    def LoadBag(self, bag_path, color_topic, depth_topic):
+    def LoadBag(self, bag_path, color_topic, depth_topic, caminfo_topic):
         # RH: Reformatting to use cv_bridge and rclpy, rosbag2_py interfaces for message deserialization
 #        with AnyReader([Path(bag_path)]) as reader:
 #            # Make list of color and depth images
@@ -68,6 +69,8 @@ class OriginFusion():
         for topic_metadata in reader.get_all_topics_and_types():
             type_map[topic_metadata.name] = topic_metadata.type
 
+        print(type_map)
+
         pbar = tqdm(total=2452, desc="Processing")
 
         # Read messages in loop and convert with cv_bridge
@@ -76,11 +79,11 @@ class OriginFusion():
 
             pbar.update(1)
 
-            if topic not in [color_topic, depth_topic]:
+            if topic not in [color_topic, depth_topic, caminfo_topic]:
                 continue
 
             # Deserialize message
-            msg_type = Image if type_map[topic] == 'sensor_msgs/msg/Image' else None
+            msg_type = Image if type_map[topic] == 'sensor_msgs/msg/Image' else CameraInfo
             if not msg_type:
                 continue
 
@@ -94,6 +97,9 @@ class OriginFusion():
                 img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
                 if(img.shape == (360,640)):
                     self.depth_images.append(img)
+
+            elif topic == caminfo_topic:
+                self.caminfo = msg
 
 #        key = cv2.waitKey(1)
 #        if key == ord('q'):
@@ -130,7 +136,7 @@ class OriginFusion():
 
     def GetOrigin(self, visualize=True):
         # Get Arcuo
-        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_250)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
         params = cv2.aruco.DetectorParameters()
 
         # These parameters consistently find our aruco target, but perhaps my dictionary is incorrect???
@@ -160,10 +166,33 @@ class OriginFusion():
         if visualize:
 #            cv2.aruco.drawDetectedMarkers(tmp, np.asarray(rejected_candidates)/2, borderColor=(100, 0, 255))
 #            cv2.aruco.drawDetectedMarkers(tmp, np.asarray(corners)/2, ids)
-            cv2.aruco.drawDetectedMarkers(tmp, rejected_candidates, borderColor=(100, 0, 255))
+
+            # Useful for debugging
+#            cv2.aruco.drawDetectedMarkers(tmp, rejected_candidates, borderColor=(100, 0, 255))
             cv2.aruco.drawDetectedMarkers(tmp, corners, ids)
             plt.imshow(tmp)
             plt.show()
+
+        # Aruco coordinate system pose estimation in Lidar frame
+        camera_matrix = np.asarray(self.caminfo.k).reshape(3,3)
+        distortion_coeffs = np.zeros(5)
+        mhl = 0.05/2 # marker half-length in meters
+        object_points = np.array([
+                                     [-mhl,mhl,0],
+                                     [mhl,mhl,0],
+                                     [mhl,-mhl,0],
+                                     [-mhl,-mhl,0]
+                                 ]) # These are the corner points in the aruco target frame
+#        rvecs, tvecs, _objPoints = cv2.aruco.legacy.estimatePoseSingleMarkers(corners, marker_length, camera_matrix, distortion_coeffs)
+
+        # Need to use PnP solver to get ref frame using the modern API, and cv2.SOLVEPNP_IPPE_SQUARE
+        ret, rvec, tvec = cv2.solvePnP(object_points, corners[0], camera_matrix, distortion_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
+        print(rvec, tvec)
+
+#        for rvec, tvec in zip(rvecs, tvecs):
+        cv2.drawFrameAxes(tmp, camera_matrix, distortion_coeffs, rvec, tvec, 0.03)
+        plt.imshow(tmp)
+        plt.show()
 
         # Find Static TF for aruco in world frame (frame cad)
 
@@ -172,7 +201,14 @@ class OriginFusion():
         # Plane fit to get normal vector (Ryan H)
 
         # Given aruco target corners, make vector of corner indices and then use opencv's fillpoly routine to generate a mask
+        mask = np.zeros_like(tmp)
+        cv2.fillPoly(mask, corners[0], 1)
+        plt.imshow(mask)
+        plt.show()
+
         # Convert depth data to xyz points and apply SVD for eigen vector definition as with my normal calculation in the surface char module
+
+
         # Evaluate error between normal vector and +y pose vector for good measure (dot product)
         # Build transformation matrix for aruco in lidar frame, aka (lidar)^T_(aruco)
 
@@ -218,9 +254,10 @@ if __name__ == "__main__":
     bag_path = sys.argv[1]
     color_topic = sys.argv[2]
     depth_topic = sys.argv[3]
+    caminfo_topic = sys.argv[4]
 
     originFuser = OriginFusion()
-    originFuser.LoadBag(bag_path, color_topic, depth_topic)
+    originFuser.LoadBag(bag_path, color_topic, depth_topic, caminfo_topic)
     originFuser.PlotImages()
     # Having the surface characterization run as its own node makes sense. Maybe i should just make this a service outright and skip the joining service.
     originFuser.GetOrigin()
