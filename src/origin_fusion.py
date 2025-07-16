@@ -130,10 +130,11 @@ class OriginFusion():
 
     def compute_pointcloud(self):
         # Use median images to generate points and associated colors (1:1 pixels) via Open3D
-        rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(o3d.geometry.Image(self.median_color_img), o3d.geometry.Image(self.median_depth_img), depth_scale=1/0.00025, depth_trunc=5.0)
+        rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(o3d.geometry.Image(self.median_color_img), o3d.geometry.Image(self.median_depth_img), depth_scale=1000., depth_trunc=5.0)
         self.median_pointcloud = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(self.median_color_img.shape[1], self.median_color_img.shape[0], np.asarray(self.caminfo.k).reshape(3,3)))
 
-        o3d.visualization.draw_geometries([self.median_pointcloud])
+        # o3d.visualization.draw_geometries([self.median_pointcloud])
+        o3d.io.write_point_cloud("out.pcd", self.median_pointcloud)
 
     def PlotImages(self):
         # Plot median images
@@ -185,7 +186,7 @@ class OriginFusion():
         # Aruco coordinate system pose estimation in Lidar frame
         camera_matrix = np.asarray(self.caminfo.k).reshape(3,3)
         distortion_coeffs = np.zeros(5)
-        mhl = 0.05/2 # marker half-length in meters
+        mhl = 0.100/2 # marker half-length in meters
         object_points = np.array([
                                      [-mhl,mhl,0],
                                      [mhl,mhl,0],
@@ -210,10 +211,10 @@ class OriginFusion():
         # Plane fit to get normal vector (Ryan H)
 
         # Given aruco target corners, make vector of corner indices and then use opencv's fillpoly routine to generate a mask
-        mask = np.zeros_like(tmp)
-        cv2.fillPoly(mask, corners[0], 1)
-        plt.imshow(mask)
-        plt.show()
+#        mask = np.zeros_like(tmp)
+#        cv2.fillPoly(mask, corners[0], 1)
+#        plt.imshow(mask)
+#        plt.show()
 
         # Convert depth data to xyz points and apply SVD for eigen vector definition as with my normal calculation in the surface char module
 

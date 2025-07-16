@@ -91,7 +91,8 @@ if __name__=="__main__":
    fname = sys.argv[1]
    MIN_Q = float(sys.argv[2])
    MAX_Q = float(sys.argv[3])
-   MODE = sys.argv[4].lower()
+   VOX_SIZE_MM = float(sys.argv[4])
+   MODE = sys.argv[5].lower()
 
    pcd = o3d.io.read_point_cloud(fname)
 
@@ -142,7 +143,7 @@ if __name__=="__main__":
       # BEGIN LOCAL PLANE FIT USING VOXEL GRID TRACE WITH 5CM VOXELS OR MASKING
 
       # Analyze voxel grid
-      voxel_size = 0.05   # 10cm so we only get one layer of voxels
+      voxel_size = VOX_SIZE_MM   # 10cm so we only get one layer of voxels
       voxel_results, voxel_grid_size = voxelize_and_analyze(pcd, voxel_size)
 
       # Print or use results
