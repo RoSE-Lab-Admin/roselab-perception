@@ -130,13 +130,12 @@ class StaticArucoToWorld(Node):
         # create the broadcaster
         self._broadcaster = StaticTransformBroadcaster(self)
 
-        # fill in your manual measurements here
         translation = {
-            'x': 0.0687,  # meters from ArUco to world origin along X
-            'y': -0.007, # meters along Y
-            'z': 0.1309   # meters along Z
+            'x': 0.070,  # meters from ArUco to world origin along X
+            'y': -0.008, # meters along Y
+            'z': 0.14   # meters along Z
         }
-        rotation = {
+        rotation = { #Unknown
             'x': 0.0,   # quaternion x
             'y': 1.0,   # quaternion y
             'z': 0, # quaternion z
@@ -158,7 +157,6 @@ class StaticArucoToWorld(Node):
         t.transform.rotation.z = rotation['z']
         t.transform.rotation.w = rotation['w']
 
-        # sendTransform works for static transforms too
         self._broadcaster.sendTransform(t)
 
 if __name__ == "__main__":
