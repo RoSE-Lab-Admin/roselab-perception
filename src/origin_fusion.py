@@ -206,7 +206,7 @@ class OriginFusion():
 
         # Need to use PnP solver to get ref frame using the modern API, and cv2.SOLVEPNP_IPPE_SQUARE
         ret, rvec, tvec = cv2.solvePnP(object_points, corners[0], camera_matrix, distortion_coeffs, flags=cv2.SOLVEPNP_IPPE_SQUARE)
-        print("R: ", rMat:=cv2.Rodrigues(rvec)[0], "\nt: ", tvec)
+        print("R: ", ARUCO_ROT_IN_LIDAR:=cv2.Rodrigues(rvec)[0], "\nt: ", tvec)
 
 #        for rvec, tvec in zip(rvecs, tvecs):
         cv2.drawFrameAxes(tmp, camera_matrix, distortion_coeffs, rvec, tvec, 0.03)
@@ -214,16 +214,19 @@ class OriginFusion():
         plt.show()
 
         # Find Static TF for aruco in world frame (frame cad)
-        ARUCO_ROT_IN_WORLD = R.from_euler('xyz', [np.pi/2,0,0]) # -90 deg rotation about y
+        ARUCO_ROT_IN_WORLD = R.from_euler('xyz', [np.pi/2,0,0]) # 90 deg rotation about x, as x is colinear across frames
 
 # 	Measurements for Cal plate translation relative to origin (world)
-#	x: 70mm
+#	x: -70mm
 #	z: 140mm
 #	y: 8mm up
-        ARUCO_POS_IN_WORLD = np.array([[-0.070],[0.008],[0.140]]) # Measured from Emma's CAD model, origin of Optitrack Square to center of Aruco target
+        ARUCO_POS_IN_WORLD = np.array([-0.070,0.008,0.140]) # Measured from Emma's CAD model, origin of Optitrack Square to center of Aruco target
 
         ARUCO_POSE_IN_WORLD = np.eye(4) # ARUCO -> WORLD
 
+        ARUCO_POSE_IN_WORLD[:3,:3] = ARUCO_ROT_IN_WORLD.as_matrix()
+        ARUCO_POSE_IN_WORLD[:3, 3] = ARUCO_POS_IN_WORLD
+        print("ARUCO TARGET POSE IN WORLD FRAME: \n\n", ARUCO_POSE_IN_WORLD)
 
         # Plane fit to get normal vector (Ryan H)
 
@@ -252,7 +255,14 @@ class OriginFusion():
 #        print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 #        aruco_depth_normal = np.asarray([a,b,c]) / np.linalg.norm([a,b,c])
 
-        aruco_pc = self.median_pointcloud.select_by_index(np.where((mask.T).flat)[0])
+#        aruco_pc = self.median_pointcloud.select_by_index(np.where((mask.T).flat)[0])
+
+        # O3D Hack for Masking data while generating pointcloud from RGBD data
+        depth_masked = self.median_depth_img.copy()
+        depth_masked[~mask] = -1.
+        rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(o3d.geometry.Image(self.median_color_img), o3d.geometry.Image(depth_masked), depth_scale=1000., depth_trunc=5.0)
+        aruco_pc = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(self.median_color_img.shape[1], self.median_color_img.shape[0], np.asarray(self.caminfo.k).reshape(3,3)))
+
         aruco_depth_points = np.asarray(aruco_pc.points)
         print("Aruco Target Centroid in Lidar Frame :", np.mean(aruco_depth_points, axis=0))
 
@@ -262,14 +272,28 @@ class OriginFusion():
         eigvals, eigvecs = np.linalg.eigh(aruco_cov)
         aruco_depth_normal = eigvecs[:, 0]  # eigenvector with smallest eigenvalue
 
-        print("Dot-Product Similarity (Depth Fit Normal vs. Aruco +Z): ", np.dot(aruco_depth_normal, rMat[:,2]))
+        print("Dot-Product Similarity (Depth Fit Normal vs. Aruco +Z): ", np.dot(aruco_depth_normal, ARUCO_ROT_IN_LIDAR[:,2]))
 
         # Evaluate error between normal vector and +y pose vector for good measure (dot product)
         # Build transformation matrix for aruco in lidar frame, aka (lidar)^T_(aruco)
+        ARUCO_POSE_IN_LIDAR = np.eye(4) # ARUCO -> LIDAR
+        ARUCO_POS_IN_LIDAR = np.mean(aruco_depth_points, axis=0)
+
+        ARUCO_POSE_IN_LIDAR[:3,:3] = ARUCO_ROT_IN_LIDAR
+        ARUCO_POSE_IN_LIDAR[:3, 3] = ARUCO_POS_IN_LIDAR
+        print("ARUCO TARGET POSE IN LIDAR FRAME: \n\n", ARUCO_POSE_IN_LIDAR)
+
+        # Compute inverse analytically
+        LIDAR_POSE_IN_ARUCO = np.eye(4)
+        LIDAR_POSE_IN_ARUCO[:3,:3] = ARUCO_ROT_IN_LIDAR.T
+        LIDAR_POSE_IN_ARUCO[:3, 3] = (-ARUCO_ROT_IN_LIDAR.T @ np.c_[ARUCO_POS_IN_LIDAR]).T[:]
 
         # Finally, find: world^T_lidar = world^T_aruco * (lidar^T_aruco)^-1
+        LIDAR_POSE_IN_WORLD = ARUCO_POSE_IN_WORLD @ LIDAR_POSE_IN_ARUCO
 
-        return #translation and rotation matricies for center lidar in world frame
+        print("LIDAR POSE IN WORLD (Lidar -> World) : \n\n", LIDAR_POSE_IN_WORLD)
+
+        return LIDAR_POSE_IN_WORLD
 
     def _detect_calibration_plate(self):
         # RH: optional, may be nice to have. Should find corners of plate and store these on the object
