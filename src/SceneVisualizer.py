@@ -185,7 +185,10 @@ if __name__ == '__main__':
     # Lidar
     lidar_pose = np.eye(4)
     # translate to (0,0,5)
-    lidar_pose[0:3, 3] = np.array([0, 2.1, 0])
+    lidar_pose[0:3, 0] = np.array([0.80778813 , -0.01618329, -0.58925074 ])
+    lidar_pose[0:3, 1] = np.array([-0.58921483, 0.00741073, -0.80794243 ])
+    lidar_pose[0:3, 2] = np.array([ 0.01744194, 0.99984158 , -0.00354913  ])
+    lidar_pose[0:3, 3] = np.array([-0.32536598, 2.34371088, -0.76987012])
 
     # rotate +90° about X so that +Z maps to -Y
     lidar_rot = R.from_euler('x', 90, degrees=True).as_matrix()
