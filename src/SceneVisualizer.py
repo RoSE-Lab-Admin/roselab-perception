@@ -219,7 +219,7 @@ if __name__ == '__main__':
     h = 5.0
 
     # Parse metadata for the four OptiTrack cameras
-    metadata_file = 'test.csv'
+    metadata_file = 'data/test.csv'
     positions, rotations = _parse_metadata(metadata_file)
     # Add a CameraPose for each parsed sensor
     for pos, quat in zip(positions, rotations):
