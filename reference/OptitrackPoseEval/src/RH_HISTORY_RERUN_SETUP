@@ -1,0 +1,1000 @@
+ 1075  cd ../VO-SLAM/
+ 1076  ls
+ 1077  ls src/
+ 1078  clear
+ 1079  cp include/ ../robotic-mapping/code/cpp/competition/include/
+ 1080  cp -r include/ ../robotic-mapping/code/cpp/competition/include/
+ 1081  cp -r src/ ../robotic-mapping/code/cpp/competition/src/
+ 1082  cat CMakeLists.txt
+ 1083  ls src/
+ 1084  clear
+ 1085  cd ..
+ 1086  cd robotic-mapping/
+ 1087  git status
+ 1088  git add code/cpp/competition/**
+ 1089  git status
+ 1090  git add code/cpp/competition/src/
+ 1091  git add code/cpp/competition/include/
+ 1092  clear
+ 1093  git commit -m "working integrated code with Kavehs"
+ 1094  git status 
+ 1095  git add code/cpp/competition/CMakeLists.txt 
+ 1096  git commit -m "lol there ya go"
+ 1097  git push
+ 1098  ls
+ 1099  ls ../HW4
+ 1100  ls ../../../num_opt_project/
+ 1101  cat ../../../num_opt_project/RH_git_push_setup 
+ 1102  git push --set-upstream origin ryan
+ 1103  git remote origin show
+ 1104  git remote show origin
+ 1105  git remote add ssh git@github.com:RyanHartzell/robotic-mapping.git
+ 1106  git remote show origin
+ 1107  git remote show ssh
+ 1108  git push
+ 1109  git push ssh
+ 1110  clear
+ 1111  ls
+ 1112  clear
+ 1113  git status
+ 1114  git add code/cpp/competition/src/
+ 1115  git commit -m "stable! submission"
+ 1116  git push
+ 1117  git push ssh
+ 1118  cleaer
+ 1119  clear
+ 1120  cd ..
+ 1121  clear
+ 1122  ls
+ 1123  cd robotic-mapping/
+ 1124  ls
+ 1125  clear
+ 1126  ls
+ 1127  cd code/
+ 1128  ls
+ 1129  cd ../..
+ 1130  cd ../../num_opt_project/
+ 1131  ls
+ 1132  cd ..
+ 1133  cd num_ws
+ 1134  ls
+ 1135  cd num_opt_project/
+ 1136  git status
+ 1137  git commit -a -m "Integration work almost done, debugging switch statement"
+ 1138  git push
+ 1139  clear
+ 1140  ls
+ 1141  clear
+ 1142  cd ..
+ 1143  cd build/
+ 1144  ls
+ 1145  clear
+ 1146  cd ..
+ 1147  cd build/bern_traj/
+ 1148  ls
+ 1149  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=0
+ 1150  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1151  clear
+ 1152  cd ../..
+ 1153  nano RH_HOWTO
+ 1154  clear
+ 1155  nano num_opt_project/bern_traj/src/trajectory_manager.cpp
+ 1156  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp 
+ 1157  history | grep colcon 
+ 1158  colcon build --symlink-install
+ 1159  source install/setup.bash 
+ 1160  cd build/bern_traj/
+ 1161  ls
+ 1162  clear
+ 1163  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=0
+ 1164  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1165  nano ../../num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1166  nano ../../num_opt_project/bern_traj/include/bern_traj/bernstein_trajectory.hpp 
+ 1167  nano ../../num_opt_project/bern_traj/include/bern_traj/trajectory_manager.hpp 
+ 1168  cd ../..
+ 1169  colcon build --symlink-install
+ 1170  source install/setup.bash 
+ 1171  cd build/bern_traj/
+ 1172  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=0
+ 1173  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1174  git commit -a -m "Switch statement not working and I'm too brain dead to debug it clearly. OSQP no matter what - think it's an issue with the shared pointer currentTrajectory on the trajectory manager class. Looks like for a single trajectory we hit the constructor for Bernstein twice???"
+ 1175  git push
+ 1176  cd ../../num_opt_project/
+ 1177  git commit -a -m "Switch statement not working and I'm too brain dead to debug it clearly. OSQP no matter what - think it's an issue with the shared pointer currentTrajectory on the trajectory manager class. Looks like for a single trajectory we hit the constructor for Bernstein twice???"
+ 1178  git push
+ 1179  cd ..
+ 1180  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1181  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1182  cd num_opt_project/bern_traj/config/
+ 1183  ls
+ 1184  git status
+ 1185  git add single_traj_params.yaml 
+ 1186  cd ../../..
+ 1187  cd num_opt_project/
+ 1188  ls
+ 1189  git status
+ 1190  git commit -m "single agent test params yaml file"
+ 1191  git push
+ 1192  clear
+ 1193  nano bern_traj/src/bernstein_trajectory.cpp 
+ 1194  nano bern_traj/include/bern_traj/bernstein_trajectory.hpp 
+ 1195  nano bern_traj/include/bern_traj/trajectory_manager.hpp 
+ 1196  cd ..
+ 1197  colcon build --symlink-install
+ 1198  source install/setup.bash 
+ 1199  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file ../../num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1200  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1201  cd build/
+ 1202  ls
+ 1203  cd bern_traj/
+ 1204  ls
+ 1205  cd ../../
+ 1206  ls data
+ 1207  mv data/ data_dqp_test_single_agent/
+ 1208  ls
+ 1209  clear
+ 1210  cat data_dqp_test_single_agent/waypoints_robot_0.txt 
+ 1211  cat data_dqp_test_single_agent/obstacles.txt 
+ 1212  cat data_dqp_test_single_agent/position_data_robot_0.txt 
+ 1213  clear
+ 1214  cd num_opt_project/
+ 1215  ls
+ 1216  clear
+ 1217  nano bern_traj/src/bernstein_trajectory.cpp
+ 1218  cd ..
+ 1219  clear
+ 1220  colcon build --symlink-install
+ 1221  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1222  colcon build --symlink-install
+ 1223  source install/setup.bash 
+ 1224  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1225  cat data/position_data_robot_0.txt 
+ 1226  clear
+ 1227  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1228  clear
+ 1229  colcon build --symlink-install
+ 1230  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1231  colcon build --symlink-install
+ 1232  source install/setup.bash 
+ 1233  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1234  clear
+ 1235  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1236  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1237  colcon build --symlink-install
+ 1238  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1239  colcon build --symlink-install
+ 1240  source install/setup.bash 
+ 1241  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1242  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1243  colcon build --symlink-install
+ 1244  source install/setup.bash 
+ 1245  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1246  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1247  nano num_opt_project/bern_traj/src/bernstein_trajectory.cpp
+ 1248  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1249  colcon build --symlink-install
+ 1250  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1251  colcon build --symlink-install
+ 1252  source install/setup.bash 
+ 1253  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1254  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1255  cd num_opt_project/
+ 1256  ls
+ 1257  clear
+ 1258  git commit -a -m "Integrated tristan's fix, currently debugging NaN issues."
+ 1259  git push
+ 1260  clear
+ 1261  cd ..
+ 1262  clear
+ 1263  nano num_opt_project/bern_traj/src/optimizer.cpp 
+ 1264  clear
+ 1265  colcon build --symlink-install
+ 1266  source install/setup.bash 
+ 1267  ros2 run bern_traj trajectory_manager_num_opt --ros-args --params-file num_opt_project/bern_traj/config/single_traj_params.yaml -p solverType:=1
+ 1268  clear
+ 1269  cd ../num_opt_project/
+ 1270  ls
+ 1271  git status
+ 1272  cd osqp/
+ 1273  git status
+ 1274  git restore -a
+ 1275  git restore
+ 1276  git restore include/ src/
+ 1277  clear
+ 1278  ls
+ 1279  clear
+ 1280  cd ..
+ 1281  mkdir build
+ 1282  cd build/
+ 1283  cmake ..
+ 1284  cd ..
+ 1285  ls
+ 1286  rm -rf build/
+ 1287  ls
+ 1288  cd bern_traj/
+ 1289  ls
+ 1290  clear
+ 1291  ls
+ 1292  cd build/
+ 1293  ls
+ 1294  cd ..
+ 1295  rm -rf build/
+ 1296  clear
+ 1297  mkdir build && cd build
+ 1298  cmake ..
+ 1299  make
+ 1300  ./dqp 3 12 12
+ 1301  clear
+ 1302  cd
+ 1303  cd -
+ 1304  clear
+ 1305  nano ../src/optimizer.cpp 
+ 1306  ./dqp 
+ 1307  ./dqp 3 12 12
+ 1308  ./dqp 1 12 12
+ 1309  ./dqp 3 3 12
+ 1310  ./dqp 3 9 9
+ 1311  ./dqp 3 9 7
+ 1312  ./dqp 3 7 9
+ 1313  ./dqp 3 9 7
+ 1314  nano ../src/optimizer.cpp 
+ 1315  nano ../include/bern_traj/optimizer.hpp 
+ 1316  nano ../src/optimizer.cpp 
+ 1317  nano ../include/bern_traj/optimizer.hpp 
+ 1318  clear
+ 1319  cmake ..
+ 1320  make
+ 1321  nano ../src/optimizer.cpp 
+ 1322  cmake ..
+ 1323  make
+ 1324  nano ../src/optimizer.cpp 
+ 1325  make
+ 1326  nano ../src/optimizer.cpp 
+ 1327  make
+ 1328  ./dqp 3 36 12 60 random_QP_toy_problem.csv
+ 1329  gdb dqp
+ 1330  nano ../CMakeLists.txt 
+ 1331  cmake -DCMAKE_BUILD_TYPE=Debug ..
+ 1332  make
+ 1333  gdp dqp
+ 1334  gdb dqp
+ 1335  nano ../src/optimizer.cpp 
+ 1336  make
+ 1337  gdb dqp
+ 1338  clear
+ 1339  nano ../src/optimizer.cpp 
+ 1340  make
+ 1341  ./dqp 3 36 12 60 data.csv
+ 1342  git commit -a -m "still failing on an indexing issue (or something dumb in the arguments because I'm literally brain dead."
+ 1343  git status
+ 1344  git push
+ 1345  git status
+ 1346  git diff
+ 1347  clear
+ 1348  git status
+ 1349  git diff ryan
+ 1350  clear
+ 1351  git push origin dqpmerge:ryan
+ 1352  clear
+ 1353  git checkout ryan
+ 1354  git pull
+ 1355  cmake ..
+ 1356  make
+ 1357  ./dqp 3 36 12 60 data.csv
+ 1358  clear
+ 1359  gdb dqp
+ 1360  ls
+ 1361  gdb dqp
+ 1362  nano ../src/optimizer.cpp 
+ 1363  make
+ 1364  gdb dqp
+ 1365  clear
+ 1366  nano ../src/optimizer.cpp 
+ 1367  make
+ 1368  gdb dqp
+ 1369  clear
+ 1370  nano ../src/optimizer.cpp 
+ 1371  make
+ 1372  gdb dqp
+ 1373  clear
+ 1374  nano ../src/optimizer.cpp 
+ 1375  make
+ 1376  nano ../src/optimizer.cpp 
+ 1377  make
+ 1378  gdb dqp
+ 1379  clear
+ 1380  nano ../src/optimizer.cpp 
+ 1381  clear
+ 1382  make
+ 1383  gdb dqp
+ 1384  clear
+ 1385  nano ../src/optimizer.cpp 
+ 1386  it commit -a -m "fixed the primal - did something dumb so the rows and columns weren't matching during matmul. now issue is another arithmetic thing regarding dual. I may have the wrong form for the residual..."
+ 1387  commit -a -m "fixed the primal - did something dumb so the rows and columns weren't matching during matmul. now issue is another arithmetic thing regarding dual. I may have the wrong form for the residual..."
+ 1388  git commit -a -m "fixed the primal - did something dumb so the rows and columns weren't matching during matmul. now issue is another arithmetic thing regarding dual. I may have the wrong form for the residual..."
+ 1389  git push
+ 1390  git status
+ 1391  git push
+ 1392  clear
+ 1393  ls
+ 1394  clear
+ 1395  cd
+ 1396  cd Projects/
+ 1397  ls
+ 1398  cd lemon-3d-scanner/
+ 1399  ls
+ 1400  git status
+ 1401  cd ..
+ 1402  clear
+ 1403  cd ..
+ 1404  ls
+ 1405  mkdir Research
+ 1406  clear
+ 1407  cd SLAM
+ 1408  cd Projects/SLAM/
+ 1409  ls
+ 1410  rm HW2_deliverable.zip
+ 1411  clear
+ 1412  ls
+ 1413  cat RYAN_LEMON_NOTES 
+ 1414  clear
+ 1415  ls
+ 1416  cd ..
+ 1417  clear
+ 1418  ls
+ 1419  clear
+ 1420  ls
+ 1421  cd num_ws
+ 1422  clear
+ 1423  ls
+ 1424  cd ..
+ 1425  cd num_opt_project/
+ 1426  ls
+ 1427  clear
+ 1428  ls
+ 1429  cd bern_traj/
+ 1430  cd build/
+ 1431  ls
+ 1432  ./dqp 3 12 12 60 out.csv
+ 1433  clear
+ 1434  nano ../src/optimizer.cpp 
+ 1435  make
+ 1436  ./dqp 3 12 12 60 out.csv
+ 1437  gdb dqp 
+ 1438  clear
+ 1439  nano ../src/optimizer.cpp 
+ 1440  make
+ 1441  ./dqp 3 12 12 60 out.csv
+ 1442  clear
+ 1443  ls
+ 1444  cat out.csv
+ 1445  nano ../src/optimizer.cpp 
+ 1446  ./dqp 3 36 12 60 out.csv
+ 1447  cat out.csv
+ 1448  nano ../src/optimizer.cpp 
+ 1449  make
+ 1450  nano ../src/optimizer.cpp 
+ 1451  make
+ 1452  ./dqp 3 36 12 60 out.csv
+ 1453  cat out.csv 
+ 1454  nano ../src/optimizer.cpp 
+ 1455  make
+ 1456  ./dqp 3 36 12 60 out.csv
+ 1457  cat out.csv 
+ 1458  nano ../src/optimizer.cpp 
+ 1459  make
+ 1460  ./dqp 3 36 12 60 out.csv
+ 1461  cat out.csv 
+ 1462  nano ../src/optimizer.cpp 
+ 1463  make
+ 1464  ./dqp 3 36 12 60 out.csv
+ 1465  cat out.csv 
+ 1466  nano ../src/optimizer.cpp 
+ 1467  make
+ 1468  ./dqp 3 36 12 60 out.csv
+ 1469  cat out.csv 
+ 1470  nano ../src/optimizer.cpp 
+ 1471  make
+ 1472  ./dqp 3 36 12 60 out.csv
+ 1473  cat out.csv 
+ 1474  nano ../src/optimizer.cpp 
+ 1475  make
+ 1476  ./dqp 3 36 12 60 out.csv
+ 1477  cat out.csv 
+ 1478  nano ../src/optimizer.cpp 
+ 1479  make
+ 1480  ./dqp 3 36 12 60 out.csv
+ 1481  cat out.csv 
+ 1482  nano ../src/optimizer.cpp 
+ 1483  make
+ 1484  nano ../src/optimizer.cpp 
+ 1485  make
+ 1486  ./dqp 3 36 12 60 out.csv
+ 1487  ./dqp 3 36 12 60 1 1 1 out.csv
+ 1488  cat out.csv 
+ 1489  ./dqp 3 36 12 60 1.1 1 1 out.csv
+ 1490  cat out.csv 
+ 1491  ./dqp 3 36 12 60 1.1 0.3 0.99 out.csv
+ 1492  cat out.csv 
+ 1493  ./dqp 3 36 12 60 1 0.3 0.99 out.csv
+ 1494  cat out.csv 
+ 1495  ./dqp 3 36 12 60 1.1 1 1 out.csv
+ 1496  cat out.csv 
+ 1497  ./dqp 3 36 12 60 1 1 1 out.csv
+ 1498  cat out.csv 
+ 1499  clear
+ 1500  nano ../src/optimizer.cpp 
+ 1501  make
+ 1502  nano ../src/optimizer.cpp 
+ 1503  make
+ 1504  ./dqp 3 36 12 60 1 1 1 out2.csv
+ 1505  nano ../src/optimizer.cpp 
+ 1506  ./dqp 3 36 12 60 1 1 1 out.csv
+ 1507  ./dqp 3 36 12 60 1 1 1 10 out.csv
+ 1508  cat out.csv
+ 1509  ./dqp 3 36 12 60 0.5 0.5 0.5 10 out.csv
+ 1510  cat out.csv
+ 1511  nano ../src/optimizer.cpp 
+ 1512  make
+ 1513  ./dqp 3 36 12 60 0.5 0.5 0.5 10 out.csv
+ 1514  cat out.csv
+ 1515  clear
+ 1516  cd ../..
+ 1517  ls
+ 1518  clear
+ 1519  git status
+ 1520  git commit -a -m "Working dqp executable. Generates global results in csv file."
+ 1521  git push
+ 1522  clear
+ 1523  cd ..
+ 1524  ls
+ 1525  cd lemon-3d-scanner/
+ 1526  ls
+ 1527  git status
+ 1528  git pull
+ 1529  git fetch
+ 1530  git diff
+ 1531  git commit -a -m "minor setup script changes"
+ 1532  git push
+ 1533  git pull
+ 1534  git status
+ 1535  git pull origin/main
+ 1536  git pull origin main
+ 1537  git pull rebase origin main
+ 1538  git pull --help
+ 1539  git pull -r
+ 1540  git status
+ 1541  cd
+ 1542  cd Projects/
+ 1543  rm -rf lemon-3d-scanner/
+ 1544  clear
+ 1545  git clone git@github.com:RyanHartzell/lemon-3d-scanner.git
+ 1546  ls
+ 1547  cd lemon-3d-scanner/
+ 1548  ls
+ 1549  clear
+ 1550  mkdir docs
+ 1551  cd docs
+ 1552  touch index.html
+ 1553  clear
+ 1554  mkdir assets
+ 1555  mkdir scripts
+ 1556  ls
+ 1557  cd assets/
+ 1558  nano style.css
+ 1559  clear
+ 1560  cd ..
+ 1561  nano index.html
+ 1562  nano style.css
+ 1563  nano styles.css
+ 1564  rm style.css 
+ 1565  cd assets/
+ 1566  ls
+ 1567  nano style.css 
+ 1568  cd ..
+ 1569  nano index.html
+ 1570  nano assets/style.css 
+ 1571  nano index.html
+ 1572  nano assets/style.css 
+ 1573  nano index.html
+ 1574  nano assets/style.css 
+ 1575  nano index.html
+ 1576  nano assets/style.css 
+ 1577  nano index.html
+ 1578  nano assets/style.css 
+ 1579  nano index.html
+ 1580  nano assets/style.css 
+ 1581  nano index.html
+ 1582  nano assets/style.css 
+ 1583  nano index.html
+ 1584  nano assets/style.css 
+ 1585  nano index.html
+ 1586  nano assets/style.css 
+ 1587  nano index.html
+ 1588  cd
+ 1589  clear
+ 1590  sudo apt install linux-tools-generic hwdata
+ 1591  sudo apt-get update
+ 1592  sudo apt install linux-tools-generic hwdata
+ 1593  clear
+ 1594  ls
+ 1595  uname -a
+ 1596  lsusb
+ 1597  clear
+ 1598  conda deactivate
+ 1599  clear
+ 1600  lsusb
+ 1601  usbipd
+ 1602  clear
+ 1603  uname -a
+ 1604  usbip
+ 1605  clear
+ 1606  sudo apt install usbutils
+ 1607  usb-devices --help
+ 1608  clear
+ 1609  ls
+ 1610  ls -la
+ 1611  ls /etc/udev/rules.d/
+ 1612  cat /etc/udev/rules.d/99-realsense-libusb.rules
+ 1613  sudo lsusb
+ 1614  clear
+ 1615  sudo udevadm control --reload
+ 1616  sudo service udev restart
+ 1617  sudo udevadm control --reload
+ 1618  clear
+ 1619  lsusb
+ 1620  clear
+ 1621  conda deactivate
+ 1622  clear
+ 1623  ls
+ 1624  cd Projects/
+ 1625  ls
+ 1626  mkdir GP_Playground
+ 1627  ls
+ 1628  cd GP_Playground/
+ 1629  ls
+ 1630  clear
+ 1631  conda env create -n gpenv python="3.12" numpy scipy sklearn matplotlib gpytorch
+ 1632  conda create -n gpenv python="3.12" numpy scipy sklearn matplotlib gpytorch
+ 1633  conda create -n gpenv python="3.12" -c conda-forge numpy scipy sklearn matplotlib gpytorch
+ 1634  conda create -n gpenv -c conda-forge python="3.12" numpy scipy sklearn matplotlib gpytorch
+ 1635  conda create -n gpenv -c conda-forge python="3.12" numpy scipy scikit-learn matplotlib gpytorch
+ 1636  clear
+ 1637  python
+ 1638  clear
+ 1639  ls
+ 1640  nano surface_reconstruction_gp.py
+ 1641  python surface_reconstruction_gp.py
+ 1642  nano surface_reconstruction_gp.py
+ 1643  python surface_reconstruction_gp.py
+ 1644  nano surface_reconstruction_gp.py
+ 1645  python surface_reconstruction_gp.py
+ 1646  nano surface_reconstruction_gp.py
+ 1647  python surface_reconstruction_gp.py
+ 1648  nano surface_reconstruction_gp.py
+ 1649  python surface_reconstruction_gp.py
+ 1650  nano surface_reconstruction_gp.py
+ 1651  python surface_reconstruction_gp.py
+ 1652  nano surface_reconstruction_gp.py
+ 1653  python surface_reconstruction_gp.py
+ 1654  nano surface_reconstruction_gp.py
+ 1655  python surface_reconstruction_gp.py
+ 1656  python
+ 1657  clear
+ 1658  nano surface_reconstruction_gp.py
+ 1659  python surface_reconstruction_gp.py
+ 1660  nano surface_reconstruction_gp.py
+ 1661  python surface_reconstruction_gp.py
+ 1662  nano surface_reconstruction_gp.py
+ 1663  python surface_reconstruction_gp.py
+ 1664  nano surface_reconstruction_gp.py
+ 1665  python surface_reconstruction_gp.py
+ 1666  nano surface_reconstruction_gp.py
+ 1667  python surface_reconstruction_gp.py
+ 1668  nano surface_reconstruction_gp.py
+ 1669  python surface_reconstruction_gp.py
+ 1670  nano surface_reconstruction_gp.py
+ 1671  python surface_reconstruction_gp.py
+ 1672  nano surface_reconstruction_gp.py
+ 1673  python surface_reconstruction_gp.py
+ 1674  nano surface_reconstruction_gp.py
+ 1675  python surface_reconstruction_gp.py
+ 1676  nano surface_reconstruction_gp.py
+ 1677  python surface_reconstruction_gp.py
+ 1678  nano surface_reconstruction_gp.py
+ 1679  python surface_reconstruction_gp.py
+ 1680  nano surface_reconstruction_gp.py
+ 1681  python surface_reconstruction_gp.py
+ 1682  nano surface_reconstruction_gp.py
+ 1683  python surface_reconstruction_gp.py
+ 1684  nano surface_reconstruction_gp.py
+ 1685  python surface_reconstruction_gp.py
+ 1686  nano surface_reconstruction_gp.py
+ 1687  python
+ 1688  python surface_reconstruction_gp.py
+ 1689  nano surface_reconstruction_gp.py
+ 1690  python surface_reconstruction_gp.py
+ 1691  nano surface_reconstruction_gp.py
+ 1692  python surface_reconstruction_gp.py
+ 1693  nano surface_reconstruction_gp.py
+ 1694  python surface_reconstruction_gp.py
+ 1695  nano surface_reconstruction_gp.py
+ 1696  python surface_reconstruction_gp.py
+ 1697  nano surface_reconstruction_gp.py
+ 1698  python surface_reconstruction_gp.py
+ 1699  nano surface_reconstruction_gp.py
+ 1700  python surface_reconstruction_gp.py
+ 1701  nano surface_reconstruction_gp.py
+ 1702  python surface_reconstruction_gp.py
+ 1703  nano surface_reconstruction_gp.py
+ 1704  python surface_reconstruction_gp.py
+ 1705  ls
+ 1706  clear
+ 1707  python surface_reconstruction_gp.py
+ 1708  nano surface_reconstruction_gp.py
+ 1709  python surface_reconstruction_gp.py
+ 1710  nano surface_reconstruction_gp.py
+ 1711  python surface_reconstruction_gp.py
+ 1712  nano surface_reconstruction_gp.py
+ 1713  python surface_reconstruction_gp.py
+ 1714  nano surface_reconstruction_gp.py
+ 1715  python surface_reconstruction_gp.py
+ 1716  nano surface_reconstruction_gp.py
+ 1717  python surface_reconstruction_gp.py
+ 1718  nano surface_reconstruction_gp.py
+ 1719  python surface_reconstruction_gp.py
+ 1720  nano surface_reconstruction_gp.py
+ 1721  python surface_reconstruction_gp.py
+ 1722  nano surface_reconstruction_gp.py
+ 1723  python surface_reconstruction_gp.py
+ 1724  nano surface_reconstruction_gp.py
+ 1725  python surface_reconstruction_gp.py
+ 1726  nano surface_reconstruction_gp.py
+ 1727  python surface_reconstruction_gp.py
+ 1728  nano surface_reconstruction_gp.py
+ 1729  python surface_reconstruction_gp.py
+ 1730  clear
+ 1731  cd ..
+ 1732  ls
+ 1733  conda deactivate
+ 1734  clear
+ 1735  ls
+ 1736  cd lemon-3d-scanner/
+ 1737  ls
+ 1738  cd scripts/
+ 1739  ls
+ 1740  cd ..
+ 1741  clear
+ 1742  ls
+ 1743  mkdir src
+ 1744  ls
+ 1745  cd src
+ 1746  mkdir python
+ 1747  mkdir cpp
+ 1748  clear
+ 1749  uname
+ 1750  clear
+ 1751  conda deactivate
+ 1752  clear
+ 1753  ls
+ 1754  cd Research/
+ 1755  ls
+ 1756  cd ..
+ 1757  cd Projects/
+ 1758  ls
+ 1759  cd SLAM/
+ 1760  ls
+ 1761  cd WSL2-Linux-Kernel-linux-msft-wsl-5.15.167.4/
+ 1762  ls
+ 1763  clear
+ 1764  cd ..
+ 1765  clear
+ 1766  ls
+ 1767  cd HW2
+ 1768  ls
+ 1769  clear
+ 1770  ls
+ 1771  cd triangulation/
+ 1772  ls
+ 1773  ls -lhr
+ 1774  ls -lhR
+ 1775  clear
+ 1776  ls
+ 1777  cd build/
+ 1778  ls
+ 1779  ./triangulation
+ 1780  clear
+ 1781  cd ../..
+ 1782  cd calib/
+ 1783  ls
+ 1784  cat README
+ 1785  clear
+ 1786  cd build/
+ 1787  ls
+ 1788  cd ..
+ 1789  clear
+ 1790  cat src/calib.cpp
+ 1791  clear
+ 1792  cd ..
+ 1793  ls
+ 1794  clear
+ 1795  cd ..
+ 1796  ls
+ 1797  clear
+ 1798  cd HW1/
+ 1799  ls
+ 1800  clear
+ 1801  cd ..
+ 1802  ls
+ 1803  cd HW2_deliverable/
+ 1804  ls
+ 1805  cat README
+ 1806  clear
+ 1807  cd ../..
+ 1808  ls
+ 1809  cd SLAM/
+ 1810  ls
+ 1811  cd HW4/
+ 1812  ls
+ 1813  cd ros_ws/
+ 1814  ls
+ 1815  git status
+ 1816  clear
+ 1817  ls
+ 1818  cd src/
+ 1819  ls
+ 1820  cd li_slam_ros2/
+ 1821  ls
+ 1822  cat README.md
+ 1823  clear
+ 1824  cd ..
+ 1825  ls
+ 1826  cd ../..
+ 1827  ls
+ 1828  cd robotic-mapping/
+ 1829  ls
+ 1830  clear
+ 1831  cd ../../..
+ 1832  ls
+ 1833  clear
+ 1834  cd ..
+ 1835  ls
+ 1836  cd Research/
+ 1837  ls
+ 1838  nano IDEAS
+ 1839  clear
+ 1840  hostname -I
+ 1841  clear
+ 1842  hostname -I
+ 1843  conda deactivate
+ 1844  cd Research/
+ 1845  ls
+ 1846  cd ../
+ 1847  cd Projects/
+ 1848  ls
+ 1849  cd GP_Playground/
+ 1850  ls
+ 1851  conda env list
+ 1852  conda activate gpenv
+ 1853  python surface_reconstruction_gp.py
+ 1854  clear
+ 1855  conda env list
+ 1856  conda activate dpvo
+ 1857  conda list
+ 1858  conda deactivate
+ 1859  conda activate gpenv
+ 1860  conda list
+ 1861  conda deactivate
+ 1862  ls
+ 1863  cd Research/
+ 1864  ls
+ 1865  mkdir Segmentation
+ 1866  ls
+ 1867  cd Segmentation/
+ 1868  clear
+ 1869  conda create -n 3dseg python="3.11" numpy scipy matplotlib open3d
+ 1870  conda create -n 3dseg -c open3d-admin python="3.11" numpy scipy matplotlib open3d-ml
+ 1871  clear
+ 1872  conda create -n 3dseg python="3.11" numpy scipy matplotlib
+ 1873  conda activate 3dseg
+ 1874  clear
+ 1875  pip install open3d
+ 1876  echo --extra-index-url https://download.pytorch.org/whl/cpu/
+ 1877  torch==2.2.2+cpu ; sys_platform != 'darwin'
+ 1878  torchvision==0.17.2+cpu ; sys_platform != 'darwin'
+ 1879  torch==2.2.2 ; sys_platform == 'darwin'
+ 1880  torchvision==0.17.2 ; sys_platform == 'darwin'
+ 1881  tensorboard > requirements-open3d-ml.txt
+ 1882  echo "--extra-index-url https://download.pytorch.org/whl/cpu/
+ 1883  torch==2.2.2+cpu ; sys_platform != 'darwin'
+ 1884  torchvision==0.17.2+cpu ; sys_platform != 'darwin'
+ 1885  torch==2.2.2 ; sys_platform == 'darwin'
+ 1886  torchvision==0.17.2 ; sys_platform == 'darwin'
+ 1887  tensorboard" > req-o3d-ml.txt
+ 1888  pip install -r req-o3d-ml.txt
+ 1889  clear
+ 1890  conda list
+ 1891  cear
+ 1892  clear
+ 1893  ls
+ 1894  mkdir src
+ 1895  ls
+ 1896  cd src/
+ 1897  ls
+ 1898  nano seg.py
+ 1899  nano config.txt
+ 1900  nano seg.py 
+ 1901  cp /mnt/c/Users/rhart/Documents/Research/Data/lunarbed_filtered_strong.ply .
+ 1902  ls
+ 1903  mv lunarbed_filtered_strong.ply test.ply
+ 1904  ls
+ 1905  clear
+ 1906  python seg.py
+ 1907  nano seg.py 
+ 1908  mv config.txt config.yml
+ 1909  python seg.py
+ 1910  nano seg.py 
+ 1911  python seg.py
+ 1912  nano seg.py 
+ 1913  python seg.py
+ 1914  nano seg.py 
+ 1915  python seg.py
+ 1916  nano seg.py 
+ 1917  python seg.py
+ 1918  conda uninstall numpy
+ 1919  pip install open3d
+ 1920  clear
+ 1921  conda list
+ 1922  clear
+ 1923  python seg.py 
+ 1924  conda list
+ 1925  conda uninstall numpy
+ 1926  pip uninstall numpy
+ 1927  clear
+ 1928  pip install numpy<2
+ 1929  pip install numpy<=2.0
+ 1930  pip install numpy==1.26.4
+ 1931  clear
+ 1932  python seg.py 
+ 1933  nano seg.py 
+ 1934  python seg.py 
+ 1935  nano seg.py 
+ 1936  python seg.py 
+ 1937  nano seg.py 
+ 1938  python seg.py 
+ 1939  nano seg.py 
+ 1940  python seg.py 
+ 1941  xeyes
+ 1942  glxgears
+ 1943  evn | grep LIBGL
+ 1944  env | grep LIBGL
+ 1945  env | grep GL
+ 1946  clear
+ 1947  sudo xhost+
+ 1948  sudo xhost +
+ 1949  python seg.py 
+ 1950  clear
+ 1951  cd
+ 1952  sudo apt install libglfw3
+ 1953  glxinfo
+ 1954  clear
+ 1955  echo $DISPLAY
+ 1956  clear
+ 1957  cd Documents/
+ 1958  ls
+ 1959  cd ..
+ 1960  cd Research/
+ 1961  ls
+ 1962  cd Segmentation/
+ 1963  ls
+ 1964  cd src/
+ 1965  ls
+ 1966  python seg.py 
+ 1967  export LIBGL_ALWAYS_SOFTWARE=1
+ 1968  python seg.py 
+ 1969  clear
+ 1970  sudo apt install libgl1-mesa-dri
+ 1971  sudo apt install --reinstall libgl1-mesa-glx libgl1-mesa-dri
+ 1972  clear
+ 1973  glxgears
+ 1974  clear
+ 1975  python seg.py 
+ 1976  export XDG_SESSION_TYPE=x11
+ 1977  python seg.py 
+ 1978  conda install -c conda-forge libstdcxx-ng
+ 1979  clear
+ 1980  python seg.py 
+ 1981  nano seg.py
+ 1982  python seg.py 
+ 1983  nano seg.py
+ 1984  python seg.py 
+ 1985  cd ../..
+ 1986  ls
+ 1987  mkdir OptitrackPoseEval
+ 1988  ls
+ 1989  cd OptitrackPoseEval/
+ 1990  cp /mnt/c/Users/rhart/Downloads/Take\ 2025-06-05\ 12.35.51\ PM.tak data.tak
+ 1991  clear
+ 1992  ls
+ 1993  conda deactivate
+ 1994  conda list
+ 1995  conda env list
+ 1996  nano README
+ 1997  clear
+ 1998  ls
+ 1999  conda deactivate
+ 2000  cd Research/
+ 2001  sl
+ 2002  ls
+ 2003  cd OptitrackPoseEval/
+ 2004  ls
+ 2005  clear
+ 2006  ls
+ 2007  rm data.tak 
+ 2008  clear
+ 2009  cat README 
+ 2010  clear
+ 2011  ls
+ 2012  mkdir src
+ 2013  ls
+ 2014  clear
+ 2015  ls
+ 2016  conda envs list
+ 2017  conda env list
+ 2018  cd ros_lisam
+ 2019  ls
+ 2020  clear
+ 2021  cd src/
+ 2022  clear
+ 2023  ls
+ 2024  conda create -n optitrack_pose python="3.11" numpy scipy matplotlib rigid_body_motion rerun_sdk
+ 2025  conda create -n optitrack_pose -c phausamann -c conda-forge  python="3.11" numpy scipy matplotlib rigid_body_motion rerun_sdk
+ 2026  clear
+ 2027  conda create -n optitrack_pose python="3.11" numpy scipy matplotlib
+ 2028  conda activate optitrack_pose
+ 2029  pip install rerun_sdk rigid_body_motion
+ 2030  clear
+ 2031  ls
+ 2032  nano parser.py
+ 2033  mv parser.py eval.py
+ 2034  clear
+ 2035  ls
+ 2036  cp /mnt/c/Users/rhart/Downloads/Take\ 2025-06-05\ 12.35.51\ PM\ DemoDayPoseUncertainty.csv pose_data.csv
+ 2037  ls
+ 2038  clear
+ 2039  cat pose_data.csv 
+ 2040  clear
+ 2041  python eval.py pose_data.csv
+ 2042  nano eval.py 
+ 2043  python eval.py pose_data.csv
+ 2044  head pose_data.csv
+ 2045  nano eval.py
+ 2046  python eval.py pose_data.csv
+ 2047  nano eval.py
+ 2048  python eval.py pose_data.csv
+ 2049  nano eval.py
+ 2050  python eval.py pose_data.csv
+ 2051  nano eval.py
+ 2052  python eval.py pose_data.csv
+ 2053  nano eval.py
+ 2054  python eval.py pose_data.csv
+ 2055  nano eval.py
+ 2056  python eval.py pose_data.csv
+ 2057  nano eval.py
+ 2058  python eval.py pose_data.csv
+ 2059  nano eval.py
+ 2060  python eval.py pose_data.csv
+ 2061  nano eval.py
+ 2062  python
+ 2063  clear
+ 2064  nano eval.py
+ 2065  python eval.py pose_data.csv
+ 2066  sudo apt-get -y install     libclang-dev     libatk-bridge2.0     libfontconfig1-dev     libfreetype6-dev     libglib2.0-dev     libgtk-3-dev     libssl-dev     libxcb-render0-dev     libxcb-shape0-dev     libxcb-xfixes0-dev     libxkbcommon-dev     patchelf
+ 2067  clear
+ 2068  python eval.py pose_data.csv
+ 2069  sudo add-apt-repository ppa:kisak/kisak-mesa
+ 2070  sudo apt-get update
+ 2071  sudo apt-get install -y mesa-vulkan-drivers
+ 2072  python eval.py pose_data.csv
+ 2073  WAYLAND_DISPLAY= python eval.py pose_data.csv
+ 2074  history > RH_HISTORY_RERUN_SETUP

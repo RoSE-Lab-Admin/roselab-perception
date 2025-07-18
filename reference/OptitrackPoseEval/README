@@ -1,0 +1,9 @@
+This module allows users to process a single rigid body's worth of pose information from Motive.
+
+Minimal example for running both the pose graph visualization in rerun and generating and displaying a heatmap of error projected onto rover trajectory.
+==================================================================
+Follow rerun installation instructions here () if running on WSL.
+Unsetting the WAYLAND_DISPLAY environment variable is important to allow graphics to be displayed via rerun.
+
+
+WAYLAND_DISPLAY= python eval.py pose_data.csv metadata.csv -a
