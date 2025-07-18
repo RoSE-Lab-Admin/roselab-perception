@@ -3,7 +3,7 @@ import numpy as np
 import os
 import copy
 from scipy.spatial.transform import Rotation as R
-
+from typing import Optional
 
 def _parse_metadata(fname):
     """
@@ -74,38 +74,45 @@ class CameraPose(PoseObject):
     """
     A camera frustum represented as a LineSet, positioned by pose.
     """
-    def __init__(self, pose: np.ndarray, scale: float = 0.1, color=(1.0, 0.0, 0.0)):
+    def __init__(self,
+                 pose: np.ndarray,
+                 scale: float = 1.0,
+                 color: tuple = (1.0, 0.0, 0.0)):
         super().__init__(pose)
         self.scale = scale
         self.color = color
 
     def get_geometry(self) -> o3d.geometry.LineSet:
+        # Define frustum: apex at origin, base square at z = scale
         apex = np.array([0.0, 0.0, 0.0])
+        half = self.scale
         corners = np.array([
-            [ self.scale,  self.scale,  self.scale],
-            [ self.scale, -self.scale,  self.scale],
-            [-self.scale, -self.scale,  self.scale],
-            [-self.scale,  self.scale,  self.scale]
+            [ half,  half,  half],
+            [ half, -half,  half],
+            [-half, -half,  half],
+            [-half,  half,  half]
         ])
-        points = np.vstack([apex, corners])
-
-        # Lines: camera center to each corner, plus base edges
-        lines = [[0, i] for i in range(1, 5)] + [[1, 2], [2, 3], [3, 4], [4, 1]]
-        colors = [list(self.color) for _ in lines]
-
-        frustum = o3d.geometry.LineSet(
-            points=o3d.utility.Vector3dVector(points),
+        pts = np.vstack([apex, corners])
+        # Lines: apex to corners, and perimeter of base
+        lines = [[0, i] for i in range(1, 5)] + [[1,2], [2,3], [3,4], [4,1]]
+        colors = [self.color for _ in lines]
+        ls = o3d.geometry.LineSet(
+            points=o3d.utility.Vector3dVector(pts),
             lines=o3d.utility.Vector2iVector(lines)
         )
-        frustum.colors = o3d.utility.Vector3dVector(colors)
-        return frustum
+        ls.colors = o3d.utility.Vector3dVector(colors)
+        return ls
 
 
-class PointCloud:
+
+class PointCloudPose(PoseObject):
     """
-    Wrapper for loading and storing a point cloud.
+    A point cloud with an associated pose.
     """
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, pose: Optional[np.ndarray] = None):
+        if pose is None:
+            pose = np.eye(4)
+        super().__init__(pose)
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Point cloud not found: {file_path}")
         self.pcd = o3d.io.read_point_cloud(file_path)
@@ -151,96 +158,43 @@ class SceneVisualizer:
             mesh_show_back_face=mesh_show_back_face
         )
 
-    # def visualize(self,
-    #               window_name: str = 'Scene',
-    #               width: int = 800,
-    #               height: int = 600,
-    #               mesh_show_back_face: bool = True):
-    #     """
-    #     Collect PoseObjects and PointClouds, add them to a custom Visualizer,
-    #     then set up camera to view the combined scene bounding box.
-    #     """
-    #     # Collect all geometries
-    #     geometries = []
-    #     for obj in self.objects:
-    #         if isinstance(obj, PoseObject):
-    #             geometries.append(obj.get_transformed_geometry())
-    #         elif isinstance(obj, PointCloud):
-    #             geometries.append(obj.get_geometry())
-    #         else:
-    #             raise TypeError(f"Unsupported object type: {type(obj)}")
-
-    #     # Initialize Visualizer
-    #     vis = o3d.visualization.Visualizer()
-    #     vis.create_window(window_name=window_name, width=width, height=height)
-
-    #     # Add each geometry
-    #     for geom in geometries:
-    #         vis.add_geometry(geom)
-
-    #     # Compute combined bounding box to center the view
-    #     bboxes = [geom.get_axis_aligned_bounding_box() for geom in geometries]
-    #     combined_bbox = bboxes[0]
-    #     for bb in bboxes[1:]:
-    #         combined_bbox += bb
-    #     center = combined_bbox.get_center()
-
-    #     # Configure view control
-    #     ctr = vis.get_view_control()
-    #     ctr.set_lookat(center)
-    #     # Camera looks toward negative y by default
-    #     ctr.set_front([0.0, -1.0, 0.0])
-    #     ctr.set_up([0.0, 0.0, 1.0])
-    #     # Adjust zoom: smaller value zooms out
-    #     ctr.set_zoom(0.2)
-    #     # Adjust clipping planes
-    #     ctr.set_constant_z_near(0.00001)
-    #     ctr.set_constant_z_far(100000.0)
-
-    #     # Render options
-    #     render_opt = vis.get_render_option()
-    #     render_opt.mesh_show_back_face = mesh_show_back_face
-    #     render_opt.line_width = 2.0
-    #     render_opt.point_size = 2.0
-
-    #     # Run
-    #     vis.run()
-    #     vis.destroy_window()
-
 if __name__ == '__main__':
     # Instantiate scene visualizer
     scene = SceneVisualizer()
 
     # Center of the floor at origin
     floor_pose = np.eye(4)
-    scene.add(SimplePose(floor_pose, size=1.0))
-
-    # Cube half-size
-    h = 5.0
-
-    # Parse metadata for the four OptiTrack cameras
+    scene.add(SimplePose(floor_pose, size=0.5))
+   
+    # Parse OptiTrack metadata and add those cameras
     metadata_file = 'data/test.csv'
     positions, rotations = _parse_metadata(metadata_file)
-    # Add a CameraPose for each parsed sensor
+    flip_z = np.diag([1,1,-1])
     for pos, quat in zip(positions, rotations):
-        pose_mat = np.eye(4)
-        pose_mat[0:3, 3] = pos
-        rot_mat = R.from_quat(quat).as_matrix()
-        pose_mat[0:3, 0:3] = rot_mat
-        scene.add(CameraPose(pose_mat, scale=1.5, color=(0, 0, 1)))
+        pose = np.eye(4)
+        # position in meters
+        pose[0:3, 3] = pos
+        # original rotation
+        rot = R.from_quat(quat).as_matrix()
+        # apply flip to face frustum inward
+        rot_fixed = rot.dot(flip_z)
+        pose[0:3, 0:3] = rot_fixed
+        scene.add(CameraPose(pose, scale=0.5, color=(0, 0, 1)))
 
 
     # Lidar
     lidar_pose = np.eye(4)
     # translate to (0,0,5)
-    lidar_pose[0:3, 3] = np.array([0, 0, 5])
-    # rotate 180° about X to point down
-    lidar_pose[1,1] = -1
-    lidar_pose[2,2] = -1
-    scene.add(CameraPose(lidar_pose, scale=1.5, color=(1, 0, 0)))
+    lidar_pose[0:3, 3] = np.array([0, 2.1, 0])
 
-    # Add single point cloud
-    #scene.add(PointCloud('scene_cloud.ply'))
+    # rotate +90° about X so that +Z maps to -Y
+    lidar_rot = R.from_euler('x', 90, degrees=True).as_matrix()
+    lidar_pose[0:3, 0:3] = lidar_rot
+    scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
+
+    # Single point cloud with same transform as LiDAR
+    pointcloud_pose = lidar_pose
+    scene.add(PointCloudPose('data/out.ply', pose=pointcloud_pose))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
