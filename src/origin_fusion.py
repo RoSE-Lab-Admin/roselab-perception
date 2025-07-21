@@ -133,7 +133,7 @@ class StaticArucoToWorld(Node):
         translation = {
             'x': 0.070,  # meters from ArUco to world origin along X
             'y': -0.008, # meters along Y
-            'z': 0.14   # meters along Z
+            'z': -0.14   # meters along Z
         }
         rotation = { #Unknown
             'x': 0.0,   # quaternion x

@@ -133,6 +133,8 @@ def transform_lidar_to_world(pcd):
     lidar_pose[0:3, 3] = np.array([0.32536598, -2.34371088, 0.76987012]) #Translation
     pcd.transform(lidar_pose)
 
+    return pcd
+
 # RGBD to PointCloud Node
 class RGBDPointCloud(Node):
     def __init__(self):
