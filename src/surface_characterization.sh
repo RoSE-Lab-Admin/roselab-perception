@@ -34,6 +34,6 @@ python3 ~/roselab-perception/src/converter.py \
 # 4. Characterize the surface from the generated point cloud
 echo "Characterizing surface..."
 python3 ~/roselab-perception/src/characterize_surface.py \
-    "$calibration_path" + /out.ply 0 1 --local
+    "$calibration_path"/out.ply 0 1 --local
 
 echo "Pipeline completed successfully, closing."

@@ -7,6 +7,7 @@ import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 from tqdm import tqdm
 import cv2
 import numpy as np
@@ -92,6 +93,7 @@ if __name__=="__main__":
    MIN_Q = float(sys.argv[2])
    MAX_Q = float(sys.argv[3])
    MODE = sys.argv[4].lower()
+   bag_dir = os.path.dirname(fname) + os.sep
 
    pcd = o3d.io.read_point_cloud(fname)
 
@@ -165,10 +167,10 @@ if __name__=="__main__":
          sig_array[v['voxel_index']] = np.sqrt(v['var'])
          dem_array[v['voxel_index']] = v['centroid'][1]
 
-      cv2.imwrite('slope_angle.tif', slope_angle_array)
-      cv2.imwrite('count.tif', count_array)
-      cv2.imwrite('sig.tif', sig_array)
-      cv2.imwrite('dem.tif', dem_array)
+      cv2.imwrite(bag_dir+'slope_angle.tif', slope_angle_array)
+      cv2.imwrite(bag_dir+'count.tif', count_array)
+      cv2.imwrite(bag_dir+'sig.tif', sig_array)
+      cv2.imwrite(bag_dir+'dem.tif', dem_array)
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
       m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
