@@ -205,7 +205,7 @@ def main():
     bag_path = sys.argv[1]
     color_topic = sys.argv[2]
     depth_topic = sys.argv[3]
-    output_file = bag_path + sys.argv[4]
+    output_file = bag_path +"/"+ sys.argv[4]
 
     #points, colors = read_pointclouds_from_bag(bag_path, topic)
     rgbd_image = read_rgbd_from_bag(bag_path, depth_topic, color_topic)
