@@ -8,6 +8,7 @@
 set -euo pipefail
 
 # 1. Run the MLSS calibration for 10 seconds
+
 echo "Running gantry_services mlss_calibration..."
 ros2 run gantry_services mlss_calibration #--duration 10.0
 

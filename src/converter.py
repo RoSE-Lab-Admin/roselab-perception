@@ -123,6 +123,18 @@ def save_pcd_as_file(pcd, output_file):
         o3d.io.write_point_cloud(output_file, pcd)
     else:
         raise ValueError("Output file must end in .pcd or .ply")
+    
+def transform_lidar_to_world(pcd):
+    # Transform
+    # Lidar
+    lidar_pose = np.eye(4)
+    lidar_pose[0:3, 0] = np.array([0.80778813 , 0.01618329, 0.58925074 ])
+    lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
+    lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
+    lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
+    pcd.transform(lidar_pose)
+
+    return pcd
 
 # RGBD to PointCloud Node
 class RGBDPointCloud(Node):
@@ -198,6 +210,9 @@ def main():
     #points, colors = read_pointclouds_from_bag(bag_path, topic)
     rgbd_image = read_rgbd_from_bag(bag_path, depth_topic, color_topic)
     pcd = convert_rgbd_to_pointclouds(rgbd_image)
+
+    pcd = transform_lidar_to_world(pcd)
+
     print(f"Total points extracted: {len(pcd.points)}")
     #save_to_pcd_or_ply(points, colors, output_file)
     save_pcd_as_file(pcd, output_file)

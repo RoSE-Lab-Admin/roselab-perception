@@ -126,7 +126,7 @@ if __name__=="__main__":
       plt.show()
 
       # Z value distribution
-      plt.hist(pts[:,2], bins=500)
+      plt.hist(pts[:,1], bins=500)
       plt.show()
 
       RMSE = np.sqrt(np.sum(residuals**2) / len(residuals))
@@ -151,7 +151,7 @@ if __name__=="__main__":
 #         print(f"Plane normal: {v['normal']}")
 #         print(f"Covariance matrix:\n{v['covariance']}\n")
 
-      Z_UP = np.asarray([0,0,1]) # This will be read in from optitrack pose average over capture
+      Y_UP = np.asarray([0,1,0]) # This will be read in from optitrack pose average over capture
 
       slope_angle_array = np.full(voxel_grid_size, np.nan)
       count_array = np.full_like(slope_angle_array, np.nan)
@@ -160,7 +160,7 @@ if __name__=="__main__":
 
       print("Constructing visualization of voxel statistics...")
       for v in tqdm(voxel_results):
-         slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Z_UP))))
+         slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Y_UP))))
          count_array[v['voxel_index']] = v['num_points']
          var_array[v['voxel_index']] = v['var']
          dem_array[v['voxel_index']] = v['centroid'][-1]
