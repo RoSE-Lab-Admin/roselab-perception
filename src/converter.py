@@ -132,7 +132,7 @@ def transform_lidar_to_world(pcd):
     lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
     lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
     lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
-    pcd.transform(lidar_pose)
+    pcd = pcd.transform(lidar_pose)
 
     return pcd
 
