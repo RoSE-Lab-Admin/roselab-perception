@@ -190,9 +190,10 @@ if __name__ == '__main__':
     lidar_pose[0:3, 2] = np.array([ 0.01744194, 0.99984158 , -0.00354913  ])
     lidar_pose[0:3, 3] = np.array([0.32536598, -2.34371088, 0.76987012])
 
-    # rotate +90° about X so that +Z maps to -Y
-    #lidar_rot = R.from_euler('x', 90, degrees=True).as_matrix()
-    #lidar_pose[0:3, 0:3] = lidar_rot
+    # a 180° rotation about X is diag([1, –1, –1])
+    # flip_x = np.diag([1, -1, -1])
+    # lidar_pose[0:3, 0:3] = flip_x @ lidar_pose[0:3, 0:3]
+
     scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
 
     # Single point cloud with same transform as LiDAR
