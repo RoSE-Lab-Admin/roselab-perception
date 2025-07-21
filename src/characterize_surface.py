@@ -167,10 +167,10 @@ if __name__=="__main__":
          sig_array[v['voxel_index']] = np.sqrt(v['var'])
          dem_array[v['voxel_index']] = v['centroid'][1]
 
-      cv2.imwrite(bag_dir+'slope_angle.tif', slope_angle_array)
-      cv2.imwrite(bag_dir+'count.tif', count_array)
-      cv2.imwrite(bag_dir+'sig.tif', sig_array)
-      cv2.imwrite(bag_dir+'dem.tif', dem_array)
+      cv2.imwrite(os.path.join(bag_dir,'slope_angle.tif'), slope_angle_array)
+      cv2.imwrite(os.path.join(bag_dir,'count.tif'), count_array)
+      cv2.imwrite(os.path.join(bag_dir,'sig.tif'), sig_array)
+      cv2.imwrite(os.path.join(bag_dir,'dem.tif'), dem_array)
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
       m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
