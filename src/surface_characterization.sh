@@ -10,7 +10,7 @@ set -euo pipefail
 # 1. Run the MLSS calibration for 10 seconds
 
 echo "Running gantry_services mlss_calibration..."
-ros2 run gantry_services mlss_calibration #--duration 10.0
+#ros2 run gantry_services mlss_calibration #--duration 10.0
 
 # 2. Most recent top‐level timestamp folder
 top_ts_dir=$(ls -dt ~/lidarcalibrations/* | head -1)
