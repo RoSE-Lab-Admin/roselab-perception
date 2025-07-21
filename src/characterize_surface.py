@@ -93,7 +93,7 @@ if __name__=="__main__":
    MIN_Q = float(sys.argv[2])
    MAX_Q = float(sys.argv[3])
    MODE = sys.argv[4].lower()
-   bag_dir = os.path.dirname(fname) + os.sep
+   bag_dir = os.path.expanduser(os.path.dirname(fname))
 
    pcd = o3d.io.read_point_cloud(fname)
 
