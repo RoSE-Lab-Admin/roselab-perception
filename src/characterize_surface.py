@@ -151,31 +151,31 @@ if __name__=="__main__":
 #         print(f"Plane normal: {v['normal']}")
 #         print(f"Covariance matrix:\n{v['covariance']}\n")
 
-      Y_UP = np.asarray([0,0,1]) # This will be read in from optitrack pose average over capture
+      Y_UP = np.asarray([0,1,0]) # This will be read in from optitrack pose average over capture
 
       slope_angle_array = np.full(voxel_grid_size, np.nan)
       count_array = np.full_like(slope_angle_array, np.nan)
-      var_array = np.full_like(slope_angle_array, np.nan)
+      sig_array = np.full_like(slope_angle_array, np.nan)
       dem_array = np.full_like(slope_angle_array, np.nan)
 
       print("Constructing visualization of voxel statistics...")
       for v in tqdm(voxel_results):
          slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Y_UP))))
          count_array[v['voxel_index']] = v['num_points']
-         var_array[v['voxel_index']] = v['var']
-         dem_array[v['voxel_index']] = v['centroid'][-1]
+         sig_array[v['voxel_index']] = np.sqrt(v['var'])
+         dem_array[v['voxel_index']] = v['centroid'][1]
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
       m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
-      axes[0][0].set_title("Local Normal vs +Z (Slope)")
+      axes[0][0].set_title("Local Normal vs +Y (Slope)")
       fig.colorbar(m1, ax=axes[0][0])
 
       m2 = axes[0][1].imshow(np.rot90(count_array), cmap='inferno')
       axes[0][1].set_title("# of Points Per Voxel")
       fig.colorbar(m2, ax=axes[0][1])
 
-      m3 = axes[1][0].imshow(np.rot90(var_array), cmap='inferno')
-      axes[1][0].set_title("Point Variance Per Voxel")
+      m3 = axes[1][0].imshow(np.rot90(sig_array), cmap='inferno')
+      axes[1][0].set_title("Point Error (1 Sigma) Per Voxel")
       fig.colorbar(m3, ax=axes[1][0])
 
       m4 = axes[1][1].imshow(np.rot90(dem_array), cmap='inferno')
