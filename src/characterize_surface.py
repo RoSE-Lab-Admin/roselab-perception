@@ -14,6 +14,8 @@ from collections import defaultdict
 import matplotlib.patches as mpatches
 import matplotlib.transforms as mtransforms
 
+import tifffile as tiff
+
 def draw_compass_rose(fig, pos, size=0.1):
    """Creates a compass rose on the given figure.
 
@@ -164,6 +166,11 @@ if __name__=="__main__":
          count_array[v['voxel_index']] = v['num_points']
          sig_array[v['voxel_index']] = np.sqrt(v['var'])
          dem_array[v['voxel_index']] = v['centroid'][1]
+
+      tiff.imwrite('slope_angle.tif', slope_angle_array)
+      tiff.imwrite('count.tif', count_array)
+      tiff.imwrite('sig.tif', sig_array)
+      tiff.imwrite('dem.tif', dem_array)
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
       m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
