@@ -11,7 +11,7 @@ set -euo pipefail
 top_ts_dir=$(ls -dt ~/lidarcalibrations/*/ | head -1)
 
 # Dive two levels down (IP folder and its only subdir)
-calibration_path=$(ls -d "${top_ts_dir}"*/*/ | head -1)
+calibration_path=$(ls -d "${top_ts_dir}"/192.168.2.4:8000/*/ | head -1)
 calibration_path="${calibration_path%/}"
 calibration_path="${recent_dir%/}"
 
