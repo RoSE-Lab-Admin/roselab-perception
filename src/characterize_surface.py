@@ -167,30 +167,51 @@ if __name__=="__main__":
          sig_array[v['voxel_index']] = np.sqrt(v['var'])
          dem_array[v['voxel_index']] = v['centroid'][1]
 
-      cv2.imwrite(os.path.join(bag_dir,'slope_angle.tif'), slope_angle_array)
-      cv2.imwrite(os.path.join(bag_dir,'count.tif'), count_array)
-      cv2.imwrite(os.path.join(bag_dir,'sig.tif'), sig_array)
-      cv2.imwrite(os.path.join(bag_dir,'dem.tif'), dem_array)
+      print("Done.")
+
+      print("Writing out NPZ files of all dem statistics...")
+
+      # RH: NOTE!!! CV2 DOES NOT HANDLE WRITING NAN VALUES PROPERLY!!!! SO USE EITHER TIFFILE OR NUMPY NPZ FORMAT TO SAVE DATA
+      np.savez_compressed(os.path.join(bag_dir,'slope_angle.npz'), slope_angle_array)
+      np.savez_compressed(os.path.join(bag_dir,'count.npz'), count_array)
+      np.savez_compressed(os.path.join(bag_dir,'sig.npz'), sig_array)
+      np.savez_compressed(os.path.join(bag_dir,'dem.npz'), dem_array)
+
+      print("Done.")
+
+      print("Generating statistics summary (report card)...")
+      print(
+f"""
+Report Card - Statistical Distributions Across All Voxels [mu +/- 1 sigma]:
+
+DEM +Y                 :      {np.nanmean(dem_array):.5} +/- {np.nanstd(dem_array):.5} [meters]
+Point Count            :      {np.nanmean(count_array):.5} +/- {np.nanstd(count_array):.5} [-]
+Local Normal vs +Y     :      {np.nanmean(slope_angle_array):.5} +/- {np.nanstd(slope_angle_array):.5} [degrees]
+Spatial Error          :      {np.nanmean(sig_array):.5} +/- {np.nanstd(sig_array):.5} [meters]
+
+""")
+
+      print("Done.")
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
-      m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
+      m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno')
       axes[0][0].set_title("Local Normal vs +Y (Slope)")
       fig.colorbar(m1, ax=axes[0][0])
 
-      m2 = axes[0][1].imshow(np.rot90(count_array), cmap='inferno')
+      m2 = axes[0][1].imshow(np.rot90(count_array[:,::-1]), cmap='inferno')
       axes[0][1].set_title("# of Points Per Voxel")
       fig.colorbar(m2, ax=axes[0][1])
 
-      m3 = axes[1][0].imshow(np.rot90(sig_array), cmap='inferno')
+      m3 = axes[1][0].imshow(np.rot90(sig_array[:,::-1]), cmap='inferno')
       axes[1][0].set_title("Point Error (1 Sigma) Per Voxel")
       fig.colorbar(m3, ax=axes[1][0])
 
-      m4 = axes[1][1].imshow(np.rot90(dem_array), cmap='inferno')
+      m4 = axes[1][1].imshow(np.rot90(dem_array[:,::-1]), cmap='inferno')
       axes[1][1].set_title("Digital Elevation Map")
       fig.colorbar(m4, ax=axes[1][1])
 
-      # Add compass rose
-      draw_compass_rose(fig, (0.91, 0.94), size=0.09)
+      # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data
+      # draw_compass_rose(fig, (0.91, 0.94), size=0.09)
 
       plt.tight_layout(rect=[0.95, 0.95, 0.9, 0.9])
       plt.show()

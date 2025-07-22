@@ -9,11 +9,11 @@ set -euo pipefail
 
 # 1. Run the MLSS calibration for 10 seconds
 
-echo "Running gantry_services mlss_calibration..."
-ros2 run gantry_services mlss_calibration #--duration 10.0
+#echo "Running gantry_services mlss_calibration..."
+#ros2 run gantry_services mlss_calibration #--duration 10.0
 
 # 2. Most recent top‐level timestamp folder
-top_ts_dir=$(ls -dt ~/lidarcalibrations/* | head -1)
+top_ts_dir=$(ls -dt /mnt/d/rosbags/Trial* | head -1)
 
 # Dive two levels down (IP folder and its only subdir)
 ip_dir=$(ls -dt "${top_ts_dir}"/192.168.2.4:8000/ | head -n1)
