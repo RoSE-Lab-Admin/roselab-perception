@@ -222,7 +222,7 @@ if __name__ == '__main__':
     gantry_pose[0:3, 1] = np.array([0.0,  1.0,  0.0])
     gantry_pose[0:3, 2] = np.array([ 0.3826834,  0.0,  0.9238795])
     gantry_pose[0:3, 3] = np.array([0.3, 1.5, 0.2])
-    scene.add(ObjectPose(gantry_pose, "D:/FullStructureAssembly2022.STL", 0.001))
+    scene.add(ObjectPose(gantry_pose, "/home/ryan/FullStructureAssembly2022.STL", 0.001))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
