@@ -73,12 +73,24 @@ class ObjectPose(PoseObject):
     """
     Visualize an STL
     """
-    def __init__(self, pose: np.ndarray, path: str):
+    def __init__(self, pose: np.ndarray, path: str, scale: float = 1.0):
         super().__init__(pose)
         self.path = path
+        self.scale = scale
 
     def get_geometry(self) -> o3d.geometry.TriangleMesh:
-        return o3d.read_triangle_mesh(self.path)
+
+        mesh = o3d.io.read_triangle_mesh(self.path)
+        mesh.compute_vertex_normals()
+        # 1) compute its centroid
+        center = mesh.get_center()
+        # 2) shift it so centroid is at (0,0,0)
+        mesh.translate(-center)
+        # 3) scale about that new local origin
+        mesh.scale(self.scale, center=np.zeros(3))
+        # 4) now apply your extrinsic pose
+        mesh.transform(self.pose)
+        return mesh
 
 class CameraPose(PoseObject):
     """
@@ -173,8 +185,8 @@ if __name__ == '__main__':
     scene = SceneVisualizer()
 
     # Center of the floor at origin
-    floor_pose = np.eye(4)
-    scene.add(SimplePose(floor_pose, size=0.5))
+    #floor_pose = np.eye(4)
+    #scene.add(SimplePose(floor_pose, size=0.5))
    
     # Parse OptiTrack metadata and add those cameras
     metadata_file = 'data/test.csv'
@@ -197,16 +209,20 @@ if __name__ == '__main__':
     lidar_pose[0:3, 0] = np.array([0.80778813 , 0.01618329, 0.58925074 ])
     lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
     lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
-    lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
+    lidar_pose[0:3, 3] = np.array([0.6936598, 2.54371088, 0.33487012])
     scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
 
     # Single point cloud with same transform as LiDAR
     pointcloud_pose = lidar_pose
-    scene.add(PointCloudPose('data/out.ply', pose=pointcloud_pose))
+    scene.add(PointCloudPose('/home/ryan/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30/192.168.2.4яА║8000/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30_lidar_2025-07-23T10-38-42/out.ply', pose=pointcloud_pose))
 
     # STL of Gantry
     gantry_pose = np.eye(4)
-    scene.add(ObjectPose(gantry_pose, "/gantry.stl"))
+    gantry_pose[0:3, 0] = np.array([ 0.9238795,  0.0,  -0.3826834])
+    gantry_pose[0:3, 1] = np.array([0.0,  1.0,  0.0])
+    gantry_pose[0:3, 2] = np.array([ 0.3826834,  0.0,  0.9238795])
+    gantry_pose[0:3, 3] = np.array([0.3, 1.5, 0.2])
+    scene.add(ObjectPose(gantry_pose, "D:/FullStructureAssembly2022.STL", 0.001))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
