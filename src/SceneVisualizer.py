@@ -69,6 +69,16 @@ class SimplePose(PoseObject):
     def get_geometry(self) -> o3d.geometry.TriangleMesh:
         return o3d.geometry.TriangleMesh.create_coordinate_frame(size=self.size)
 
+class ObjectPose(PoseObject):
+    """
+    Visualize an STL
+    """
+    def __init__(self, pose: np.ndarray, path: str):
+        super().__init__(pose)
+        self.path = path
+
+    def get_geometry(self) -> o3d.geometry.TriangleMesh:
+        return o3d.read_triangle_mesh(self.path)
 
 class CameraPose(PoseObject):
     """
@@ -188,16 +198,15 @@ if __name__ == '__main__':
     lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
     lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
     lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
-
-    # a 180° rotation about X is diag([1, –1, –1])
-    # flip_x = np.diag([1, -1, -1])
-    # lidar_pose[0:3, 0:3] = flip_x @ lidar_pose[0:3, 0:3]
-
     scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
 
     # Single point cloud with same transform as LiDAR
     pointcloud_pose = lidar_pose
     scene.add(PointCloudPose('data/out.ply', pose=pointcloud_pose))
+
+    # STL of Gantry
+    gantry_pose = np.eye(4)
+    scene.add(ObjectPose(gantry_pose, "/gantry.stl"))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
