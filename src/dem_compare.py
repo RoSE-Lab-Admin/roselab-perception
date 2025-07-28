@@ -24,12 +24,12 @@ def compare_images(pre_img, post_img):
     diff[valid_mask] = post_img[valid_mask] - pre_img[valid_mask]
     return diff
 
-def diff_viz():
+def diff_viz(diff):
       # Edit this with correct values
       fig, axes = plt.subplots(1,2,figsize=(10,10))
-      m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno')
-      axes[0][0].set_title("Local Normal vs +Y (Slope) Difference")
-      fig.colorbar(m1, ax=axes[0][0])
+    #   m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno')
+    #   axes[0][0].set_title("Local Normal vs +Y (Slope) Difference")
+    #   fig.colorbar(m1, ax=axes[0][0])
 
     #   m2 = axes[0][1].imshow(np.rot90(count_array[:,::-1]), cmap='inferno')
     #   axes[0][1].set_title("# of Points Per Voxel")
@@ -39,14 +39,14 @@ def diff_viz():
     #   axes[1][0].set_title("Point Error (1 Sigma) Per Voxel")
     #   fig.colorbar(m3, ax=axes[1][0])
 
-      m2 = axes[1][1].imshow(np.rot90(dem_array[:,::-1]), cmap='inferno')
-      axes[1][1].set_title("Digital Elevation Map Difference")
+      m2 = axes[0][1].imshow(diff, cmap='inferno')
+      axes[0][1].set_title("Digital Elevation Map Difference")
       fig.colorbar(m2, ax=axes[1][1])
 
       # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data
       # draw_compass_rose(fig, (0.91, 0.94), size=0.09)
 
-      plt.tight_layout(rect=[0.95, 0.95, 0.9, 0.9])
+    #   plt.tight_layout(rect=[0.95, 0.95, 0.9, 0.9])
       plt.show()
 
 def main(pre_dir, post_dir, output_dir):
@@ -72,6 +72,8 @@ def main(pre_dir, post_dir, output_dir):
             post_img = load_npz(post_path)
             diff_img = compare_images(pre_img, post_img)
 
+            diff_viz(diff_img)
+
             base_name = fname.replace(".npz", "")
             out_path = os.path.join(output_dir, f"{base_name}_diff.npz")
             np.savez_compressed(out_path, diff_img)
@@ -86,3 +88,4 @@ if __name__ == "__main__":
     parser.add_argument("--output", required=True, help="Directory to save output difference .npz files")
     args = parser.parse_args()
     main(args.pre, args.post, args.output)
+

@@ -17,7 +17,7 @@ ip_dir=$(ls -dt "${top_ts_dir}"/192.168.2.4:8000/ | head -n1)
 scan_paths=$(ls -d "${ip_dir}"*/ | head -2)
 scan_paths="${scan_paths%/}"
 
-echo "Using lidar scan folders: $calibration_path"
+echo "Using lidar scan folders: $scan_paths"
 
 for scan in "$scan_paths"; do
 
