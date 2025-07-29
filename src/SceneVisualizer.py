@@ -4,6 +4,7 @@ import os
 import copy
 from scipy.spatial.transform import Rotation as R
 from typing import Optional
+import sys
 
 def _parse_metadata(fname):
     """
@@ -181,6 +182,12 @@ class SceneVisualizer:
         )
 
 if __name__ == '__main__':
+
+    if(len(sys.argv) != 3):
+        print("Usage: python SceneVisualizer.py <path to pointcloud ply> <path to STL>")
+    pointcloud_path = sys.argv[1]
+    stl_path = sys.argv[2]
+
     # Instantiate scene visualizer
     scene = SceneVisualizer()
 
@@ -204,25 +211,37 @@ if __name__ == '__main__':
         scene.add(CameraPose(pose, scale=0.5, color=(0, 0, 1)))
 
 
+    # build a rotation about Y
+    theta = np.deg2rad(-9)
+    Ry = np.array([
+        [ np.cos(theta), 0, np.sin(theta)],
+        [            0, 1,            0],
+        [-np.sin(theta), 0, np.cos(theta)]
+    ])
     # Lidar
     lidar_pose = np.eye(4)
     lidar_pose[0:3, 0] = np.array([0.80778813 , 0.01618329, 0.58925074 ])
     lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
     lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
     lidar_pose[0:3, 3] = np.array([0.6936598, 2.54371088, 0.33487012])
+    lidar_pose[:3, :3] = Ry @ lidar_pose[:3, :3]
     scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
 
-    # Single point cloud with same transform as LiDAR
-    pointcloud_pose = lidar_pose
-    scene.add(PointCloudPose('/home/ryan/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30/192.168.2.4яА║8000/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30_lidar_2025-07-23T10-38-42/out.ply', pose=pointcloud_pose))
 
-    # STL of Gantry
+    # Single point cloud with same transform as LiDAR
+    pointcloud_pose = np.eye(4)
+    pointcloud_pose[0:3, 3] = np.array([0.33487012, 0.0, 0.6936598])
+    pointcloud_pose[:3, :3] = Ry @ pointcloud_pose[:3, :3]
+    #pointcloud_pose[:3,  3 ] = Ry @ pointcloud_pose[:3,  3 ]
+    scene.add(PointCloudPose('C:/Users/ryan1/Documents/out.ply', pose=pointcloud_pose))
+
+        # STL of Gantry
     gantry_pose = np.eye(4)
     gantry_pose[0:3, 0] = np.array([ 0.9238795,  0.0,  -0.3826834])
     gantry_pose[0:3, 1] = np.array([0.0,  1.0,  0.0])
     gantry_pose[0:3, 2] = np.array([ 0.3826834,  0.0,  0.9238795])
     gantry_pose[0:3, 3] = np.array([0.3, 1.5, 0.2])
-    scene.add(ObjectPose(gantry_pose, "/home/ryan/FullStructureAssembly2022.STL", 0.001))
+    scene.add(ObjectPose(gantry_pose, "C:/Users/ryan1/Documents/FullStructureAssembly2022.STL", 0.001))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
