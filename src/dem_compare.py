@@ -15,33 +15,42 @@ def load_npz(file_path):
         img = img.astype(np.float64)
     return img
 
-def compare_images(pre_img, post_img):
-    if pre_img.shape != post_img.shape:
-        raise ValueError("Image shapes do not match")
+def compare_images(pre_img, post_img, crop=True):
+    if (not crop) and (pre_img.shape != post_img.shape):
+        raise ValueError(f"Image shapes do not match: {pre_img.shape=} != {post_img.shape=}")
+    else:
+        # Crop the larger image to the size of the other for each dimension
+        min_rows = np.min([pre_img.shape[0], post_img.shape[0]])
+        min_cols = np.min([pre_img.shape[1], post_img.shape[1]])
+        pre_img = pre_img.copy()[:min_rows, :min_cols]
+        post_img = post_img.copy()[:min_rows, :min_cols]
 
     valid_mask = ~np.isnan(pre_img) & ~np.isnan(post_img)
     diff = np.full_like(pre_img, np.nan)
     diff[valid_mask] = post_img[valid_mask] - pre_img[valid_mask]
     return diff
 
-def diff_viz(diff):
+def diff_viz(diff_img, name):
       # Edit this with correct values
-      fig, axes = plt.subplots(1,2,figsize=(10,10))
-    #   m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno')
-    #   axes[0][0].set_title("Local Normal vs +Y (Slope) Difference")
-    #   fig.colorbar(m1, ax=axes[0][0])
+#      fig, axes = plt.subplots(2,1,figsize=(10,10))
+    #   m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1])
 
-    #   m2 = axes[0][1].imshow(np.rot90(count_array[:,::-1]), cmap='inferno')
-    #   axes[0][1].set_title("# of Points Per Voxel")
-    #   fig.colorbar(m2, ax=axes[0][1])
+#      m1 = axes[0].imshow(dem[:,::-1], cmap='inferno')
+#      axes[0].set_title("Digital Elevation Map Difference")
+#      fig.colorbar(m1, ax=axes[0])
 
-    #   m3 = axes[1][0].imshow(np.rot90(sig_array[:,::-1]), cmap='inferno')
-    #   axes[1][0].set_title("Point Error (1 Sigma) Per Voxel")
-    #   fig.colorbar(m3, ax=axes[1][0])
+#      m2 = axes[1].imshow(slope[:,::-1], cmap='inferno')
+#      axes[1].set_title("Digital Elevation Map Difference")
+#      fig.colorbar(m2, ax=axes[1])
 
-      m2 = axes[0][1].imshow(diff, cmap='inferno')
-      axes[0][1].set_title("Digital Elevation Map Difference")
-      fig.colorbar(m2, ax=axes[1][1])
+      plt.figure(figsize=(4,4), dpi=250)
+
+      # Currently optimized for DEM viz....
+      ax = plt.imshow(diff_img[:,::-1], cmap='inferno', vmin=-0.01, vmax=0.01, origin='lower')
+      plt.title(name)
+      plt.colorbar(ax, label=r"$\Delta$ Z [m]")
+      plt.ylabel("Voxel ID in Y")
+      plt.xlabel("Voxel ID in X")
 
       # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data
       # draw_compass_rose(fig, (0.91, 0.94), size=0.09)
@@ -53,7 +62,8 @@ def main(pre_dir, post_dir, output_dir):
     if not os.path.isdir(pre_dir) or not os.path.isdir(post_dir):
         raise NotADirectoryError("One or both provided paths are not valid directories")
 
-    os.makedirs(output_dir, exist_ok=True)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     pre_files = {f for f in os.listdir(pre_dir) if f.endswith(".npz")}
     post_files = {f for f in os.listdir(post_dir) if f.endswith(".npz")}
@@ -70,14 +80,17 @@ def main(pre_dir, post_dir, output_dir):
         try:
             pre_img = load_npz(pre_path)
             post_img = load_npz(post_path)
-            diff_img = compare_images(pre_img, post_img)
-
-            diff_viz(diff_img)
+            diff_img = compare_images(pre_img, post_img, crop=True)
 
             base_name = fname.replace(".npz", "")
-            out_path = os.path.join(output_dir, f"{base_name}_diff.npz")
-            np.savez_compressed(out_path, diff_img)
-            print(f"[✓] Compared: {fname} -> Saved diff to {out_path}")
+            diff_viz(diff_img, "Difference "+base_name.upper()+" (After - Before)")
+
+            if output_dir:
+                out_path = os.path.join(output_dir, f"{base_name}_diff.npz")
+                np.savez_compressed(out_path, diff_img)
+
+            print(f"[✓] Compared: {fname} Before and After Trial")
+
         except Exception as e:
             print(f"[!] Error processing {fname}: {e}")
 
@@ -85,7 +98,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare two folders of .npz DEM arrays (post - pre), ignoring NaNs.")
     parser.add_argument("--pre", required=True, help="Path to folder of 'pre' surface .npz files")
     parser.add_argument("--post", required=True, help="Path to folder of 'post' surface .npz files")
-    parser.add_argument("--output", required=True, help="Directory to save output difference .npz files")
+    parser.add_argument("--output", required=False, help="Directory to save output difference .npz files", default=None)
     args = parser.parse_args()
     main(args.pre, args.post, args.output)
 
