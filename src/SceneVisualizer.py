@@ -185,6 +185,7 @@ if __name__ == '__main__':
 
     if(len(sys.argv) != 3):
         print("Usage: python SceneVisualizer.py <path to pointcloud ply> <path to STL>")
+        quit()
     pointcloud_path = sys.argv[1]
     stl_path = sys.argv[2]
 
