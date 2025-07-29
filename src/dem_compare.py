@@ -59,8 +59,10 @@ def diff_viz(diff_img, name):
       plt.show()
 
 def main(pre_dir, post_dir, output_dir):
-    if not os.path.isdir(pre_dir) or not os.path.isdir(post_dir):
-        raise NotADirectoryError("One or both provided paths are not valid directories")
+    if not os.path.isdir(pre_dir):
+        raise NotADirectoryError(f"The provided 'pre' path {pre_dir} is not a valid directory")
+    if not os.path.isdir(post_dir):
+        raise NotADirectoryError(f"The provided 'post' path {post_dir} is not a valid directory")
 
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
