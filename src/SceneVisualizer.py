@@ -185,8 +185,8 @@ if __name__ == '__main__':
     scene = SceneVisualizer()
 
     # Center of the floor at origin
-    #floor_pose = np.eye(4)
-    #scene.add(SimplePose(floor_pose, size=0.5))
+    floor_pose = np.eye(4)
+    scene.add(SimplePose(floor_pose, size=0.5))
    
     # Parse OptiTrack metadata and add those cameras
     metadata_file = 'data/test.csv'
@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
     # Single point cloud with same transform as LiDAR
     pointcloud_pose = lidar_pose
-    scene.add(PointCloudPose('/home/ryan/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30/192.168.2.4яА║8000/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30_lidar_2025-07-23T10-38-42/out.ply', pose=pointcloud_pose))
+    scene.add(PointCloudPose('data/out.ply', pose=pointcloud_pose))
 
     # STL of Gantry
     gantry_pose = np.eye(4)
