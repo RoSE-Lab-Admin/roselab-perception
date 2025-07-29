@@ -234,7 +234,7 @@ if __name__ == '__main__':
     pointcloud_pose[0:3, 3] = np.array([0.33487012, 0.0, 0.6936598])
     pointcloud_pose[:3, :3] = Ry @ pointcloud_pose[:3, :3]
     #pointcloud_pose[:3,  3 ] = Ry @ pointcloud_pose[:3,  3 ]
-    scene.add(PointCloudPose('C:/Users/ryan1/Documents/out.ply', pose=pointcloud_pose))
+    scene.add(PointCloudPose(pointcloud_path, pose=pointcloud_pose))
 
         # STL of Gantry
     gantry_pose = np.eye(4)
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     gantry_pose[0:3, 1] = np.array([0.0,  1.0,  0.0])
     gantry_pose[0:3, 2] = np.array([ 0.3826834,  0.0,  0.9238795])
     gantry_pose[0:3, 3] = np.array([0.3, 1.5, 0.2])
-    scene.add(ObjectPose(gantry_pose, "C:/Users/ryan1/Documents/FullStructureAssembly2022.STL", 0.001))
+    scene.add(ObjectPose(gantry_pose, stl_path, 0.001))
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
