@@ -199,7 +199,7 @@ class RGBDPointCloud(Node):
 def main():
     if len(sys.argv) != 5:
         #print("Usage: python ros2_bag_to_pcd.py <bag_path> <pointcloud_topic> <output_file.pcd|.ply>")
-        print("Usage: python ros2_bag_to_pcd.py <bag_path> <color_topic> <aligned_depth_topic> <output_file.pcd|.ply>")
+        print("Usage: python converter.py <bag_path> <color_topic> <aligned_depth_topic> <output_file.pcd|.ply>")
         sys.exit(1)
 
     bag_path = sys.argv[1]
