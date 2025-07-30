@@ -43,14 +43,15 @@ def diff_viz(diff_img, name):
 #      axes[1].set_title("Digital Elevation Map Difference")
 #      fig.colorbar(m2, ax=axes[1])
 
-      plt.figure(figsize=(4,4), dpi=250)
+      plt.figure(figsize=(3.5,3.5), dpi=300)
 
       # Currently optimized for DEM viz....
-      ax = plt.imshow(diff_img[:,::-1], cmap='inferno', vmin=-0.01, vmax=0.01, origin='lower')
+      ax = plt.imshow(diff_img[:,::-1] * 1000., cmap='inferno', vmin=-10, vmax=10, origin='lower')
       plt.title(name)
-      plt.colorbar(ax, label=r"$\Delta$ Z [m]")
+      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.765)
       plt.ylabel("Voxel ID in Y")
       plt.xlabel("Voxel ID in X")
+      plt.tight_layout()
 
       # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data
       # draw_compass_rose(fig, (0.91, 0.94), size=0.09)
@@ -85,7 +86,7 @@ def main(pre_dir, post_dir, output_dir):
             diff_img = compare_images(pre_img, post_img, crop=True)
 
             base_name = fname.replace(".npz", "")
-            diff_viz(diff_img, "Difference "+base_name.upper()+" (After - Before)")
+            diff_viz(diff_img, "Difference "+base_name.upper()+"\n(After - Before)")
 
             if output_dir:
                 out_path = os.path.join(output_dir, f"{base_name}_diff.npz")
