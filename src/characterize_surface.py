@@ -99,7 +99,7 @@ if __name__=="__main__":
 
    # Do one last colormap filtering step to condense Z values to smaller range
    pts = np.asarray(pcd.points)
-   mask = (pts[:,2] > np.quantile(pts[:,2], MIN_Q)) & (pts[:,2] < np.quantile(pts[:,2], MAX_Q))
+   mask = (pts[:,1] > np.quantile(pts[:,1], MIN_Q)) & (pts[:,1] < np.quantile(pts[:,1], MAX_Q))
 #
 #      filtered_pcd = o3d.geometry.PointCloud()
 #      filtered_pcd.points = o3d.utility.Vector3dVector(pts[mask])
@@ -194,7 +194,7 @@ Spatial Error          :      {np.nanmean(sig_array):.5} +/- {np.nanstd(sig_arra
       print("Done.")
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
-      m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno')
+      m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno', vmin=0, vmax=15.)
       axes[0][0].set_title("Local Normal vs +Y (Slope)")
       fig.colorbar(m1, ax=axes[0][0])
 
