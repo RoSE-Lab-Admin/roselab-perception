@@ -1,16 +1,3 @@
-# Load Bag, and fuse with time probably
-# Color match the plate (research color matching)
-# Plane fit the plate  (research plane fitting)
-# Grab center (or origin) of plate, store as origin
-# Get normal of plane, store as Y
-# Determine orientation of x, z
-# Store all 
-# Get transaltion based on camera frame (examples)
-# Make translation matrix
-# Rotation based on slope of plane
-# Make rotation matrix
-# Return both
-
 # ROS
 import rclpy
 import rosbag2_py
@@ -53,7 +40,7 @@ class OriginFusion():
 
         with open(Path(bag_path) / "metadata.yaml", 'r') as md:
             metadata = yaml.safe_load(md)
-            print(metadata)
+#            print(metadata)
 
         reader = SequentialReader()
         reader.open(storage_options, converter_options)
@@ -62,7 +49,7 @@ class OriginFusion():
         for topic_metadata in reader.get_all_topics_and_types():
             type_map[topic_metadata.name] = topic_metadata.type
 
-        print(type_map)
+#        print(type_map)
 
         msg_max = max([int(x["message_count"]) for x in metadata["rosbag2_bagfile_information"]["topics_with_message_count"]])
 
@@ -321,7 +308,10 @@ class OriginFusion():
 #            params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX  # Improves accuracy
 
             # Improve contrast
-            tmp =  cv2.cvtColor(self.median_color_img.copy(), cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(self.median_color_img.copy(), cv2.COLOR_BGR2GRAY)
+            gray = cv2.GaussianBlur(gray, (3,3), 0)
+            tmp = cv2.equalizeHist(gray)
+
             corners, ids, _, _ = charuco_detector.detectBoard(tmp)
 
             print("Detected Aruco Target IDs: ", ids)
@@ -333,9 +323,16 @@ class OriginFusion():
                 # Useful for debugging
     #            cv2.aruco.drawDetectedMarkers(tmp, rejected_candidates, borderColor=(100, 0, 255))
 
-                cv2.aruco.drawDetectedCornersCharuco(tmp, corners, ids)
-                plt.imshow(tmp)
-                plt.show()
+                plt.ion()
+
+                for i in range(len(ids)):
+                    tmp2 = tmp.copy()
+                    # cv2.aruco.drawDetectedCornersCharuco(tmp, corners, ids)
+                    cv2.aruco.drawDetectedCornersCharuco(tmp2, corners[i:i+1], ids[i:i+1])
+                    plt.imshow(tmp2)
+                    plt.pause(0.75)
+
+                plt.ioff()
 
             # Charuco Board coordinate system pose estimation in Lidar frame
             camera_matrix = np.asarray(self.caminfo.k).reshape(3,3)
@@ -353,12 +350,77 @@ class OriginFusion():
             print("R: ", ARUCO_ROT_IN_LIDAR:=cv2.Rodrigues(rvec)[0], "\nt: ", tvec)
 
             disp = self.median_color_img.copy()
-            cv2.drawFrameAxes(disp, camera_matrix, distortion_coeffs, rvec, tvec, 0.03)
+            cv2.drawFrameAxes(disp, camera_matrix, distortion_coeffs, rvec, tvec, 0.3)
             plt.imshow(disp)
             plt.show()
 
-            # Construct intermediate and world transforms
-            LIDAR_POSE_IN_WORLD = np.eye(4)
+            # Find Static TF for aruco in world frame (frame cad)
+            ARUCO_ROT_IN_WORLD = R.from_matrix(np.eye(3))
+            # ARUCO_ROT_IN_WORLD = R.from_euler('xyz', [np.pi/2,0,0]) # 90 deg rotation about x, as x is colinear across frames
+
+            # 	Measurements for Cal plate translation relative to origin (world)
+            #	x: ??? Get estimate of these from imagery and our measurements, correcting by relative position of far marker to the reported rigid body pose
+            #	z: ???
+            #	y: ???
+            ARUCO_POS_IN_WORLD = np.array([0,0,0]) # Measured from Emma's CAD model, origin of Optitrack Square to center of Aruco target
+
+            ARUCO_POSE_IN_WORLD = np.eye(4) # ARUCO -> WORLD
+
+            ARUCO_POSE_IN_WORLD[:3,:3] = ARUCO_ROT_IN_WORLD.as_matrix()
+            ARUCO_POSE_IN_WORLD[:3, 3] = ARUCO_POS_IN_WORLD
+            print("ARUCO TARGET POSE IN WORLD FRAME: \n\n", ARUCO_POSE_IN_WORLD)
+
+            # Plane fit to get normal vector (Ryan H)
+
+            # Given aruco target corners, make vector of corner indices and then use opencv's fillpoly routine to generate a mask
+            mask = np.zeros_like(self.median_depth_img, np.uint8)
+            cv2.fillPoly(mask, pts=(np.asarray(corners)).astype(int), color=(255))
+            kernel = np.ones((3,3))
+            mask_dilated = cv2.dilate(mask,kernel,iterations = 11) # grow mask by a few iterations
+            mask = mask_dilated.astype(bool)
+            print("Mask Info: ", mask.dtype, mask.shape, mask.sum() / mask.size * 100, "% Masked")
+
+            plt.imshow(mask)
+            plt.show()
+
+            # Convert depth data to xyz points and apply PCA eigen vector definition as with my normal calculation in the surface char module
+            print("# of PCD Points  : ", len(np.asarray(self.median_pointcloud.points)))
+
+            # O3D Hack for Masking data while generating pointcloud from RGBD data
+            depth_masked = self.median_depth_img.copy()
+            depth_masked[~mask] = -1.
+            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(o3d.geometry.Image(self.median_color_img), o3d.geometry.Image(depth_masked), depth_scale=1000., depth_trunc=5.0)
+            aruco_pc = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(self.median_color_img.shape[1], self.median_color_img.shape[0], np.asarray(self.caminfo.k).reshape(3,3)))
+
+            aruco_depth_points = np.asarray(aruco_pc.points)
+            print("Aruco Target Centroid in Lidar Frame :", np.mean(aruco_depth_points, axis=0), " +/- ", np.std(aruco_depth_points, axis=0))
+
+            o3d.visualization.draw_geometries([aruco_pc])
+
+            aruco_cov = np.cov(aruco_depth_points.T)
+            eigvals, eigvecs = np.linalg.eigh(aruco_cov)
+            aruco_depth_normal = eigvecs[:, 0]  # eigenvector with smallest eigenvalue
+
+            print("Dot-Product Similarity (Depth Fit Normal vs. Aruco +Z): ", np.dot(aruco_depth_normal, ARUCO_ROT_IN_LIDAR[:,2]))
+
+            # Evaluate error between normal vector and +y pose vector for good measure (dot product)
+            # Build transformation matrix for aruco in lidar frame, aka (lidar)^T_(aruco)
+            ARUCO_POSE_IN_LIDAR = np.eye(4) # ARUCO -> LIDAR
+            ARUCO_POS_IN_LIDAR = np.mean(aruco_depth_points, axis=0)
+
+            ARUCO_POSE_IN_LIDAR[:3,:3] = ARUCO_ROT_IN_LIDAR
+            ARUCO_POSE_IN_LIDAR[:3, 3] = ARUCO_POS_IN_LIDAR
+            print("ARUCO TARGET POSE IN LIDAR FRAME: \n\n", ARUCO_POSE_IN_LIDAR)
+
+            # Compute inverse analytically
+            LIDAR_POSE_IN_ARUCO = np.eye(4)
+            LIDAR_POSE_IN_ARUCO[:3,:3] = ARUCO_ROT_IN_LIDAR.T
+            LIDAR_POSE_IN_ARUCO[:3, 3] = (-ARUCO_ROT_IN_LIDAR.T @ np.c_[ARUCO_POS_IN_LIDAR]).T[:]
+
+            # Finally, find: world^T_lidar = world^T_aruco * (lidar^T_aruco)^-1
+            LIDAR_POSE_IN_WORLD = ARUCO_POSE_IN_WORLD @ LIDAR_POSE_IN_ARUCO
+
+            print("LIDAR POSE IN WORLD (Lidar -> World) : \n\n", LIDAR_POSE_IN_WORLD)
 
         return LIDAR_POSE_IN_WORLD
 
