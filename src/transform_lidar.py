@@ -25,13 +25,16 @@ import threading
 from tqdm import tqdm
 import yaml
 
+# Helpers
+from pose_utils import *
+
 class OriginFusion():
     def __init__(self):
         self.color_images = []
         self.depth_images = []
         self.caminfo = None
 
-    def LoadBag(self, bag_path, color_topic, depth_topic, caminfo_topic):
+    def load_lidar_bag(self, bag_path, color_topic, depth_topic, caminfo_topic):
         bridge = CvBridge()
 
         # Initialize reader
@@ -91,6 +94,14 @@ class OriginFusion():
 
         self.stack_task()
         self.compute_pointcloud_from_rgbd()
+
+    def load_pose_bag(self, pose_bag_path, pose_topic):
+        self.target_average_pose = np.eye(4)
+
+        POS, ROT = get_average_pose(Path(pose_bag_path), pose_topic)
+
+        self.target_average_pose[:3,:3] = R.from_quat(ROT).as_matrix()
+        self.target_average_pose[:3, 3] = POS
 
     def stack_task(self):
         # Make stacked and median images
@@ -207,7 +218,7 @@ class OriginFusion():
             kernel = np.ones((3,3))
             mask_eroded = cv2.erode(mask,kernel,iterations = 2)
             mask = mask_eroded.astype(bool)
-            print("Mask Info: ", mask.dtype, mask.shape, mask.sum() / mask.size * 100, "% Masked")
+            print("Mask Info: ", mask.dtype, mask.shape, mask.sum() / mask.size * 100, "% Selected")
 
             plt.imshow(mask)
             plt.show()
@@ -354,20 +365,15 @@ class OriginFusion():
             plt.imshow(disp)
             plt.show()
 
-            # Find Static TF for aruco in world frame (frame cad)
-            ARUCO_ROT_IN_WORLD = R.from_matrix(np.eye(3))
-            # ARUCO_ROT_IN_WORLD = R.from_euler('xyz', [np.pi/2,0,0]) # 90 deg rotation about x, as x is colinear across frames
+            # Find TF from world origin to far marker to corner origin point
 
-            # 	Measurements for Cal plate translation relative to origin (world)
-            #	x: ??? Get estimate of these from imagery and our measurements, correcting by relative position of far marker to the reported rigid body pose
-            #	z: ???
-            #	y: ???
-            ARUCO_POS_IN_WORLD = np.array([0,0,0]) # Measured from Emma's CAD model, origin of Optitrack Square to center of Aruco target
+#            ARUCO_POS_IN_WORLD, ARUCO_ROT_IN_WORLD = get_average_pose(Path(self.pose_bag), self.pose_topic)
+#
+#            ARUCO_POSE_IN_WORLD = np.eye(4)  # CHARUCO -> WORLD
+#            ARUCO_POSE_IN_WORLD[:3,:3] = ARUCO_ROT_IN_WORLD.as_matrix()
+#            ARUCO_POSE_IN_WORLD[:3, 3] = ARUCO_POS_IN_WORLD
 
-            ARUCO_POSE_IN_WORLD = np.eye(4) # ARUCO -> WORLD
-
-            ARUCO_POSE_IN_WORLD[:3,:3] = ARUCO_ROT_IN_WORLD.as_matrix()
-            ARUCO_POSE_IN_WORLD[:3, 3] = ARUCO_POS_IN_WORLD
+            ARUCO_POSE_IN_WORLD = self.target_average_pose
             print("ARUCO TARGET POSE IN WORLD FRAME: \n\n", ARUCO_POSE_IN_WORLD)
 
             # Plane fit to get normal vector (Ryan H)
@@ -376,9 +382,9 @@ class OriginFusion():
             mask = np.zeros_like(self.median_depth_img, np.uint8)
             cv2.fillPoly(mask, pts=(np.asarray(corners)).astype(int), color=(255))
             kernel = np.ones((3,3))
-            mask_dilated = cv2.dilate(mask,kernel,iterations = 11) # grow mask by a few iterations
+            mask_dilated = cv2.dilate(mask,kernel,iterations = 15) # grow mask by a few iterations
             mask = mask_dilated.astype(bool)
-            print("Mask Info: ", mask.dtype, mask.shape, mask.sum() / mask.size * 100, "% Masked")
+            print("Mask Info: ", mask.dtype, mask.shape, mask.sum() / mask.size * 100, "% Selected")
 
             plt.imshow(mask)
             plt.show()
@@ -463,11 +469,13 @@ if __name__ == "__main__":
     color_topic = sys.argv[2]
     depth_topic = sys.argv[3]
     caminfo_topic = sys.argv[4]
+    pose_bag_path = sys.argv[5]
+    pose_topic = sys.argv[6]
 
     originFuser = OriginFusion()
-    originFuser.LoadBag(bag_path, color_topic, depth_topic, caminfo_topic)
+    originFuser.load_lidar_bag(bag_path, color_topic, depth_topic, caminfo_topic)
+    originFuser.load_pose_bag(pose_bag_path, pose_topic)
     originFuser.PlotImages()
-    # Having the surface characterization run as its own node makes sense. Maybe i should just make this a service outright and skip the joining service.
     originFuser.get_lidar_to_world_tf()
 
     rclpy.shutdown()
