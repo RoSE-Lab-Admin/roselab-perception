@@ -1,16 +1,3 @@
-# Load Bag, and fuse with time probably
-# Color match the plate (research color matching)
-# Plane fit the plate  (research plane fitting)
-# Grab center (or origin) of plate, store as origin
-# Get normal of plane, store as Y
-# Determine orientation of x, z
-# Store all 
-# Get transaltion based on camera frame (examples)
-# Make translation matrix
-# Rotation based on slope of plane
-# Make rotation matrix
-# Return both
-
 # ROS
 import rclpy
 import rosbag2_py
@@ -122,6 +109,10 @@ class OriginFusion():
         self.compute_pointcloud_from_rgbd()
 
     def stack_task(self):
+        """
+        Helper function. Using image arrays, stack, then take the median.
+        Also takes mean of position and average orientation
+        """
         # Make stacked and median images
         stacked_color = np.stack(self.color_images, axis=0)
         self.median_color_img = np.median(stacked_color, axis=0).astype(np.uint8)
@@ -146,6 +137,9 @@ class OriginFusion():
             pass
 
     def PlotImages(self):
+        """
+        Plot both median images with matplotlib
+        """
         # Plot median images
         fig, axes=plt.subplots(1,2)
         axes[0].imshow(self.median_color_img)

@@ -7,8 +7,9 @@ import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 from tqdm import tqdm
-import open3d as o3d
+import cv2
 import numpy as np
 from collections import defaultdict
 import matplotlib.patches as mpatches
@@ -60,7 +61,7 @@ def voxelize_and_analyze(pcd, voxel_size):
 
    print("Building voxel grid point associations...")
    for point in tqdm(np.asarray(pcd.points)):
-      voxel_idx = tuple(((point[:2] - voxel_grid.origin[:2]) / voxel_size).astype(int))
+      voxel_idx = tuple(((point[[:2]] - voxel_grid.origin[[:2]]) / voxel_size).astype(int))
       voxel_point_map[voxel_idx].append(point)
 
    voxel_data = []
@@ -93,6 +94,7 @@ if __name__=="__main__":
    MAX_Q = float(sys.argv[3])
    VOX_SIZE_MM = float(sys.argv[4])
    MODE = sys.argv[5].lower()
+   bag_dir = os.path.expanduser(os.path.dirname(fname))
 
    pcd = o3d.io.read_point_cloud(fname)
 
@@ -152,39 +154,66 @@ if __name__=="__main__":
 #         print(f"Plane normal: {v['normal']}")
 #         print(f"Covariance matrix:\n{v['covariance']}\n")
 
-      Z_UP = np.asarray([0,0,1]) # This will be read in from optitrack pose average over capture
+      # Y_UP = np.asarray([0,1,0]) # This will be read in from optitrack pose average over capture
+      Z_UP = np.array([0,0,1])
 
       slope_angle_array = np.full(voxel_grid_size, np.nan)
       count_array = np.full_like(slope_angle_array, np.nan)
-      var_array = np.full_like(slope_angle_array, np.nan)
+      sig_array = np.full_like(slope_angle_array, np.nan)
       dem_array = np.full_like(slope_angle_array, np.nan)
 
       print("Constructing visualization of voxel statistics...")
       for v in tqdm(voxel_results):
          slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Z_UP))))
          count_array[v['voxel_index']] = v['num_points']
-         var_array[v['voxel_index']] = v['var']
-         dem_array[v['voxel_index']] = v['centroid'][-1]
+         sig_array[v['voxel_index']] = np.sqrt(v['var'])
+         dem_array[v['voxel_index']] = v['centroid'][2]
+
+      print("Done.")
+
+      print("Writing out NPZ files of all dem statistics...")
+
+      # RH: NOTE!!! CV2 DOES NOT HANDLE WRITING NAN VALUES PROPERLY!!!! SO USE EITHER TIFFILE OR NUMPY NPZ FORMAT TO SAVE DATA
+      np.savez_compressed(os.path.join(bag_dir,'slope_angle.npz'), slope_angle_array)
+      np.savez_compressed(os.path.join(bag_dir,'count.npz'), count_array)
+      np.savez_compressed(os.path.join(bag_dir,'sig.npz'), sig_array)
+      np.savez_compressed(os.path.join(bag_dir,'dem.npz'), dem_array)
+
+      print("Done.")
+
+      print("Generating statistics summary (report card)...")
+      print(
+f"""
+Report Card - Statistical Distributions Across All Voxels [mu +/- 1 sigma]:
+
+DEM +Z                 :      {np.nanmean(dem_array):.5} +/- {np.nanstd(dem_array):.5} [meters]
+Point Count            :      {np.nanmean(count_array):.5} +/- {np.nanstd(count_array):.5} [-]
+Local Normal vs +Z     :      {np.nanmean(slope_angle_array):.5} +/- {np.nanstd(slope_angle_array):.5} [degrees]
+Spatial Error          :      {np.nanmean(sig_array):.5} +/- {np.nanstd(sig_array):.5} [meters]
+
+""")
+
+      print("Done.")
 
       fig, axes = plt.subplots(2,2,figsize=(10,10))
-      m1 = axes[0][0].imshow(np.rot90(slope_angle_array), cmap='inferno')
+      m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1]), cmap='inferno', vmin=0, vmax=15.)
       axes[0][0].set_title("Local Normal vs +Z (Slope)")
       fig.colorbar(m1, ax=axes[0][0])
 
-      m2 = axes[0][1].imshow(np.rot90(count_array), cmap='inferno')
+      m2 = axes[0][1].imshow(np.rot90(count_array[:,::-1]), cmap='inferno')
       axes[0][1].set_title("# of Points Per Voxel")
       fig.colorbar(m2, ax=axes[0][1])
 
-      m3 = axes[1][0].imshow(np.rot90(var_array), cmap='inferno')
-      axes[1][0].set_title("Point Variance Per Voxel")
+      m3 = axes[1][0].imshow(np.rot90(sig_array[:,::-1]), cmap='inferno')
+      axes[1][0].set_title("Point Error (1 Sigma) Per Voxel")
       fig.colorbar(m3, ax=axes[1][0])
 
-      m4 = axes[1][1].imshow(np.rot90(dem_array), cmap='inferno')
+      m4 = axes[1][1].imshow(np.rot90(dem_array[:,::-1]), cmap='inferno')
       axes[1][1].set_title("Digital Elevation Map")
       fig.colorbar(m4, ax=axes[1][1])
 
-      # Add compass rose
-      draw_compass_rose(fig, (0.91, 0.94), size=0.09)
+      # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data
+      # draw_compass_rose(fig, (0.91, 0.94), size=0.09)
 
       plt.tight_layout(rect=[0.95, 0.95, 0.9, 0.9])
       plt.show()

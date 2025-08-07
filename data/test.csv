@@ -1,0 +1,16 @@
+Rigid Body,Rigid Body 001,1,-1,0,0,0,,
+Rigid Body Marker,Marker 001,Rigid Body 001,Marker 001,0.013118,-0.014674,-0.11824,,
+Rigid Body Marker,Marker 002,Rigid Body 001,Marker 002,-0.082607,-0.012562,-0.003149,,
+Rigid Body Marker,Marker 003,Rigid Body 001,Marker 003,0.069489,0.027236,0.121389,,
+Marker set,Rigid Body 001,,,,,,,
+Marker,Marker 001,Rigid Body 001,,,,,,
+Marker,Marker 002,Rigid Body 001,,,,,,
+Marker,Marker 003,Rigid Body 001,,,,,,
+Marker set,all,,,,,,,
+Marker,Rigid Body 001_Marker 001,all,,,,,,
+Marker,Rigid Body 001_Marker 002,all,,,,,,
+Marker,Rigid Body 001_Marker 003,all,,,,,,
+Camera,PrimeX 22 #118493,-3.999677,1.661119,-3.718146,0.108364,0.885675,0.175208,-0.4161
+Camera,PrimeX 22 #118538,1.540082,1.876326,5.526878,-0.210511,0.102605,0.036642,0.971501
+Camera,PrimeX 22 #118539,3.728274,2.93063,-3.858617,-0.120383,0.869004,0.240612,0.415265
+Camera,PrimeX 22 #118702,-4.601749,3.105949,2.750346,-0.255006,-0.415767,-0.124824,0.864019
