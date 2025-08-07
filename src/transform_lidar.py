@@ -127,7 +127,7 @@ class OriginFusion():
             print("Could not write out point cloud... Does a file called 'out.pcd' already exist?")
             pass
 
-    def PlotImages(self):
+    def plot_median_rgbd(self):
         # Plot median images
         fig, axes=plt.subplots(1,2)
         axes[0].imshow(self.median_color_img)
@@ -475,7 +475,10 @@ if __name__ == "__main__":
     originFuser = OriginFusion()
     originFuser.load_lidar_bag(bag_path, color_topic, depth_topic, caminfo_topic)
     originFuser.load_pose_bag(pose_bag_path, pose_topic)
-    originFuser.PlotImages()
-    originFuser.get_lidar_to_world_tf()
+    originFuser.plot_median_rgbd()
+    tf = originFuser.get_lidar_to_world_tf()
+
+    # Print the Homogeneous transform, write out to YAML/JSON/NPZ/CSV
+    np.savez_compressed("lidar_to_world_tf.npz", tf)
 
     rclpy.shutdown()
