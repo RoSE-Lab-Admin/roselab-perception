@@ -43,14 +43,16 @@ def diff_viz(diff_img, name):
 #      axes[1].set_title("Digital Elevation Map Difference")
 #      fig.colorbar(m2, ax=axes[1])
 
-      plt.figure(figsize=(3.5,3.5), dpi=300)
+      plt.figure(figsize=(3.5,3.5), dpi=350)
 
       # Currently optimized for DEM viz....
-      ax = plt.imshow(diff_img[:,::-1] * 1000., cmap='inferno', vmin=-10, vmax=10, origin='lower')
+#      ax = plt.imshow(diff_img[::-1, ::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
+      ax = plt.imshow(diff_img.T[:,::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
       plt.title(name)
-      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.765)
-      plt.ylabel("Voxel ID in Y")
-      plt.xlabel("Voxel ID in X")
+#      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.389)
+      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.872)
+      plt.xlabel("Voxel ID in Y")
+      plt.ylabel("Voxel ID in X")
       plt.tight_layout()
 
       # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data

@@ -96,6 +96,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
 
 def convert_rgbd_to_pointclouds(rgbd_image):
     intrinsics = o3d.camera.PinholeCameraIntrinsic()
+    # THIS MUST BE CHANGED TO USE CAMERA_INFO TOPIC FOR INTRINSICS!!!!!!!
     intrinsics.set_intrinsics(640, 360, 450.6466369628906, 450.8058776855469, 327.085693359375, 177.85765075683594)
     pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd_image, intrinsics)
     return pcd
@@ -117,22 +118,25 @@ def save_to_pcd_or_ply(points_np, colors_np, output_file):
         raise ValueError("Output file must end in .pcd or .ply")
 
 def save_pcd_as_file(pcd, output_file):
-    if output_file.endswith(".pcd"):
+    if output_file.suffix == ".pcd":
         o3d.io.write_point_cloud(output_file, pcd, write_ascii=True)
-    elif output_file.endswith(".ply"):
+    elif output_file.suffix == ".ply":
         o3d.io.write_point_cloud(output_file, pcd)
     else:
         raise ValueError("Output file must end in .pcd or .ply")
     
-def transform_lidar_to_world(pcd):
+def transform_lidar_to_world(pcd, tf_file):
     # Transform
     # Lidar
-    lidar_pose = np.eye(4)
-    lidar_pose[0:3, 0] = np.array([0.80778813 , 0.01618329, 0.58925074 ])
-    lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
-    lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
-    lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
-    pcd = pcd.transform(lidar_pose)
+#    lidar_pose = np.eye(4)
+#    lidar_pose[0:3, 0] = np.array([0.80778813 , 0.01618329, 0.58925074 ])
+#    lidar_pose[0:3, 1] = np.array([-0.58921483, -0.00741073, 0.80794243 ])
+#    lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
+#    lidar_pose[0:3, 3] = np.array([0.32536598, 2.34371088, -0.48987012])
+
+    tf = np.load(tf_file)["arr_0"]
+
+    pcd = pcd.transform(tf)
 
     return pcd
 
@@ -197,26 +201,27 @@ class RGBDPointCloud(Node):
 #    rclpy.shutdown()
 
 def main():
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 6:
         #print("Usage: python ros2_bag_to_pcd.py <bag_path> <pointcloud_topic> <output_file.pcd|.ply>")
-        print("Usage: python converter.py <bag_path> <color_topic> <aligned_depth_topic> <output_file.pcd|.ply>")
+        print("Usage: python converter.py <bag_path> <color_topic> <aligned_depth_topic> <transform_file> <output_file.pcd|.ply>")
         sys.exit(1)
 
     bag_path = sys.argv[1]
     color_topic = sys.argv[2]
     depth_topic = sys.argv[3]
-    output_file = bag_path +"/"+ sys.argv[4]
+    tf_file = sys.argv[4]
+    output_file = Path(bag_path) / Path(sys.argv[5])
 
     #points, colors = read_pointclouds_from_bag(bag_path, topic)
     rgbd_image = read_rgbd_from_bag(bag_path, depth_topic, color_topic)
     pcd = convert_rgbd_to_pointclouds(rgbd_image)
 
-    pcd = transform_lidar_to_world(pcd)
+    pcd = transform_lidar_to_world(pcd, tf_file)
 
     print(f"Total points extracted: {len(pcd.points)}")
     #save_to_pcd_or_ply(points, colors, output_file)
     save_pcd_as_file(pcd, output_file)
-    print(f"Saved to: {output_file}")
+    print(f"Saved to: {output_file.absolute()}")
 
 
 if __name__ == "__main__":

@@ -479,6 +479,6 @@ if __name__ == "__main__":
     tf = originFuser.get_lidar_to_world_tf()
 
     # Print the Homogeneous transform, write out to YAML/JSON/NPZ/CSV
-    np.savez_compressed("lidar_to_world_tf.npz", tf)
+    np.savez_compressed(Path(bag_path) / Path("lidar_to_world_tf.npz"), tf)
 
     rclpy.shutdown()

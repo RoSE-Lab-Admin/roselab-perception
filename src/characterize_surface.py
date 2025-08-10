@@ -61,7 +61,7 @@ def voxelize_and_analyze(pcd, voxel_size):
 
    print("Building voxel grid point associations...")
    for point in tqdm(np.asarray(pcd.points)):
-      voxel_idx = tuple(((point[[:2]] - voxel_grid.origin[[:2]]) / voxel_size).astype(int))
+      voxel_idx = tuple(((point[:2] - voxel_grid.origin[:2]) / voxel_size).astype(int))
       voxel_point_map[voxel_idx].append(point)
 
    voxel_data = []
@@ -98,7 +98,11 @@ if __name__=="__main__":
 
    pcd = o3d.io.read_point_cloud(fname)
 
-   # Do one last colormap filtering step to condense Z values to smaller range
+   # Filter outliers
+   pcd, ind = pcd.remove_statistical_outlier(nb_neighbors=20,
+                                            std_ratio=2.5)
+
+   # Do one last filtering step to condense Z values to smaller range
    pts = np.asarray(pcd.points)
    mask = (pts[:,2] > np.quantile(pts[:,2], MIN_Q)) & (pts[:,2] < np.quantile(pts[:,2], MAX_Q))
 #
