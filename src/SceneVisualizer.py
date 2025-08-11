@@ -362,6 +362,17 @@ if __name__ == '__main__':
     #pointcloud_pose[:3,  3 ] = Ry @ pointcloud_pose[:3,  3 ]
     scene.add([PointCloudPose(pointcloud_path, pose=pointcloud_pose)])
 
+    # Rover reference frame
+    rover_pose = np.eye(4)
+    rx = np.deg2rad(-90)
+    ry = np.deg2rad(45+90)
+    rz = np.deg2rad(0)
+    center_to_rover = np.array([1.29,-0.35,-0.12])
+    R_rover = R.from_euler('xyz', [rx,ry,rz])
+    rover_pose[:3,:3] = R_rover.as_matrix()
+    rover_pose[:3, 3] = center_to_rover
+    scene.add([SimplePose(rover_pose, size=1.0)])
+
     # STL of Gantry
     gantry_pose = np.eye(4)
     gantry_pose[0:3, 0] = np.array([ 0.9238795,  0.0,  -0.3826834])
