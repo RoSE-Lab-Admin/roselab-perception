@@ -36,6 +36,116 @@ def _parse_metadata(fname):
     return np.asarray(sensors_pos), np.asarray(sensors_rot)
 
 
+def create_cylinder_between_points(p1, p2, radius=0.02, color=[1, 0, 0]):
+    """
+    Create a cylinder from p1 to p2 with specified radius and color.
+    """
+    cylinder_height = np.linalg.norm(p2 - p1)
+    cylinder = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=cylinder_height, resolution=20, split=4)
+    cylinder.paint_uniform_color(color)
+    cylinder.compute_vertex_normals()
+
+    # Align the cylinder along the vector (p2 - p1)
+    direction = (p2 - p1) / cylinder_height
+    z_axis = np.array([0, 0, 1])
+    axis = np.cross(z_axis, direction)
+    angle = np.arccos(np.dot(z_axis, direction))
+    if np.linalg.norm(axis) != 0:
+        R = o3d.geometry.get_rotation_matrix_from_axis_angle(axis / np.linalg.norm(axis) * angle)
+        cylinder.rotate(R, center=np.zeros(3))
+
+    # Translate to midpoint
+    midpoint = (p1 + p2) / 2
+    cylinder.translate(midpoint)
+
+    return cylinder
+
+def create_dimension_cylinders(bbox, tf=None, thickness=0.02):
+    min_bound = bbox.get_min_bound()
+    max_bound = bbox.get_max_bound()
+    center = bbox.get_center()
+
+    # Compute extents manually
+    extent = max_bound - min_bound
+    x_extent = extent[0]
+    y_extent = extent[1]
+    z_extent = extent[2]
+
+    # Axis endpoints
+    x0 = center - np.array([x_extent / 2, 0, 0])
+    x1 = center + np.array([x_extent / 2, 0, 0])
+
+    y0 = center - np.array([0, y_extent / 2, 0])
+    y1 = center + np.array([0, y_extent / 2, 0])
+
+    z0 = center - np.array([0, 0, z_extent / 2])
+    z1 = center + np.array([0, 0, z_extent / 2])
+
+    # Create cylinders for each axis
+    x_cyl = create_cylinder_between_points(x0, x1, radius=thickness, color=[1, 0, 0])  # Red for X
+    y_cyl = create_cylinder_between_points(y0, y1, radius=thickness, color=[0, 1, 0])  # Green for Y
+    z_cyl = create_cylinder_between_points(z0, z1, radius=thickness, color=[0, 0, 1])  # Blue for Z
+
+    if tf is not None:
+        return [cyl.transform(tf) for cyl in [x_cyl, y_cyl, z_cyl]]
+
+    return [x_cyl, y_cyl, z_cyl]
+
+
+def create_dimension_lines(bbox):
+    min_bound = bbox.get_min_bound()
+    max_bound = bbox.get_max_bound()
+    center = bbox.get_center()
+
+    # Define axis directions
+    x_axis = np.array([1, 0, 0])
+    y_axis = np.array([0, 1, 0])
+    z_axis = np.array([0, 0, 1])
+
+    # Lengths
+    width = max_bound[0] - min_bound[0]
+    length = max_bound[1] - min_bound[1]
+    height = max_bound[2] - min_bound[2]
+
+    # Starting point is the center of the bounding box
+    origin = center
+
+    # Compute endpoints for the lines
+    x_end = origin + width / 2 * x_axis
+    x_start = origin - width / 2 * x_axis
+
+    y_end = origin + length / 2 * y_axis
+    y_start = origin - length / 2 * y_axis
+
+    z_end = origin + height / 2 * z_axis
+    z_start = origin - height / 2 * z_axis
+
+    # Combine into points and lines
+    points = [
+        x_start, x_end,
+        y_start, y_end,
+        z_start, z_end
+    ]
+    lines = [
+        [0, 1],  # X axis (Width)
+        [2, 3],  # Y axis (Length)
+        [4, 5],  # Z axis (Height)
+    ]
+    colors = [
+        [1, 0, 0],  # Red for width (x)
+        [0, 1, 0],  # Green for length (y)
+        [0, 0, 1],  # Blue for height (z)
+    ]
+
+    line_set = o3d.geometry.LineSet(
+        points=o3d.utility.Vector3dVector(points),
+        lines=o3d.utility.Vector2iVector(lines),
+    )
+    line_set.colors = o3d.utility.Vector3dVector(colors)
+    line_set.size = o3d.utility.Scalar()
+
+    return line_set
+
 class PoseObject:
     """
     Base class for objects with a 4×4 pose.
@@ -153,11 +263,11 @@ class SceneVisualizer:
     def __init__(self):
         self.objects = []
 
-    def add(self, obj):
+    def add(self, obj_list):
         """
         Add a PoseObject or PointCloud to the scene.
         """
-        self.objects.append(obj)
+        self.objects.extend(obj_list)
 
     def visualize(self,
                   window_name: str = 'Scene',
@@ -168,8 +278,10 @@ class SceneVisualizer:
         for obj in self.objects:
             if isinstance(obj, PoseObject):
                 geometries.append(obj.get_transformed_geometry())
-            elif isinstance(obj, PointCloud):
+            elif isinstance(obj, PointCloudPose):
                 geometries.append(obj.get_geometry())
+            elif isinstance(obj, o3d.geometry.Geometry):
+                geometries.append(obj)
             else:
                 raise TypeError(f"Unsupported object type: {type(obj)}")
 
@@ -183,21 +295,31 @@ class SceneVisualizer:
 
 if __name__ == '__main__':
 
-    if(len(sys.argv) != 3):
-        print("Usage: python SceneVisualizer.py <path to pointcloud ply> <path to STL>")
+    if(len(sys.argv) != 4):
+        print("Usage: python SceneVisualizer.py <path to pointcloud ply> <path to STL> <path to optitrack metadata csv>")
         quit()
     pointcloud_path = sys.argv[1]
     stl_path = sys.argv[2]
+    metadata_file = sys.argv[3]
 
     # Instantiate scene visualizer
     scene = SceneVisualizer()
 
     # Center of the floor at origin
     floor_pose = np.eye(4)
-    scene.add(SimplePose(floor_pose, size=0.5))
-   
+
+    # build a transform to place axes at corner of point cloud
+    rx = np.deg2rad(-90)
+    ry = np.deg2rad(45)
+    rz = np.deg2rad(0)
+    center_to_corner = np.array([-1.47,-0.65,-0.5])
+    R_floor = R.from_euler('xyz', [rx,ry,rz])
+    floor_pose[:3,:3] = R_floor.as_matrix()
+    floor_pose[:3, 3] = center_to_corner
+    scene.add([SimplePose(floor_pose, size=1.0)])
+
     # Parse OptiTrack metadata and add those cameras
-    metadata_file = 'data/test.csv'
+#    metadata_file = 'data/test.csv'
     positions, rotations = _parse_metadata(metadata_file)
     flip_z = np.diag([1,1,-1])
     for pos, quat in zip(positions, rotations):
@@ -209,8 +331,8 @@ if __name__ == '__main__':
         # apply flip to face frustum inward
         rot_fixed = rot.dot(flip_z)
         pose[0:3, 0:3] = rot_fixed
-        scene.add(CameraPose(pose, scale=0.5, color=(0, 0, 1)))
-
+        scene.add([CameraPose(pose, scale=0.5, color=(0, 0, 1))])
+#        scene.add([SimplePose(pose, size=0.5)])
 
     # build a rotation about Y
     theta = np.deg2rad(-9)
@@ -226,23 +348,67 @@ if __name__ == '__main__':
     lidar_pose[0:3, 2] = np.array([ 0.01744194, -0.99984158 , 0.00354913  ])
     lidar_pose[0:3, 3] = np.array([0.6936598, 2.54371088, 0.33487012])
     lidar_pose[:3, :3] = Ry @ lidar_pose[:3, :3]
-    scene.add(CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0)))
 
+    lidar_rot =  R.from_euler('xyz', [0,np.pi,0]) * R.from_matrix(lidar_pose[:3,:3])
+    lidar_pose[:3,:3] = lidar_rot.as_matrix()
+
+    scene.add([CameraPose(lidar_pose, scale=0.5, color=(1, 0, 0))])
+    scene.add([SimplePose(lidar_pose, size=1.0)])
 
     # Single point cloud with same transform as LiDAR
     pointcloud_pose = np.eye(4)
     pointcloud_pose[0:3, 3] = np.array([0.33487012, 0.0, 0.6936598])
     pointcloud_pose[:3, :3] = Ry @ pointcloud_pose[:3, :3]
     #pointcloud_pose[:3,  3 ] = Ry @ pointcloud_pose[:3,  3 ]
-    scene.add(PointCloudPose(pointcloud_path, pose=pointcloud_pose))
+    scene.add([PointCloudPose(pointcloud_path, pose=pointcloud_pose)])
 
-        # STL of Gantry
+    # STL of Gantry
     gantry_pose = np.eye(4)
     gantry_pose[0:3, 0] = np.array([ 0.9238795,  0.0,  -0.3826834])
     gantry_pose[0:3, 1] = np.array([0.0,  1.0,  0.0])
     gantry_pose[0:3, 2] = np.array([ 0.3826834,  0.0,  0.9238795])
     gantry_pose[0:3, 3] = np.array([0.3, 1.5, 0.2])
-    scene.add(ObjectPose(gantry_pose, stl_path, 0.001))
+    
+    gantry_geom = ObjectPose(gantry_pose, stl_path, 0.001)
+
+#    bbox = gantry_geom.get_geometry().get_axis_aligned_bounding_box()
+#    dims = create_dimension_cylinders(bbox, tf=floor_pose, thickness=0.05)
+
+    # Hardcode gantry geometry since its bounding box is uhhhhhh weird
+    # X dimension (same, width, East-West)
+    rot = R.from_euler('y', np.pi/4).as_matrix()
+
+    xdim = create_cylinder_between_points(rot @ np.array([-5.2,-1.5,6]), rot @ np.array([5.2,-1.5,6]), radius=0.02, color=[1, 0, 0])
+
+    # Y dimension (former Z, length, North-South)
+    ydim = create_cylinder_between_points(rot @ np.array([-6,-1.5,-5.2]), rot @ np.array([-6,-1.5,5.2]), radius=0.02, color=[0, 1, 0])
+
+    # Z dimension (former Y, height)
+    zdim = create_cylinder_between_points(np.array([-8.4,-1.5, 0]), np.array([-8.4,4.1, 0]), radius=0.02, color=[0, 0, 1])
+
+    dims = [xdim, ydim, zdim]
+    scene.add([gantry_geom] + dims)
 
     # Render the scene
     scene.visualize(window_name='MLSS Sensor Poses', width=1024, height=768)
+
+#
+#{
+#	"class_name" : "ViewTrajectory",
+#	"interval" : 29,
+#	"is_loop" : false,
+#	"trajectory" : 
+#	[
+#		{
+#			"boundingbox_max" : [ 7.7568800406736402, 3.5627625872781534, 7.3948479728601413 ],
+#			"boundingbox_min" : [ -7.3420793491526677, -1.2459973767111041, -7.8903603184415791 ],
+#			"field_of_view" : 60.0,
+#			"front" : [ -0.31522538429328806, 0.62961532773836182, 0.7100827389636114 ],
+#			"lookat" : [ -0.29711469313404348, -0.56852788619118033, 0.77594232354844539 ],
+#			"up" : [ 0.23290600086368904, 0.77667201987550472, -0.58526521193744874 ],
+#			"zoom" : 0.47999999999999976
+#		}
+#	],
+#	"version_major" : 1,
+#	"version_minor" : 0
+#}
