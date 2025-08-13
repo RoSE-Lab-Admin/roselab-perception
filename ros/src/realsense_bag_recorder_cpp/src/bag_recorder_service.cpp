@@ -38,14 +38,23 @@ private:
   rclcpp::Service<RecordBag>::SharedPtr service_;
 
   const std::vector<std::string> topics_ = {
-    "/camera/color/image_raw",
-    "/camera/depth/image_rect_raw",
-    "/camera/color/camera_info",
-    "/camera/depth/camera_info",
-    "/camera/accel/sample",
-    "/camera/gyro/sample"
+        //"/MastCam/Front/accel/imu_info",
+        //"/MastCam/Front/accel/metadata",
+        //"/MastCam/Front/accel/sample",
+        "/MastCam/Front/color/camera_info",
+        "/MastCam/Front/color/image_raw",
+        //"/MastCam/Front/color/metadata",
+        "/MastCam/Front/depth/camera_info",
+        "/MastCam/Front/depth/image_rect_raw",
+        //"/MastCam/Front/depth/metadata",
+        "/MastCam/Front/extrinsics/depth_to_accel",
+        "/MastCam/Front/extrinsics/depth_to_color",
+        "/MastCam/Front/extrinsics/depth_to_gyro",
+        //"/MastCam/Front/gyro/imu_info",
+        //"/MastCam/Front/gyro/metadata",
+        //"/MastCam/Front/gyro/sample",
+	"/tf_static"
   };
-  // May want to add the camera extrinsics here too
 
   void handle_request(
     const std::shared_ptr<RecordBag::Request> request,
@@ -88,12 +97,14 @@ private:
     std::filesystem::create_directories(bag_directory);
 
     std::stringstream cmd;
-    cmd << "ros2 bag record -o " << bag_path << "-d " << duration;
+    cmd << "ros2 bag record -o " << bag_path << " -d " << duration;
     for (const auto& topic : topics_) {
       cmd << " " << topic;
     }
 
     std::string full_cmd = cmd.str(); //+ " & echo $! > /tmp/bag_pid.txt";
+    RCLCPP_INFO(this->get_logger(), "Bagging via:   %s", full_cmd.c_str());
+
     int result = std::system(full_cmd.c_str());
 
     if (result != 0) {

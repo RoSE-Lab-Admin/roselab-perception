@@ -45,7 +45,7 @@ class MastCamPointCloudNode(Node):
         points = self.pc.calculate(depth_frame)
 
         verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, 3)
-        tex_coords = np.asanyarray(points.get_texture_coordinates()).reshape(-1, 2)
+        tex_coords = np.asanyarray(points.get_texture_coordinates()).view(np.float32).reshape(-1, 2)
 
         color_image = np.asanyarray(color_frame.get_data())
         u = (tex_coords[:, 0] * color_image.shape[1]).astype(np.int32)
@@ -90,7 +90,7 @@ class MastCamPointCloudNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = D456PointCloudNode()
+    node = MastCamPointCloudNode()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
