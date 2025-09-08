@@ -59,7 +59,8 @@ ros2 launch realsense2_camera rs_launch.py \
     depth_module.profile:=$RESOLUTION \
     enable_gyro:=$ENABLE_IMU \
     enable_accel:=$ENABLE_IMU \
-    align_depth.enable:=$USE_ALIGNED_DEPTH &
+    align_depth.enable:=$USE_ALIGNED_DEPTH \
+    camera_name:=Front --ros-args -r __ns:=/MastCam &
 REALSENSE_PID=$!
 
 # wait a bit for init
