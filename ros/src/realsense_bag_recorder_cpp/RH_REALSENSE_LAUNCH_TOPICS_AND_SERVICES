@@ -1,0 +1,30 @@
+(venv) dev@lemonpi:~/kiss-icp/ros$ ros2 topic list
+/MastCam/Front/accel/imu_info
+/MastCam/Front/accel/metadata
+/MastCam/Front/accel/sample
+/MastCam/Front/color/camera_info
+/MastCam/Front/color/image_raw
+/MastCam/Front/color/metadata
+/MastCam/Front/depth/camera_info
+/MastCam/Front/depth/image_rect_raw
+/MastCam/Front/depth/metadata
+/MastCam/Front/extrinsics/depth_to_accel
+/MastCam/Front/extrinsics/depth_to_color
+/MastCam/Front/extrinsics/depth_to_gyro
+/MastCam/Front/gyro/imu_info
+/MastCam/Front/gyro/metadata
+/MastCam/Front/gyro/sample
+/parameter_events
+/rosout
+/tf_static
+(venv) dev@lemonpi:~/kiss-icp/ros$ ros2 service list
+/MastCam/Front/describe_parameters
+/MastCam/Front/device_info
+/MastCam/Front/get_parameter_types
+/MastCam/Front/get_parameters
+/MastCam/Front/get_type_description
+/MastCam/Front/list_parameters
+/MastCam/Front/set_parameters
+/MastCam/Front/set_parameters_atomically
+(venv) dev@lemonpi:~/kiss-icp/ros$ 
+

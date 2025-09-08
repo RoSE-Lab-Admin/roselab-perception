@@ -1,0 +1,1 @@
+ros2 launch realsense2_camera rs_launch.py depth_module.depth_profile:=1280x720x30 rgb_camera.color_profile:=1280x720x30 enable_accel:=true enable_gyro:=true accel_fps:=200 gyro_fps:=200 camera_namespace:=MastCam camera_name:=Front
