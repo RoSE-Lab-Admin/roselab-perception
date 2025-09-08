@@ -13,7 +13,7 @@
 #
 #   Use (default plz):
 #
-#       run_perception_trial.sh --res=1240x720x15 --no-imu --tag dryrun_featureless_
+#       run_perception_trial.sh --tag dryrun_featureless_
 
 set -e
 
@@ -60,7 +60,8 @@ ros2 launch realsense2_camera rs_launch.py \
     enable_gyro:=$ENABLE_IMU \
     enable_accel:=$ENABLE_IMU \
     align_depth.enable:=$USE_ALIGNED_DEPTH \
-    camera_name:=Front --ros-args -r __ns:=/MastCam &
+    camera_name:=Front \
+    camera_namespace:=/MastCam/ &
 REALSENSE_PID=$!
 
 # wait a bit for init
