@@ -93,8 +93,12 @@ fi
 POSE_TOPICS=$(ros2 topic list | grep '/pose$' | tr '\n' ' ')
 
 
-# RYAN + CAM : PUT ALL ROVER CONTROL AND TELEMETRY TOPICS HERE
-ROVER_TOPICS="/odom
+ROVER_TOPICS="/roseybot_base_controller/cmd_vel_out
+              /roseybot_base_controller/odom
+              /robot_description
+              /cmd_vel
+              /dynamic_joint_states
+              /joint_states
               /tf
               /tf_static"
 
