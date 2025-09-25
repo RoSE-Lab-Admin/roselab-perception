@@ -1,0 +1,5 @@
+GantryCommand:
+  ros__parameters:
+    data_file: "D:/perception_data"
+    trajectory_file: "ros/src/scan_automation/scan_automation/path_files/RH_test.yaml"
+    panda_file: "lidar_bags"

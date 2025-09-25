@@ -7,6 +7,9 @@
   <maintainer email="lexi.j.hanlon@gmail.com">lexij</maintainer>
   <license>Apache-2.0</license>
 
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+
   <depend>rclpy</depend>
   <depend>nav_msgs</depend>
   <depend>std_msgs</depend>

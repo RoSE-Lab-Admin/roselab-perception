@@ -13,6 +13,7 @@ from builtin_interfaces.msg import Time
 import subprocess
 from pathlib import Path as pth
 import time
+from datetime import datetime
 
 #runGantryScan shell script
 
@@ -23,6 +24,24 @@ import time
 class GantryCommand(Node):
     def __init__(self):
         super().__init__('gantry_command')
+
+        #set up output file
+        self.declare_parameter("data_file", "D:/perception_data/default")
+        data_base = self.get_parameter("data_file").value
+        #name folders as dates and times
+        self.day = datetime.now().strftime("%m%d%Y")
+        hour = datetime.now().strftime("/%H-%M-%S")
+        self.data_file = pth(data_base) / self.day / hour
+        #if folder doesnt exist, make it
+        self.data_file.mkdir(parents=True, exist_ok=True)
+
+        #set up trajectory input file
+        self.declare_parameter("trajectory_file", "ros/src/scan_automation/scan_automation/path_files/RH_test.yaml")
+        self.path_file = self.get_parameter("trajectory_file").value
+
+        #setup lattepanda output file
+        self.declare_parameter("panda_file", "lidar_bags")
+        self.panda_file = self.get_parameter("panda_file").value
 
         #service client setup
         self.gant_capture = self.create_client(Capture, "gantry_capture_service/capture")
@@ -41,16 +60,7 @@ class GantryCommand(Node):
         while not self.gant_delete.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for delete service...")
 
-        #where bags will be stored
-        # RH: Let's clean this up to output to D drive by default (maybe as configuration parameter when running?)
-        self.path = str(pth.home() / "rosbags" / "912-test")
-        pth(self.path).mkdir(parents=True, exist_ok=True)
-
-        #user file name choice
-        # RH: More UX, should be loaded from command line to support tab completion as either a parameter
-        self.test_name = str(input("File name: "))
-
-        with open(f"{self.test_name}.yaml", "r") as f:
+        with open(self.path_file, "r") as f:
             waypoints = yaml.safe_load(f)
 
         self.path_msg = Path()
@@ -146,16 +156,16 @@ class GantryCommand(Node):
         self.get_logger().info(f"url: {cap_url}")
 
         #download data from url
-        subprocess.Popen(["wget", "-r", "-P", f"{self.path}", f"{cap_url}"])
+        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
         time.sleep(10)
 
         self.get_logger().info("trial complete.")
-        self.get_logger().info(f"bag saved to {self.path}")
+        self.get_logger().info(f"bag saved to {self.data_file}")
 
-    #helper function
+    #helper function to send requests to bagger service
     def start_lidar(self):
         capture_request = Capture.Request()
-        capture_request.outname = self.test_name + "_lidar"
+        capture_request.outname = self.panda_file 
         capture_request.sensors = ["l515_center"] #, "l515_west", "l515_east"]
 
         # Capture duration should be length of trajectory + 2 * padding
