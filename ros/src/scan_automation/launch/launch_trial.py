@@ -23,7 +23,7 @@ def generate_launch_description():
 
     trajectory_file_arg = DeclareLaunchArgument(
         "trajectory_file",
-        default_value="ros/src/scan_automation/scan_automation/path_files/RH_test.yaml",
+        default_value="src/scan_automation/scan_automation/path_files/RH_test.yaml",
         description="Trajectory file to be used for the gantry"
     )
 

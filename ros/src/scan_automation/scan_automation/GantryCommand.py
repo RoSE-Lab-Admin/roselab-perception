@@ -94,7 +94,7 @@ class GantryCommand(Node):
     # RH: Maybe we should support goto through this interface as well... takes a GeometryMsg Point type
     def move_gantry(self):
         #start moving the gantry
-        self.get_logger().info(f"Publishing Trajectory to Gantry: {self.path_msg}")
+        self.get_logger().info(f"Publishing Trajectory to Gantry")
         self.trajectory_pub.publish(self.path_msg)
 
         # RH: mode might need to come second?
