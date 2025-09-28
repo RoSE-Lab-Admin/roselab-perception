@@ -1,0 +1,17 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from gantry_lidar_interfaces/srv/DeleteTimeRange.srv
+// generated code does not contain a copyright notice
+
+
+module gantry_lidar_interfaces {
+  module srv {
+    struct DeleteTimeRange_Request {
+      string start;
+
+      string end;
+    };
+    struct DeleteTimeRange_Response {
+      string outdata;
+    };
+  };
+};

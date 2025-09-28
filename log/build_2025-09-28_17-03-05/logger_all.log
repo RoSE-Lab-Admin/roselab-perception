@@ -1,0 +1,630 @@
+[0.375s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.375s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=22, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7d594e2821b0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7d594e39a990>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7d594e39a990>>, mixin_verb=('build',))
+[0.430s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.431s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.431s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.431s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.431s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.431s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.431s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/lexij/roselab-perception'
+[0.431s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.431s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.431s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.432s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.469s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.469s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['ignore', 'ignore_ament_install']
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'ignore'
+[0.470s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'ignore_ament_install'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['colcon_pkg']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'colcon_pkg'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['colcon_meta']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'colcon_meta'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['ros']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'ros'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['cmake', 'python']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'cmake'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'python'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extensions ['python_setup_py']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(data) by extension 'python_setup_py'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.471s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['ignore', 'ignore_ament_install']
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'ignore'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'ignore_ament_install'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['colcon_pkg']
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'colcon_pkg'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['colcon_meta']
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'colcon_meta'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['ros']
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'ros'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['cmake', 'python']
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'cmake'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'python'
+[0.472s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extensions ['python_setup_py']
+[0.473s] Level 1:colcon.colcon_core.package_identification:_identify(reference) by extension 'python_setup_py'
+[0.474s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['ignore', 'ignore_ament_install']
+[0.474s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'ignore'
+[0.474s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'ignore_ament_install'
+[0.474s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['colcon_pkg']
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'colcon_pkg'
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['colcon_meta']
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'colcon_meta'
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['ros']
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'ros'
+[0.475s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['cmake', 'python']
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'cmake'
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'python'
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extensions ['python_setup_py']
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval) by extension 'python_setup_py'
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['ignore', 'ignore_ament_install']
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'ignore'
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'ignore_ament_install'
+[0.476s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['colcon_pkg']
+[0.477s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'colcon_pkg'
+[0.477s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['colcon_meta']
+[0.477s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'colcon_meta'
+[0.477s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['ros']
+[0.477s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'ros'
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['cmake', 'python']
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'cmake'
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'python'
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extensions ['python_setup_py']
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(reference/OptitrackPoseEval/src) by extension 'python_setup_py'
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['ignore', 'ignore_ament_install']
+[0.478s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'ignore'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'ignore_ament_install'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['colcon_pkg']
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'colcon_pkg'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['colcon_meta']
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'colcon_meta'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['ros']
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'ros'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['cmake', 'python']
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'cmake'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'python'
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extensions ['python_setup_py']
+[0.479s] Level 1:colcon.colcon_core.package_identification:_identify(ros) by extension 'python_setup_py'
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['ignore', 'ignore_ament_install']
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'ignore'
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'ignore_ament_install'
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['colcon_pkg']
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'colcon_pkg'
+[0.480s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['colcon_meta']
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'colcon_meta'
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['ros']
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'ros'
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['cmake', 'python']
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'cmake'
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'python'
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extensions ['python_setup_py']
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src) by extension 'python_setup_py'
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extensions ['ignore', 'ignore_ament_install']
+[0.481s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extension 'ignore'
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extension 'ignore_ament_install'
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extensions ['colcon_pkg']
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extension 'colcon_pkg'
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extensions ['colcon_meta']
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extension 'colcon_meta'
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extensions ['ros']
+[0.482s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/aggregated_pointcloud) by extension 'ros'
+[0.485s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/aggregated_pointcloud' with type 'ros.ament_python' and name 'aggregated_pointcloud'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['ignore', 'ignore_ament_install']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'ignore'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'ignore_ament_install'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['colcon_pkg']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'colcon_pkg'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['colcon_meta']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'colcon_meta'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['ros']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'ros'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['cmake', 'python']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'cmake'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'python'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extensions ['python_setup_py']
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/benchmarking_sdk) by extension 'python_setup_py'
+[0.486s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extensions ['ignore', 'ignore_ament_install']
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extension 'ignore'
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extension 'ignore_ament_install'
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extensions ['colcon_pkg']
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extension 'colcon_pkg'
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extensions ['colcon_meta']
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extension 'colcon_meta'
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extensions ['ros']
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidar_interfaces) by extension 'ros'
+[0.487s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/gantry_lidar_interfaces' with type 'ros.ament_cmake' and name 'gantry_lidar_interfaces'
+[0.487s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['ignore', 'ignore_ament_install']
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'ignore'
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'ignore_ament_install'
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['colcon_pkg']
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'colcon_pkg'
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['colcon_meta']
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'colcon_meta'
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['ros']
+[0.488s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'ros'
+[0.489s] DEBUG:colcon.colcon_core.package_identification:Found ROS schema reference in package manifest in 'ros/src/gantry_lidars'
+[0.489s] WARNING:colcon.colcon_core.package_identification:Failed to parse ROS package manifest in 'ros/src/gantry_lidars': Error(s) in package 'ros/src/gantry_lidars/package.xml':
+Error(s):
+- The generic dependency on 'rclpy' is redundant with: exec_depend
+[0.489s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['cmake', 'python']
+[0.489s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'cmake'
+[0.489s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'python'
+[0.489s] DEBUG:colcon.colcon_core.package_identification:Python package in 'ros/src/gantry_lidars' passes arguments to the setup() function which requires a different identification extension than 'python'
+[0.489s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extensions ['python_setup_py']
+[0.489s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars) by extension 'python_setup_py'
+[0.855s] ERROR:colcon.colcon_core.package_identification:Exception in package identification extension 'python_setup_py' in 'ros/src/gantry_lidars': Command '['/usr/bin/python3', '-c', 'import sys;from contextlib import suppress;exec("with suppress(ImportError):    from setuptools.extern.packaging.specifiers    import SpecifierSet");exec("with suppress(ImportError):    from packaging.specifiers import SpecifierSet");from distutils.core import run_setup;dist = run_setup(    \'setup.py\', script_args=(\'--dry-run\',), stop_after=\'config\');skip_keys = (\'cmdclass\', \'distclass\', \'ext_modules\', \'metadata\');data = {    key: value for key, value in dist.__dict__.items()     if (        not key.startswith(\'_\') and         not callable(value) and         key not in skip_keys and         key not in dist.display_option_names    )};data[\'metadata\'] = {    k: v for k, v in dist.metadata.__dict__.items()     if k not in (\'license_files\', \'provides_extras\')};sys.stdout.buffer.write(repr(data).encode(\'utf-8\'))']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/colcon_core/package_identification/__init__.py", line 144, in _identify
+    retval = extension.identify(_reused_descriptor_instance)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/colcon_python_setup_py/package_identification/python_setup_py.py", line 48, in identify
+    config = get_setup_information(setup_py)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/colcon_python_setup_py/package_identification/python_setup_py.py", line 249, in get_setup_information
+    _setup_information_cache[hashable_env] = _get_setup_information(
+                                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/colcon_python_setup_py/package_identification/python_setup_py.py", line 296, in _get_setup_information
+    result = subprocess.run(
+             ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/usr/bin/python3', '-c', 'import sys;from contextlib import suppress;exec("with suppress(ImportError):    from setuptools.extern.packaging.specifiers    import SpecifierSet");exec("with suppress(ImportError):    from packaging.specifiers import SpecifierSet");from distutils.core import run_setup;dist = run_setup(    \'setup.py\', script_args=(\'--dry-run\',), stop_after=\'config\');skip_keys = (\'cmdclass\', \'distclass\', \'ext_modules\', \'metadata\');data = {    key: value for key, value in dist.__dict__.items()     if (        not key.startswith(\'_\') and         not callable(value) and         key not in skip_keys and         key not in dist.display_option_names    )};data[\'metadata\'] = {    k: v for k, v in dist.metadata.__dict__.items()     if k not in (\'license_files\', \'provides_extras\')};sys.stdout.buffer.write(repr(data).encode(\'utf-8\'))']' returned non-zero exit status 1.
+
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['ignore', 'ignore_ament_install']
+[0.855s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'ignore'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'ignore_ament_install'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['colcon_pkg']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'colcon_pkg'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['colcon_meta']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'colcon_meta'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['ros']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'ros'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['cmake', 'python']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'cmake'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'python'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extensions ['python_setup_py']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/gantry_lidars) by extension 'python_setup_py'
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['ignore', 'ignore_ament_install']
+[0.856s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'ignore'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'ignore_ament_install'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['colcon_pkg']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'colcon_pkg'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['colcon_meta']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'colcon_meta'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['ros']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'ros'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['cmake', 'python']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'cmake'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'python'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extensions ['python_setup_py']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/resource) by extension 'python_setup_py'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['ignore', 'ignore_ament_install']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'ignore'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'ignore_ament_install'
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['colcon_pkg']
+[0.857s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'colcon_pkg'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['colcon_meta']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'colcon_meta'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['ros']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'ros'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['cmake', 'python']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'cmake'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'python'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extensions ['python_setup_py']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_lidars/test) by extension 'python_setup_py'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extensions ['ignore', 'ignore_ament_install']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extension 'ignore'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extension 'ignore_ament_install'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extensions ['colcon_pkg']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extension 'colcon_pkg'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extensions ['colcon_meta']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extension 'colcon_meta'
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extensions ['ros']
+[0.858s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/gantry_services) by extension 'ros'
+[0.859s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/gantry_services' with type 'ros.ament_python' and name 'gantry_services'
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extensions ['ignore', 'ignore_ament_install']
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extension 'ignore'
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extension 'ignore_ament_install'
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extensions ['colcon_pkg']
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extension 'colcon_pkg'
+[0.860s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extensions ['colcon_meta']
+[0.861s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extension 'colcon_meta'
+[0.861s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extensions ['ros']
+[0.861s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/mastcam_pointcloud) by extension 'ros'
+[0.862s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/mastcam_pointcloud' with type 'ros.ament_python' and name 'mastcam_pointcloud'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extensions ['ignore', 'ignore_ament_install']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extension 'ignore'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extension 'ignore_ament_install'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extensions ['colcon_pkg']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extension 'colcon_pkg'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extensions ['colcon_meta']
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extension 'colcon_meta'
+[0.862s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extensions ['ros']
+[0.863s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/realsense_bag_recorder_cpp) by extension 'ros'
+[0.864s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/realsense_bag_recorder_cpp' with type 'ros.ament_cmake' and name 'realsense_bag_recorder_cpp'
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extensions ['ignore', 'ignore_ament_install']
+[0.864s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extension 'ignore'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extension 'ignore_ament_install'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extensions ['colcon_pkg']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extension 'colcon_pkg'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extensions ['colcon_meta']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extension 'colcon_meta'
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extensions ['ros']
+[0.865s] Level 1:colcon.colcon_core.package_identification:_identify(ros/src/scan_automation) by extension 'ros'
+[0.866s] DEBUG:colcon.colcon_core.package_identification:Package 'ros/src/scan_automation' with type 'ros.ament_python' and name 'scan_automation'
+[0.866s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['ignore', 'ignore_ament_install']
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'ignore'
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'ignore_ament_install'
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['colcon_pkg']
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'colcon_pkg'
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['colcon_meta']
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'colcon_meta'
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['ros']
+[0.867s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'ros'
+[0.868s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['cmake', 'python']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'cmake'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'python'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extensions ['python_setup_py']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(scripts) by extension 'python_setup_py'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.869s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.870s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.870s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.870s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.870s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.870s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.870s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.902s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.903s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.906s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 6 installed packages in /home/lexij/roselab-perception/install
+[0.909s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 318 installed packages in /opt/ros/jazzy
+[0.911s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.976s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_args' from command line to 'None'
+[0.976s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_target' from command line to 'None'
+[0.976s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_clean_cache' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_clean_first' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'cmake_force_configure' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'ament_cmake_args' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'catkin_cmake_args' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'aggregated_pointcloud' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.977s] DEBUG:colcon.colcon_core.verb:Building package 'aggregated_pointcloud' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/aggregated_pointcloud', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/aggregated_pointcloud', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud', 'symlink_install': False, 'test_result_base': None}
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_args' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_target' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_clean_cache' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_clean_first' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'cmake_force_configure' from command line to 'False'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'ament_cmake_args' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'catkin_cmake_args' from command line to 'None'
+[0.977s] Level 5:colcon.colcon_core.verb:set package 'gantry_lidar_interfaces' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.977s] DEBUG:colcon.colcon_core.verb:Building package 'gantry_lidar_interfaces' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/gantry_lidar_interfaces', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/gantry_lidar_interfaces', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/gantry_lidar_interfaces', 'symlink_install': False, 'test_result_base': None}
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_target' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_clean_cache' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_clean_first' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'cmake_force_configure' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'ament_cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'catkin_cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'mastcam_pointcloud' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.978s] DEBUG:colcon.colcon_core.verb:Building package 'mastcam_pointcloud' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/mastcam_pointcloud', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/mastcam_pointcloud', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud', 'symlink_install': False, 'test_result_base': None}
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_target' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_clean_cache' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_clean_first' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'cmake_force_configure' from command line to 'False'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'ament_cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'catkin_cmake_args' from command line to 'None'
+[0.978s] Level 5:colcon.colcon_core.verb:set package 'realsense_bag_recorder_cpp' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.978s] DEBUG:colcon.colcon_core.verb:Building package 'realsense_bag_recorder_cpp' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/realsense_bag_recorder_cpp', 'symlink_install': False, 'test_result_base': None}
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_target' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_clean_cache' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_clean_first' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'cmake_force_configure' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'ament_cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'catkin_cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'gantry_services' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.979s] DEBUG:colcon.colcon_core.verb:Building package 'gantry_services' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/gantry_services', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/gantry_services', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/gantry_services', 'symlink_install': False, 'test_result_base': None}
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_target' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_clean_cache' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_clean_first' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'cmake_force_configure' from command line to 'False'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'ament_cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'catkin_cmake_args' from command line to 'None'
+[0.979s] Level 5:colcon.colcon_core.verb:set package 'scan_automation' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.979s] DEBUG:colcon.colcon_core.verb:Building package 'scan_automation' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/lexij/roselab-perception/build/scan_automation', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/lexij/roselab-perception/install/scan_automation', 'merge_install': False, 'path': '/home/lexij/roselab-perception/ros/src/scan_automation', 'symlink_install': False, 'test_result_base': None}
+[0.979s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.982s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.982s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/gantry_lidar_interfaces' with build type 'ament_cmake'
+[0.982s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/lexij/roselab-perception/ros/src/gantry_lidar_interfaces'
+[0.985s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.985s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.985s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.991s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud' with build type 'ament_python'
+[0.992s] Level 1:colcon.colcon_core.shell:create_environment_hook('aggregated_pointcloud', 'ament_prefix_path')
+[0.992s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/ament_prefix_path.ps1'
+[0.994s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/ament_prefix_path.dsv'
+[0.995s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/ament_prefix_path.sh'
+[0.997s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.997s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.002s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud' with build type 'ament_python'
+[1.002s] Level 1:colcon.colcon_core.shell:create_environment_hook('mastcam_pointcloud', 'ament_prefix_path')
+[1.002s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/ament_prefix_path.ps1'
+[1.003s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/ament_prefix_path.dsv'
+[1.004s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/ament_prefix_path.sh'
+[1.004s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.004s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.011s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/realsense_bag_recorder_cpp' with build type 'ament_cmake'
+[1.012s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/lexij/roselab-perception/ros/src/realsense_bag_recorder_cpp'
+[1.012s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.012s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.026s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/build/gantry_lidar_interfaces': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/gantry_lidar_interfaces -- -j22 -l22
+[1.375s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud'
+[1.375s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.375s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.672s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud'
+[1.672s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.673s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.686s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/build/gantry_lidar_interfaces' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/gantry_lidar_interfaces -- -j22 -l22
+[1.701s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/build/gantry_lidar_interfaces': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/gantry_lidar_interfaces
+[1.712s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp -- -j22 -l22
+[1.816s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(gantry_lidar_interfaces)
+[1.817s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/build/gantry_lidar_interfaces' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/gantry_lidar_interfaces
+[1.821s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces' for CMake module files
+[1.821s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces' for CMake config files
+[1.822s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'cmake_prefix_path')
+[1.822s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.ps1'
+[1.823s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.dsv'
+[1.823s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.sh'
+[1.824s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib'
+[1.825s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'ld_library_path_lib')
+[1.825s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.ps1'
+[1.825s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.dsv'
+[1.826s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.sh'
+[1.827s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/bin'
+[1.828s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/pkgconfig/gantry_lidar_interfaces.pc'
+[1.828s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages'
+[1.829s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'pythonpath')
+[1.829s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.ps1'
+[1.831s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.dsv'
+[1.831s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.sh'
+[1.832s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/bin'
+[1.833s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.ps1'
+[1.834s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.dsv'
+[1.835s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.sh'
+[1.837s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.bash'
+[1.838s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.zsh'
+[1.839s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/colcon-core/packages/gantry_lidar_interfaces)
+[1.841s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(gantry_lidar_interfaces)
+[1.841s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces' for CMake module files
+[1.842s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces' for CMake config files
+[1.843s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'cmake_prefix_path')
+[1.843s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.ps1'
+[1.844s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.dsv'
+[1.845s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/cmake_prefix_path.sh'
+[1.846s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib'
+[1.846s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'ld_library_path_lib')
+[1.847s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.ps1'
+[1.847s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.dsv'
+[1.848s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/ld_library_path_lib.sh'
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/bin'
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/pkgconfig/gantry_lidar_interfaces.pc'
+[1.849s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages'
+[1.849s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_lidar_interfaces', 'pythonpath')
+[1.850s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.ps1'
+[1.850s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.dsv'
+[1.851s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/hook/pythonpath.sh'
+[1.852s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/bin'
+[1.853s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.ps1'
+[1.854s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.dsv'
+[1.854s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.sh'
+[1.855s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.bash'
+[1.856s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/gantry_lidar_interfaces/package.zsh'
+[1.857s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/gantry_lidar_interfaces/share/colcon-core/packages/gantry_lidar_interfaces)
+[1.857s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/gantry_services' with build type 'ament_python'
+[1.857s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_services', 'ament_prefix_path')
+[1.858s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/ament_prefix_path.ps1'
+[1.860s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/ament_prefix_path.dsv'
+[1.862s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/ament_prefix_path.sh'
+[1.869s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.870s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.879s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/lexij/roselab-perception/ros/src/scan_automation' with build type 'ament_python'
+[1.881s] Level 1:colcon.colcon_core.shell:create_environment_hook('scan_automation', 'ament_prefix_path')
+[1.885s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/ament_prefix_path.ps1'
+[1.886s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/ament_prefix_path.dsv'
+[1.886s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/ament_prefix_path.sh'
+[1.887s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.887s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[2.452s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/lexij/roselab-perception/ros/src/gantry_services'
+[2.452s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[2.452s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[2.779s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/lexij/roselab-perception/ros/src/scan_automation'
+[2.779s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[2.779s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[2.786s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp -- -j22 -l22
+[2.790s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp
+[2.795s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud': PYTHONPATH=/home/lexij/roselab-perception/build/mastcam_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/mastcam_pointcloud build --build-base /home/lexij/roselab-perception/build/mastcam_pointcloud/build install --record /home/lexij/roselab-perception/build/mastcam_pointcloud/install.log --single-version-externally-managed install_data
+[2.799s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data
+[2.887s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(realsense_bag_recorder_cpp)
+[2.887s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp' for CMake module files
+[2.888s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp
+[2.889s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp' for CMake config files
+[2.890s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'cmake_prefix_path')
+[2.890s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.ps1'
+[2.891s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.dsv'
+[2.892s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.sh'
+[2.893s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib'
+[2.893s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'ld_library_path_lib')
+[2.893s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.ps1'
+[2.894s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.dsv'
+[2.894s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.sh'
+[2.895s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/bin'
+[2.895s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/pkgconfig/realsense_bag_recorder_cpp.pc'
+[2.896s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages'
+[2.896s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'pythonpath')
+[2.897s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.ps1'
+[2.898s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.dsv'
+[2.899s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.sh'
+[2.901s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/bin'
+[2.901s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.ps1'
+[2.902s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.dsv'
+[2.903s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.sh'
+[2.904s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.bash'
+[2.905s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.zsh'
+[2.905s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/colcon-core/packages/realsense_bag_recorder_cpp)
+[2.906s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(realsense_bag_recorder_cpp)
+[2.906s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp' for CMake module files
+[2.907s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp' for CMake config files
+[2.907s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'cmake_prefix_path')
+[2.908s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.ps1'
+[2.908s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.dsv'
+[2.909s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/cmake_prefix_path.sh'
+[2.910s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib'
+[2.910s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'ld_library_path_lib')
+[2.910s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.ps1'
+[2.911s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.dsv'
+[2.911s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/ld_library_path_lib.sh'
+[2.912s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/bin'
+[2.912s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/pkgconfig/realsense_bag_recorder_cpp.pc'
+[2.913s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages'
+[2.913s] Level 1:colcon.colcon_core.shell:create_environment_hook('realsense_bag_recorder_cpp', 'pythonpath')
+[2.913s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.ps1'
+[2.913s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.dsv'
+[2.914s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/hook/pythonpath.sh'
+[2.914s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/bin'
+[2.915s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.ps1'
+[2.915s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.dsv'
+[2.916s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.sh'
+[2.917s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.bash'
+[2.917s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.zsh'
+[2.918s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/colcon-core/packages/realsense_bag_recorder_cpp)
+[3.559s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud' for CMake module files
+[3.561s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud' returned '0': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data
+[3.561s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud' for CMake config files
+[3.562s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud/lib'
+[3.562s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud/bin'
+[3.562s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/pkgconfig/aggregated_pointcloud.pc'
+[3.562s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages'
+[3.562s] Level 1:colcon.colcon_core.shell:create_environment_hook('aggregated_pointcloud', 'pythonpath')
+[3.563s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/pythonpath.ps1'
+[3.563s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/pythonpath.dsv'
+[3.564s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/hook/pythonpath.sh'
+[3.565s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/aggregated_pointcloud/bin'
+[3.565s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(aggregated_pointcloud)
+[3.565s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/package.ps1'
+[3.567s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/package.dsv'
+[3.568s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/package.sh'
+[3.568s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/package.bash'
+[3.569s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/package.zsh'
+[3.570s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/aggregated_pointcloud/share/colcon-core/packages/aggregated_pointcloud)
+[3.571s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud' for CMake module files
+[3.574s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud' for CMake config files
+[3.575s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud' returned '0': PYTHONPATH=/home/lexij/roselab-perception/build/mastcam_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/mastcam_pointcloud build --build-base /home/lexij/roselab-perception/build/mastcam_pointcloud/build install --record /home/lexij/roselab-perception/build/mastcam_pointcloud/install.log --single-version-externally-managed install_data
+[3.575s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud/lib'
+[3.576s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud/bin'
+[3.576s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/pkgconfig/mastcam_pointcloud.pc'
+[3.576s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages'
+[3.576s] Level 1:colcon.colcon_core.shell:create_environment_hook('mastcam_pointcloud', 'pythonpath')
+[3.576s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/pythonpath.ps1'
+[3.577s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/pythonpath.dsv'
+[3.577s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/hook/pythonpath.sh'
+[3.578s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/mastcam_pointcloud/bin'
+[3.578s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mastcam_pointcloud)
+[3.578s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/package.ps1'
+[3.579s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/package.dsv'
+[3.580s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/package.sh'
+[3.580s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/package.bash'
+[3.581s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud/package.zsh'
+[3.582s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/mastcam_pointcloud/share/colcon-core/packages/mastcam_pointcloud)
+[3.631s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/ros/src/gantry_services': CMAKE_PREFIX_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor LD_LIBRARY_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib PYTHONPATH=/home/lexij/roselab-perception/build/gantry_services/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/gantry_services build --build-base /home/lexij/roselab-perception/build/gantry_services/build install --record /home/lexij/roselab-perception/build/gantry_services/install.log --single-version-externally-managed install_data
+[3.878s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/lexij/roselab-perception/ros/src/scan_automation': CMAKE_PREFIX_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor LD_LIBRARY_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib PYTHONPATH=/home/lexij/roselab-perception/build/scan_automation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/scan_automation build --build-base /home/lexij/roselab-perception/build/scan_automation/build install --record /home/lexij/roselab-perception/build/scan_automation/install.log --single-version-externally-managed install_data
+[4.355s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services' for CMake module files
+[4.356s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/ros/src/gantry_services' returned '0': CMAKE_PREFIX_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor LD_LIBRARY_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib PYTHONPATH=/home/lexij/roselab-perception/build/gantry_services/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/gantry_services build --build-base /home/lexij/roselab-perception/build/gantry_services/build install --record /home/lexij/roselab-perception/build/gantry_services/install.log --single-version-externally-managed install_data
+[4.356s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services' for CMake config files
+[4.357s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services/lib'
+[4.357s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services/bin'
+[4.357s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services/lib/pkgconfig/gantry_services.pc'
+[4.357s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages'
+[4.357s] Level 1:colcon.colcon_core.shell:create_environment_hook('gantry_services', 'pythonpath')
+[4.357s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/pythonpath.ps1'
+[4.358s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/pythonpath.dsv'
+[4.359s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/hook/pythonpath.sh'
+[4.359s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/gantry_services/bin'
+[4.359s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(gantry_services)
+[4.359s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/package.ps1'
+[4.360s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/package.dsv'
+[4.361s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/package.sh'
+[4.361s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/package.bash'
+[4.362s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/gantry_services/share/gantry_services/package.zsh'
+[4.362s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/gantry_services/share/colcon-core/packages/gantry_services)
+[4.584s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation' for CMake module files
+[4.586s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/lexij/roselab-perception/ros/src/scan_automation' returned '0': CMAKE_PREFIX_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor LD_LIBRARY_PATH=/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib PYTHONPATH=/home/lexij/roselab-perception/build/scan_automation/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_lidar_interfaces/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/scan_automation build --build-base /home/lexij/roselab-perception/build/scan_automation/build install --record /home/lexij/roselab-perception/build/scan_automation/install.log --single-version-externally-managed install_data
+[4.587s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation' for CMake config files
+[4.588s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation/lib'
+[4.588s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation/bin'
+[4.588s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation/lib/pkgconfig/scan_automation.pc'
+[4.588s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages'
+[4.588s] Level 1:colcon.colcon_core.shell:create_environment_hook('scan_automation', 'pythonpath')
+[4.589s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/pythonpath.ps1'
+[4.589s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/pythonpath.dsv'
+[4.590s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/hook/pythonpath.sh'
+[4.590s] Level 1:colcon.colcon_core.environment:checking '/home/lexij/roselab-perception/install/scan_automation/bin'
+[4.590s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(scan_automation)
+[4.591s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/package.ps1'
+[4.591s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/package.dsv'
+[4.592s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/package.sh'
+[4.593s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/package.bash'
+[4.593s] INFO:colcon.colcon_core.shell:Creating package script '/home/lexij/roselab-perception/install/scan_automation/share/scan_automation/package.zsh'
+[4.594s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/lexij/roselab-perception/install/scan_automation/share/colcon-core/packages/scan_automation)
+[4.594s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[4.594s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[4.596s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[4.596s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[4.701s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[4.701s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[4.701s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[4.701s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[4.704s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Notifications was not provided by any .service files
+[4.704s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[4.704s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/lexij/roselab-perception/install/local_setup.ps1'
+[4.705s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/lexij/roselab-perception/install/_local_setup_util_ps1.py'
+[4.706s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/lexij/roselab-perception/install/setup.ps1'
+[4.707s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/lexij/roselab-perception/install/local_setup.sh'
+[4.708s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/lexij/roselab-perception/install/_local_setup_util_sh.py'
+[4.709s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/lexij/roselab-perception/install/setup.sh'
+[4.710s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/lexij/roselab-perception/install/local_setup.bash'
+[4.710s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/lexij/roselab-perception/install/setup.bash'
+[4.712s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/lexij/roselab-perception/install/local_setup.zsh'
+[4.712s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/lexij/roselab-perception/install/setup.zsh'

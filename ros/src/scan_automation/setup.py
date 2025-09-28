@@ -15,6 +15,8 @@ setup(
 
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'path_files'), glob('scan_automation/path_files/*.yaml')),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,

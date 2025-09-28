@@ -1,0 +1,21 @@
+[1.805s] Invoking command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data
+[2.183s] running egg_info
+[2.207s] writing ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/PKG-INFO
+[2.208s] writing dependency_links to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/dependency_links.txt
+[2.208s] writing entry points to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/entry_points.txt
+[2.208s] writing requirements to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/requires.txt
+[2.208s] writing top-level names to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/top_level.txt
+[2.259s] reading manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+[2.260s] writing manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+[2.261s] running build
+[2.261s] running build_py
+[2.261s] running install
+[2.269s] running install_lib
+[2.296s] running install_data
+[2.296s] running install_egg_info
+[2.323s] removing '/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud-0.0.0-py3.12.egg-info' (and everything under it)
+[2.324s] Copying ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud-0.0.0-py3.12.egg-info
+[2.325s] running install_scripts
+[2.523s] Installing aggregated_pointcloud_node script to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/aggregated_pointcloud
+[2.523s] writing list of installed files to '/home/lexij/roselab-perception/build/aggregated_pointcloud/install.log'
+[2.567s] Invoked command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud' returned '0': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data

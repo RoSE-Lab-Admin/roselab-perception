@@ -1,0 +1,37 @@
+running egg_info
+creating ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info
+writing ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/PKG-INFO
+writing dependency_links to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/dependency_links.txt
+writing entry points to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/entry_points.txt
+writing requirements to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/requires.txt
+writing top-level names to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/top_level.txt
+writing manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+reading manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+writing manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build
+creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib
+creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+copying aggregated_pointcloud/aggregated_pointcloud_node.py -> /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+copying aggregated_pointcloud/__init__.py -> /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+running install
+running install_lib
+creating /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+copying /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud/aggregated_pointcloud_node.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+copying /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud/__init__.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+byte-compiling /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud/aggregated_pointcloud_node.py to aggregated_pointcloud_node.cpython-312.pyc
+byte-compiling /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud/__init__.py to __init__.cpython-312.pyc
+running install_data
+creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index
+creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index
+creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index/packages
+copying resource/aggregated_pointcloud -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index/packages
+copying package.xml -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud
+creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/launch
+copying launch/aggregated_pointcloud.launch.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/launch
+running install_egg_info
+Copying ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud-0.0.0-py3.12.egg-info
+running install_scripts
+Installing aggregated_pointcloud_node script to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/aggregated_pointcloud
+writing list of installed files to '/home/lexij/roselab-perception/build/aggregated_pointcloud/install.log'

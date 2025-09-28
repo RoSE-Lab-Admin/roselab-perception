@@ -5,6 +5,7 @@ from nav_msgs.msg import Path
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped, Point
 
+from ament_index_python.packages import get_package_share_directory
 from gantry_lidar_interfaces.srv import Capture, DownloadName, DeleteName
 
 import yaml
@@ -14,6 +15,7 @@ import subprocess
 from pathlib import Path as pth
 import time
 from datetime import datetime
+import os
 
 #runGantryScan shell script
 
@@ -27,17 +29,20 @@ class GantryCommand(Node):
 
         #set up output file
         self.declare_parameter("data_file", "D:/perception_data/default")
-        data_base = self.get_parameter("data_file").value
+        data_base = pth(self.get_parameter("data_file").value).expanduser().resolve()
         #name folders as dates and times
         self.day = datetime.now().strftime("%m%d%Y")
-        hour = datetime.now().strftime("/%H-%M-%S")
+        hour = datetime.now().strftime("%H-%M-%S")
         self.data_file = pth(data_base) / self.day / hour
         #if folder doesnt exist, make it
         self.data_file.mkdir(parents=True, exist_ok=True)
 
         #set up trajectory input file
-        self.declare_parameter("trajectory_file", "ros/src/scan_automation/scan_automation/path_files/RH_test.yaml")
-        self.path_file = self.get_parameter("trajectory_file").value
+        current_file = get_package_share_directory("scan_automation")
+        traj_folder = os.path.join(current_file, "path_files")
+        self.declare_parameter("trajectory_file", "goto_cont_test.yaml")
+        traj_file = self.get_parameter("trajectory_file").value
+        self.path_file = os.path.join(traj_folder, traj_file)
 
         #setup lattepanda output file
         self.declare_parameter("panda_file", "lidar_bags")
@@ -51,6 +56,13 @@ class GantryCommand(Node):
         #publishers to gantry control
         self.trajectory_pub = self.create_publisher(Path, '/gantry/setTrajectory', 10)
         self.mode_pub = self.create_publisher(String, '/gantry/setMode', 10) 
+        self.goto_pub = self.create_publisher(Point, '/gantry/gotoLocation', 10)
+
+        #subscriber to gantry_control mode
+        self.mode_sub = self.create_subscription(String, '/gantry/setMode', self.read_mode, 10)
+
+        self.gantry_mode = None
+
 
         #wait for services to be ready
         while not self.gant_capture.wait_for_service(timeout_sec=1.0):
@@ -65,73 +77,126 @@ class GantryCommand(Node):
 
         self.path_msg = Path()
 
-        #read trajectory in from file and store in path message
-        self.path_msg.header.frame_id = "map"
+        self.goto_msgs = []
+        self.stop_times = []
+
+        #read trajectory in from file and store in point message list
         for point in waypoints:
-            pose = PoseStamped()
-            pose.header.frame_id="map"
-            pose.pose.position.x = float(point["position_x"])
-            pose.pose.position.y = float(point["position_y"])
+            goal = Point()
 
-            # RH: All of these fields MUST be floats!!!
-            pose.pose.position.z = 0.0
-            pose.pose.orientation.x = 0.
-            pose.pose.orientation.y = 0.
-            pose.pose.orientation.z = 0.
-            pose.pose.orientation.w = 1.0
+            #reconstruct file into point message
+            goal.x = float(point['position_x'])
+            goal.y = float(point['position_y'])
+            goal.z = 0.0
+            scan_time = point['time']
 
-            sec = int(point["time"])
-            nsec=int((point["time"]-sec)*1e9)
-            pose.header.stamp = Time(sec=sec, nanosec=nsec)
+            self.goto_msgs.append(goal)
 
-            self.path_msg.poses.append(pose)
-        
-        #start trial
-        # RH: Commenting out lidar capture (which is basically working!) until trajectory is actually being used
-        #self.start_scan()
-        self.move_gantry()
+            #discerning between continuous and discrete
+            if scan_time: #if not zero
+                self.stop_times.append(scan_time)
 
-    # RH: Maybe we should support goto through this interface as well... takes a GeometryMsg Point type
-    def move_gantry(self):
-        #start moving the gantry
-        self.get_logger().info(f"Publishing Trajectory to Gantry")
-        self.trajectory_pub.publish(self.path_msg)
+        #start lidar scan
+        self.start_lidar()
 
-        # RH: mode might need to come second?
-        mode_msg = String(data = "TRAJECTORY")
-        self.mode_pub.publish(mode_msg)
 
-        #give it a second to publish messages
-        rclpy.spin_once(self, timeout_sec=3.) # Upping the timeout since I think that's the issue
+        #if stop times are not the length of the points, it is continuous, otherwise its discrete
+        if len(self.stop_times) != len(self.goto_msgs):
+            self.go_to_cont()
+        else:
+            self.go_to_disc()
 
-        # RH: WAIT FOR TRAJECTORY TO COMPLETE!!! HARDCODING FOR NOW
-        duration = 30
-        time.sleep(duration)
+    def read_mode(self, msg: String):
+        self.gantry_mode = msg.data
 
-        # Finally set to HOLD for good measure
-        mode_msg = String(data = "HOLD")
-        self.mode_pub.publish(mode_msg)
+    def go_to_cont(self):
+        self.get_logger().info('starting continuous path')
+        #just making sure lol
+        mode_hold = String(data='HOLD')
+        self.mode_pub.publish(mode_hold)
 
-        #give it a second to publish messages
-        rclpy.spin_once(self, timeout_sec=3.) # Upping the timeout since I think that's the issue
+        #give it a second to publish
+        rclpy.spin_once(self, timeout_sec=3.0)
 
-    def start_scan(self):
-        #start lidar
-        future_cap = self.start_lidar()
-        time.sleep(5)
+        mode_go = String(data='GOTO')
 
-        # Move gantry
-        self.move_gantry()
+        for point in self.goto_msgs:
+            #publish, set mode, wait until mode changes to hold, begin count down
+            #publish point, set mode
+            self.goto_pub.publish(point)
 
-        #wait until lidar scan done
-        rclpy.spin_until_future_complete(self, future=future_cap)
+            rclpy.spin_once(self, timeout_sec=3.0)
 
-        #start downloading and ending processes
-        self.end_scan(future_cap)
+            self.mode_pub.publish(mode_go)
 
-    def end_scan(self, future_cap):
+            self.get_logger().info('point published')
+
+            rclpy.spin_once(self, timeout_sec=3.0)
+
+            #this logic might make it jerky, potentially should just manually
+            #wait until movement is done
+            while self.gantry_mode != "HOLD":
+                rclpy.spin_once(self, timeout_sec=3.0)
+                self.get_logger().info('waiting for hold mode...')
+
+            self.get_logger().info('ready to publish next point')
+
+        self.mode_pub.publish(mode_hold)
+        rclpy.spin_once(self, timeout_sec=3.0)
+        self.end_scan()
+
+
+    def go_to_disc(self):
+        self.get_logger().info('starting discrete path')
+        #just making sure lol
+        mode_hold = String(data='HOLD')
+        self.mode_pub.publish(mode_hold)
+
+        rclpy.spin_once(self, timeout_sec=1.0)
+
+        mode_go = String(data='GOTO')
+
+        counter = 0
+
+        for point in self.goto_msgs:
+            #publish, set mode, wait until mode changes to hold, begin count down
+            #publish point, set mode
+            self.goto_pub.publish(point)
+            self.mode_pub.publish(mode_go)
+
+            rclpy.spin_once(self, timeout_sec=1.0)
+
+            #this logic might make it jerky, potentially should just manually
+            #wait until movement is done
+            while self.gantry_mode != "HOLD":
+                rclpy.spin_once(self, timeout_sec=1.0)
+
+            #wait until finished scanning
+            time.sleep(self.stop_times[counter])
+            counter += 1
+
+        self.mode_pub.publish(mode_hold)
+        rclpy.spin_once(self, timeout_sec=1.0)
+        self.end_scan()
+
+    #starts lidar bagging 
+    def start_lidar(self):
+        capture_request = Capture.Request()
+        capture_request.outname = self.panda_file 
+        capture_request.sensors = ["l515_center"] #, "l515_west", "l515_east"]
+
+        # Capture duration should be length of trajectory + 2 * padding
+        capture_request.duration = 60.
+        self.future_cap = self.gant_capture.call_async(capture_request)
+
+
+    def end_scan(self):
+
+        if self.future_cap and not self.future_cap.done():
+            rclpy.spin_until_future_complete(self, self.future_cap)
+
         #get capture service repsonse
-        cap_response = future_cap.result()
+        cap_response = self.future_cap.result()
 
         #lidar capture data
         lidar_cap_data = json.loads(cap_response.outdata)
@@ -162,16 +227,6 @@ class GantryCommand(Node):
         self.get_logger().info("trial complete.")
         self.get_logger().info(f"bag saved to {self.data_file}")
 
-    #helper function to send requests to bagger service
-    def start_lidar(self):
-        capture_request = Capture.Request()
-        capture_request.outname = self.panda_file 
-        capture_request.sensors = ["l515_center"] #, "l515_west", "l515_east"]
-
-        # Capture duration should be length of trajectory + 2 * padding
-        capture_request.duration = 60.0
-        future_cap = self.gant_capture.call_async(capture_request)
-        return future_cap
     
 def main(args=None):
     rclpy.init()

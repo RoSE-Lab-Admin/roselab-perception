@@ -1,0 +1,5 @@
+float64 duration
+string bag_name
+---
+bool success
+string message

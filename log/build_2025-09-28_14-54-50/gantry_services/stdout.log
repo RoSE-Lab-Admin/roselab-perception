@@ -1,0 +1,19 @@
+running egg_info
+writing ../../../build/gantry_services/gantry_services.egg-info/PKG-INFO
+writing dependency_links to ../../../build/gantry_services/gantry_services.egg-info/dependency_links.txt
+writing entry points to ../../../build/gantry_services/gantry_services.egg-info/entry_points.txt
+writing requirements to ../../../build/gantry_services/gantry_services.egg-info/requires.txt
+writing top-level names to ../../../build/gantry_services/gantry_services.egg-info/top_level.txt
+reading manifest file '../../../build/gantry_services/gantry_services.egg-info/SOURCES.txt'
+writing manifest file '../../../build/gantry_services/gantry_services.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+running install_egg_info
+removing '/home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages/gantry_services-0.0.0-py3.12.egg-info' (and everything under it)
+Copying ../../../build/gantry_services/gantry_services.egg-info to /home/lexij/roselab-perception/install/gantry_services/lib/python3.12/site-packages/gantry_services-0.0.0-py3.12.egg-info
+running install_scripts
+Installing gantry_capture_service script to /home/lexij/roselab-perception/install/gantry_services/lib/gantry_services
+writing list of installed files to '/home/lexij/roselab-perception/build/gantry_services/install.log'

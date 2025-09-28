@@ -1,0 +1,37 @@
+[1.732s] Invoking command in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud': PYTHONPATH=/home/lexij/roselab-perception/build/mastcam_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/mastcam_pointcloud build --build-base /home/lexij/roselab-perception/build/mastcam_pointcloud/build install --record /home/lexij/roselab-perception/build/mastcam_pointcloud/install.log --single-version-externally-managed install_data
+[2.130s] running egg_info
+[2.131s] creating ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info
+[2.155s] writing ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/PKG-INFO
+[2.155s] writing dependency_links to ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/dependency_links.txt
+[2.156s] writing entry points to ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/entry_points.txt
+[2.156s] writing requirements to ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/requires.txt
+[2.156s] writing top-level names to ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/top_level.txt
+[2.156s] writing manifest file '../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/SOURCES.txt'
+[2.210s] reading manifest file '../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/SOURCES.txt'
+[2.211s] writing manifest file '../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info/SOURCES.txt'
+[2.211s] running build
+[2.212s] running build_py
+[2.212s] creating /home/lexij/roselab-perception/build/mastcam_pointcloud/build
+[2.213s] creating /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib
+[2.213s] creating /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib/mastcam_pointcloud
+[2.213s] copying mastcam_pointcloud/__init__.py -> /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib/mastcam_pointcloud
+[2.213s] copying mastcam_pointcloud/mastcam_pointcloud_node.py -> /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib/mastcam_pointcloud
+[2.213s] running install
+[2.220s] running install_lib
+[2.249s] creating /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud
+[2.249s] copying /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib/mastcam_pointcloud/__init__.py -> /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud
+[2.250s] copying /home/lexij/roselab-perception/build/mastcam_pointcloud/build/lib/mastcam_pointcloud/mastcam_pointcloud_node.py -> /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud
+[2.250s] byte-compiling /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud/__init__.py to __init__.cpython-312.pyc
+[2.251s] byte-compiling /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud/mastcam_pointcloud_node.py to mastcam_pointcloud_node.cpython-312.pyc
+[2.253s] running install_data
+[2.253s] creating /home/lexij/roselab-perception/install/mastcam_pointcloud/share/ament_index
+[2.253s] creating /home/lexij/roselab-perception/install/mastcam_pointcloud/share/ament_index/resource_index
+[2.253s] creating /home/lexij/roselab-perception/install/mastcam_pointcloud/share/ament_index/resource_index/packages
+[2.254s] copying resource/mastcam_pointcloud -> /home/lexij/roselab-perception/install/mastcam_pointcloud/share/ament_index/resource_index/packages
+[2.254s] copying package.xml -> /home/lexij/roselab-perception/install/mastcam_pointcloud/share/mastcam_pointcloud
+[2.254s] running install_egg_info
+[2.281s] Copying ../../../build/mastcam_pointcloud/mastcam_pointcloud.egg-info to /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages/mastcam_pointcloud-0.0.0-py3.12.egg-info
+[2.282s] running install_scripts
+[2.466s] Installing mastcam_pointcloud_publisher script to /home/lexij/roselab-perception/install/mastcam_pointcloud/lib/mastcam_pointcloud
+[2.468s] writing list of installed files to '/home/lexij/roselab-perception/build/mastcam_pointcloud/install.log'
+[2.524s] Invoked command in '/home/lexij/roselab-perception/ros/src/mastcam_pointcloud' returned '0': PYTHONPATH=/home/lexij/roselab-perception/build/mastcam_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/mastcam_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/mastcam_pointcloud build --build-base /home/lexij/roselab-perception/build/mastcam_pointcloud/build install --record /home/lexij/roselab-perception/build/mastcam_pointcloud/install.log --single-version-externally-managed install_data

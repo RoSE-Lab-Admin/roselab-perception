@@ -1,0 +1,19 @@
+- time: 0
+  position_x: 1
+  position_y: 1
+- time: 16
+  position_x: 9
+  position_y: 2.5
+- time: 16
+  position_x: 1
+  position_y: 4
+- time: 16
+  position_x: 9
+  position_y: 5.5
+- time: 16
+  position_x: 1
+  position_y: 7
+- time: 16
+  position_x: 9
+  position_y: 8.5
+...
