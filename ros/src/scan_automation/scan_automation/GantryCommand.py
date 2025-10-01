@@ -21,8 +21,6 @@ import os
 #runGantryScan shell script
 
 #LIDAR is always running, just subscribe to the topics maybe or make it event driven perhaps
-#wait i can just use the hold mode
-#TODO: look at goto mode for gantry
 #pattern input automatic, potentially a lot of waypoints
 class GantryCommand(Node):
     def __init__(self):
@@ -94,23 +92,42 @@ class GantryCommand(Node):
         self.path_msg = Path()
         self.path_msg.header.frame_id = "map"
 
+        num_time = 0
+        first = Point()
+
         for point in self.waypoints:
-            pose = PoseStamped()
-            pose.header.frame_id = "map"
-            pose.pose.position.x = float(point["position_x"])
-            pose.pose.position.y = float(point["position_y"])
+            if num_time == 0:
+                first.x = float(point['position_x'])
+                first.y = float(point['position_y'])
+                first.z = 0.0
 
-            pose.pose.position.z = 0.0
-            pose.pose.orientation.x = 0.0
-            pose.pose.orientation.y = 0.0
-            pose.pose.orientation.z = 0.0
-            pose.pose.orientation.w = 1.0
+                go_string = String(data="GOTO")
+                self.mode_pub(go_string)
+                rclpy.spin_once(self, timeout_sec=2.0)
 
-            sec = int(point["time"])
-            nsec = int((point["time"]-sec)*1e9)
-            pose.header.stamp = Time(sec=sec, nanosec=nsec)
+                self.goto_pub.publish(first)
+                rclpy.spin_once(self, timeout_sec=5.0)
+                time.sleep(3)
+            else:
+                
+                pose = PoseStamped()
+                pose.header.frame_id = "map"
+                pose.pose.position.x = float(point["position_x"])
+                pose.pose.position.y = float(point["position_y"])
 
-            self.path_msg.poses.append(pose)
+                pose.pose.position.z = 0.0
+                pose.pose.orientation.x = 0.0
+                pose.pose.orientation.y = 0.0
+                pose.pose.orientation.z = 0.0
+                pose.pose.orientation.w = 1.0
+
+                sec = int(point["time"])
+                nsec = int((point["time"]-sec)*1e9)
+                pose.header.stamp = Time(sec=sec, nanosec=nsec)
+
+                self.path_msg.poses.append(pose)
+
+            num_time+=1
 
         self.start_lidar()
 
