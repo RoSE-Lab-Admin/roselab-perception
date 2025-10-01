@@ -23,7 +23,7 @@ def generate_launch_description():
 
     trajectory_file_arg = DeclareLaunchArgument(
         "trajectory_file",
-        default_value="goto_cont_test.yaml",
+        default_value="cont_rast.yaml",
         description="Trajectory file to be used for the gantry"
     )
 

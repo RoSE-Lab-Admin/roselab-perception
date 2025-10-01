@@ -3,3 +3,4 @@ GantryCommand:
     data_file: "D:/perception_data"
     trajectory_file: "goto_cont_test.yaml"
     panda_file: "lidar_bags"
+    movement_mode: "TRAJECTORY"

@@ -7,6 +7,7 @@ from geometry_msgs.msg import PoseStamped, Point
 
 from ament_index_python.packages import get_package_share_directory
 from gantry_lidar_interfaces.srv import Capture, DownloadName, DeleteName
+from gantry_control_interfaces.msg import GantryState
 
 import yaml
 import json
@@ -26,6 +27,10 @@ import os
 class GantryCommand(Node):
     def __init__(self):
         super().__init__('gantry_command')
+
+        #determine mode
+        self.declare_parameter("movement_mode", "TRAJECTORY")
+        movement_mode = self.get_parameter("movement_mode").value
 
         #set up output file
         self.declare_parameter("data_file", "D:/perception_data/default")
@@ -59,7 +64,7 @@ class GantryCommand(Node):
         self.goto_pub = self.create_publisher(Point, '/gantry/gotoLocation', 10)
 
         #subscriber to gantry_control mode
-        self.mode_sub = self.create_subscription(String, '/gantry/setMode', self.read_mode, 10)
+        self.mode_sub = self.create_subscription(GantryState, '/gantry/gantry_status/gantry_state', self.read_mode, 10)
 
         self.gantry_mode = None
 
@@ -73,15 +78,69 @@ class GantryCommand(Node):
             self.get_logger().info("Waiting for delete service...")
 
         with open(self.path_file, "r") as f:
-            waypoints = yaml.safe_load(f)
+            self.waypoints = yaml.safe_load(f)
 
+        if movement_mode == "TRAJECTORY":
+            self.traj_mode_start()
+        else:
+            self.goto_mode_start()
+
+        
+
+    def read_mode(self, msg: String):
+        self.gantry_mode = msg.controller_mode
+
+    def traj_mode_start(self):
+        self.path_msg = Path()
+        self.path_msg.header.frame_id = "map"
+
+        for point in self.waypoints:
+            pose = PoseStamped()
+            pose.header.frame_id = "map"
+            pose.pose.position.x = float(point["position_x"])
+            pose.pose.position.y = float(point["position_y"])
+
+            pose.pose.position.z = 0.0
+            pose.pose.orientation.x = 0.0
+            pose.pose.orientation.y = 0.0
+            pose.pose.orientation.z = 0.0
+            pose.pose.orientation.w = 1.0
+
+            sec = int(point["time"])
+            nsec = int((point["time"]-sec)*1e9)
+            pose.header.stamp = Time(sec=sec, nanosec=nsec)
+
+            self.path_msg.poses.append(pose)
+
+        self.start_lidar()
+
+        #start moving gantry
+        self.trajectory_pub.publish(self.path_msg)
+        self.get_logger().info("Published trajectory")
+
+        mode_msg = String(data="TRAJECTORY")
+        self.mode_pub.publish(mode_msg)
+
+        rclpy.spin_once(self, timeout_sec=3.0)
+
+        #wait until trajectory finished
+        while self.gantry_mode != "HOLD":
+            rclpy.spin_once(self, timeout_sec=3.0)
+            self.get_logger().info("waiting to stop moving")
+
+        self.end_scan()
+
+
+
+
+    def goto_mode_start(self):
         self.path_msg = Path()
 
         self.goto_msgs = []
         self.stop_times = []
 
         #read trajectory in from file and store in point message list
-        for point in waypoints:
+        for point in self.waypoints:
             goal = Point()
 
             #reconstruct file into point message
@@ -95,7 +154,7 @@ class GantryCommand(Node):
             #discerning between continuous and discrete
             if scan_time: #if not zero
                 self.stop_times.append(scan_time)
-
+                
         #start lidar scan
         self.start_lidar()
 
@@ -105,9 +164,7 @@ class GantryCommand(Node):
             self.go_to_cont()
         else:
             self.go_to_disc()
-
-    def read_mode(self, msg: String):
-        self.gantry_mode = msg.data
+        
 
     def go_to_cont(self):
         self.get_logger().info('starting continuous path')
