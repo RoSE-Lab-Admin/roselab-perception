@@ -98,47 +98,45 @@ class GantryCommand(Node):
         self.path_msg = Path()
         self.path_msg.header.frame_id = "map"
 
-        num_time = 0
         first = Point()
 
+        first_point = self.waypoints[0]
+
+        first.x = float(first_point['position_x'])
+        first.y = float(first_point['position_y'])
+        first.z = 0.0
+
+        go_string = String(data="GOTO")
+        self.mode_pub.publish(go_string)
+        rclpy.spin_once(self, timeout_sec=2.0)
+
+        self.goto_pub.publish(first)
+
+        tolerance = .02
+
+        while (self.gantry_posx-first.x) >= tolerance and (self.gantry_posy-first.y) >= tolerance: 
+            rclpy.spin_once(self, timeout_sec=5.0)
+            self.get_logger().info("waiting for goto position")
+        
+
         for point in self.waypoints:
-            if num_time == 0:
-                first.x = float(point['position_x'])
-                first.y = float(point['position_y'])
-                first.z = 0.0
+            pose = PoseStamped()
+            pose.header.frame_id = "map"
+            pose.pose.position.x = float(point["position_x"])
+            pose.pose.position.y = float(point["position_y"])
 
-                go_string = String(data="GOTO")
-                self.mode_pub.publish(go_string)
-                rclpy.spin_once(self, timeout_sec=2.0)
+            pose.pose.position.z = 0.0
+            pose.pose.orientation.x = 0.0
+            pose.pose.orientation.y = 0.0
+            pose.pose.orientation.z = 0.0
+            pose.pose.orientation.w = 1.0
 
-                self.goto_pub.publish(first)
+            sec = int(point["time"])
+            nsec = int((point["time"]-sec)*1e9)
+            pose.header.stamp = Time(sec=sec, nanosec=nsec)
 
-                tolerance = .02
+            self.path_msg.poses.append(pose)
 
-                while (self.gantry_posx-first.x) >= tolerance and (self.gantry_posy-first.y) >= tolerance: 
-                    rclpy.spin_once(self, timeout_sec=5.0)
-                    self.get_logger().info("waiting for goto position")
-                
-            else:
-                
-                pose = PoseStamped()
-                pose.header.frame_id = "map"
-                pose.pose.position.x = float(point["position_x"])
-                pose.pose.position.y = float(point["position_y"])
-
-                pose.pose.position.z = 0.0
-                pose.pose.orientation.x = 0.0
-                pose.pose.orientation.y = 0.0
-                pose.pose.orientation.z = 0.0
-                pose.pose.orientation.w = 1.0
-
-                sec = int(point["time"])
-                nsec = int((point["time"]-sec)*1e9)
-                pose.header.stamp = Time(sec=sec, nanosec=nsec)
-
-                self.path_msg.poses.append(pose)
-
-            num_time+=1
 
         self.start_lidar()
 
