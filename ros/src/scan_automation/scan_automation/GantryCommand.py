@@ -118,7 +118,7 @@ class GantryCommand(Node):
             rclpy.spin_once(self, timeout_sec=1.0)
             self.get_logger().info("waiting for state publisher")
 
-        while (self.gantry_posx-first.x) >= tolerance and (self.gantry_posy-first.y) >= tolerance: 
+        while abs(self.gantry_posx-first.x) >= tolerance and abs(self.gantry_posy-first.y) >= tolerance: 
             rclpy.spin_once(self, timeout_sec=5.0)
             self.get_logger().info("waiting for goto position")
         
@@ -222,9 +222,7 @@ class GantryCommand(Node):
 
             #this logic might make it jerky, potentially should just manually
             #wait until movement is done
-            while self.gantry_mode != "HOLD":
-                rclpy.spin_once(self, timeout_sec=3.0)
-                self.get_logger().info('waiting for hold mode...')
+            self.wait_for_end(point)
 
             self.get_logger().info('ready to publish next point')
 
@@ -265,6 +263,16 @@ class GantryCommand(Node):
         self.mode_pub.publish(mode_hold)
         rclpy.spin_once(self, timeout_sec=1.0)
         self.end_scan()
+
+    def wait_for_end(self, goto_point):
+        tolerance = .05
+        while (not self.gantry_posx) or (not self.gantry_posy):
+            rclpy.spin_once(self, timeout_sec=1.0)
+            self.get_logger().info("waiting for state publisher")
+
+        while abs(self.gantry_posx-goto_point.x) >= tolerance and abs(self.gantry_posy-goto_point.y) >= tolerance: 
+            rclpy.spin_once(self, timeout_sec=5.0)
+            self.get_logger().info("waiting for goto position")
 
     #starts lidar bagging 
     def start_lidar(self):
