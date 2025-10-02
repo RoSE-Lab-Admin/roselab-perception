@@ -1,25 +1,10 @@
-- time: 10
-  position_x: 2
-  position_y: 2
+- time: 0
+  position_x: 4
+  position_y: 4
 - time: 50
-  position_x: 8
-  position_y: 2
+  position_x: 6
+  position_y: 4
 - time: 90
-  position_x: 8
-  position_y: 4
-- time: 130
-  position_x: 2
-  position_y: 4
-- time: 170
-  position_x: 2
+  position_x: 6
   position_y: 6
-- time: 210
-  position_x: 8
-  position_y: 6
-- time: 250
-  position_x: 8
-  position_y: 8
-- time: 290
-  position_x: 2
-  position_y: 8
 ...
