@@ -17,7 +17,7 @@ def generate_launch_description():
     #launch arguments
     data_file_arg = DeclareLaunchArgument(
         "data_file",
-        default_value="~/rose_lab/perception-data",
+        default_value="/mnt/d/perception-data",
         description="Where bagged data is stored on slade"
     )
 

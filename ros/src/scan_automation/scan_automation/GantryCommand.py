@@ -102,7 +102,7 @@ class GantryCommand(Node):
                 first.z = 0.0
 
                 go_string = String(data="GOTO")
-                self.mode_pub(go_string)
+                self.mode_pub.publish(go_string)
                 rclpy.spin_once(self, timeout_sec=2.0)
 
                 self.goto_pub.publish(first)
@@ -300,6 +300,11 @@ class GantryCommand(Node):
 
         self.get_logger().info("trial complete.")
         self.get_logger().info(f"bag saved to {self.data_file}")
+
+        delete_req = DeleteName.Request()
+        delete_req.name = lidar_cap_data["outname"]
+        future_delete = self.gant_delete.call_async(delete_req)
+        rclpy.spin_until_future_complete(self, future_delete)
 
     
 def main(args=None):
