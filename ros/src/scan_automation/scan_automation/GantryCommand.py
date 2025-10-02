@@ -31,7 +31,7 @@ class GantryCommand(Node):
         movement_mode = self.get_parameter("movement_mode").value
 
         #set up output file
-        self.declare_parameter("data_file", "D:/perception_data/default")
+        self.declare_parameter("data_file")
         data_base = pth(self.get_parameter("data_file").value).expanduser().resolve()
         #name folders as dates and times
         self.day = datetime.now().strftime("%m%d%Y")
@@ -64,6 +64,8 @@ class GantryCommand(Node):
         #subscriber to gantry_control mode
         self.mode_sub = self.create_subscription(GantryState, '/gantry/gantry_status/gantry_state', self.read_mode, 10)
 
+        #state variables
+        self.tolerance = .02
         self.gantry_mode = None
         self.gantry_posx = None
         self.gantry_posy = None
@@ -102,6 +104,9 @@ class GantryCommand(Node):
 
         first_point = self.waypoints[0]
 
+        last_point = self.waypoints[-1]
+        self.duration = float(last_point["time"])
+
         first.x = float(first_point['position_x'])
         first.y = float(first_point['position_y'])
         first.z = 0.0
@@ -112,17 +117,9 @@ class GantryCommand(Node):
 
         self.goto_pub.publish(first)
 
-        tolerance = .02
-
-        while (not self.gantry_posx) or (not self.gantry_posy):
-            rclpy.spin_once(self, timeout_sec=1.0)
-            self.get_logger().info("waiting for state publisher")
-
-        while abs(self.gantry_posx-first.x) >= tolerance and abs(self.gantry_posy-first.y) >= tolerance: 
-            rclpy.spin_once(self, timeout_sec=5.0)
-            self.get_logger().info("waiting for goto position")
+        # wait until goto is finished
+        self.wait_for_end(first)
         
-
         for point in self.waypoints:
             pose = PoseStamped()
             pose.header.frame_id = "map"
@@ -161,8 +158,6 @@ class GantryCommand(Node):
         self.end_scan()
 
 
-
-
     def goto_mode_start(self):
         self.path_msg = Path()
 
@@ -181,9 +176,18 @@ class GantryCommand(Node):
 
             self.goto_msgs.append(goal)
 
+            buffer_time = 5 * len(self.waypoints)
+
             #discerning between continuous and discrete
-            if scan_time: #if not zero
+            if scan_time: #if not zero, aka discrete, add to scan time list, and find reasonable total scannig duration
                 self.stop_times.append(scan_time)
+                total_scan_time = sum(scan_time) #time its stopping
+                #add five seconds for each point
+                self.duration = buffer_time+total_scan_time
+
+            else:
+                self.duration = buffer_time
+
                 
         #start lidar scan
         self.start_lidar()
@@ -208,13 +212,10 @@ class GantryCommand(Node):
         mode_go = String(data='GOTO')
 
         for point in self.goto_msgs:
-            #publish, set mode, wait until mode changes to hold, begin count down
-            #publish point, set mode
-            self.goto_pub.publish(point)
-
-            rclpy.spin_once(self, timeout_sec=3.0)
-
+            #set mode, publish, wait until it gets to destination
             self.mode_pub.publish(mode_go)
+            rclpy.spin_once(self, timeout_sec=3.0)
+            self.goto_pub.publish(point)
 
             self.get_logger().info('point published')
 
@@ -223,6 +224,7 @@ class GantryCommand(Node):
             #this logic might make it jerky, potentially should just manually
             #wait until movement is done
             self.wait_for_end(point)
+
 
             self.get_logger().info('ready to publish next point')
 
@@ -244,17 +246,15 @@ class GantryCommand(Node):
         counter = 0
 
         for point in self.goto_msgs:
-            #publish, set mode, wait until mode changes to hold, begin count down
-            #publish point, set mode
-            self.goto_pub.publish(point)
+            #set mode, publish, wait until it gets there, begin count down
+
             self.mode_pub.publish(mode_go)
+            rclpy.spin_once(self, timeout_sec=3.0)
 
-            rclpy.spin_once(self, timeout_sec=1.0)
+            self.goto_pub.publish(point)
 
-            #this logic might make it jerky, potentially should just manually
-            #wait until movement is done
-            while self.gantry_mode != "HOLD":
-                rclpy.spin_once(self, timeout_sec=1.0)
+            #wait until reaches point
+            self.wait_for_end(point)
 
             #wait until finished scanning
             time.sleep(self.stop_times[counter])
@@ -265,13 +265,12 @@ class GantryCommand(Node):
         self.end_scan()
 
     def wait_for_end(self, goto_point):
-        tolerance = .05
         while (not self.gantry_posx) or (not self.gantry_posy):
             rclpy.spin_once(self, timeout_sec=1.0)
             self.get_logger().info("waiting for state publisher")
 
-        while abs(self.gantry_posx-goto_point.x) >= tolerance and abs(self.gantry_posy-goto_point.y) >= tolerance: 
-            rclpy.spin_once(self, timeout_sec=5.0)
+        while abs(self.gantry_posx-goto_point.x) >= self.tolerance and abs(self.gantry_posy-goto_point.y) >= self.tolerance: 
+            rclpy.spin_once(self, timeout_sec=3.0)
             self.get_logger().info("waiting for goto position")
 
     #starts lidar bagging 
@@ -280,14 +279,15 @@ class GantryCommand(Node):
         capture_request.outname = self.panda_file 
         capture_request.sensors = ["l515_center"] #, "l515_west", "l515_east"]
 
-        # Capture duration should be length of trajectory + 2 * padding
-        capture_request.duration = 60.
+        # Capture duration should be length of trajectory + padding
+        capture_request.duration = float(self.duration) + 10.0
         self.future_cap = self.gant_capture.call_async(capture_request)
 
 
     def end_scan(self):
 
         if self.future_cap and not self.future_cap.done():
+            self.get_logger().info("lidar scanning.....")
             rclpy.spin_until_future_complete(self, self.future_cap)
 
         #get capture service repsonse
@@ -322,6 +322,7 @@ class GantryCommand(Node):
         self.get_logger().info("trial complete.")
         self.get_logger().info(f"bag saved to {self.data_file}")
 
+        #delete data from lattepanda
         delete_req = DeleteName.Request()
         delete_req.name = lidar_cap_data["outname"]
         future_delete = self.gant_delete.call_async(delete_req)
