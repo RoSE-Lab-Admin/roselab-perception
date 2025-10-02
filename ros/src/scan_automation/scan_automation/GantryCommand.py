@@ -114,6 +114,10 @@ class GantryCommand(Node):
 
         tolerance = .02
 
+        while (not self.gantry_posx) or (not self.gantry_posy):
+            rclpy.spin_once(self, timeout_sec=1.0)
+            self.get_logger().info("waiting for state publisher")
+
         while (self.gantry_posx-first.x) >= tolerance and (self.gantry_posy-first.y) >= tolerance: 
             rclpy.spin_once(self, timeout_sec=5.0)
             self.get_logger().info("waiting for goto position")
