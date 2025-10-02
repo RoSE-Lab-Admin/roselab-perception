@@ -7,7 +7,7 @@ from geometry_msgs.msg import PoseStamped, Point
 
 from ament_index_python.packages import get_package_share_directory
 from gantry_lidar_interfaces.srv import Capture, DownloadName, DeleteName
-from gantry_control_interfaces.msg import GantryState
+from gantry_interfaces.msg import GantryState
 
 import yaml
 import json
