@@ -12,7 +12,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/aggregated_pointcloud.launch.py']),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'open3d', 'scipy'],
     zip_safe=True,
     maintainer='Ryan Hartzell',
     maintainer_email='ryan_hartzell@mines.edu',
