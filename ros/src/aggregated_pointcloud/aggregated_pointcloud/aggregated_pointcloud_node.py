@@ -1,10 +1,11 @@
-#! $VIRTUAL_ENV/bin/python
+#!VIRTUAL_ENV/bin/python
 
 import rclpy
 from rclpy.node import Node
 
 import numpy as np
 import open3d as o3d
+from pathlib import Path
 
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
@@ -97,7 +98,8 @@ class AggregatedPointCloud(Node):
         )
 
         # Save to disk (PLY file with colors if present)
-        o3d.io.write_point_cloud("~/aggregated_cloud.ply", down)
+        HOME_DIR = Path.home()
+        o3d.io.write_point_cloud(HOME_DIR / Path(f"aggregated_cloud.ply"), down)
 
         # Option: Publish back to ROS2 topic
         # cloud_msg = self.o3d_to_ros2(down)
