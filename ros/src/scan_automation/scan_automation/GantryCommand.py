@@ -65,6 +65,8 @@ class GantryCommand(Node):
         self.mode_sub = self.create_subscription(GantryState, '/gantry/gantry_status/gantry_state', self.read_mode, 10)
 
         self.gantry_mode = None
+        self.gantry_posx = None
+        self.gantry_posy = None
 
 
         #wait for services to be ready
@@ -87,6 +89,10 @@ class GantryCommand(Node):
 
     def read_mode(self, msg: String):
         self.gantry_mode = msg.controller_mode
+        self.gantry_posx = msg.obs_gantry_position_c
+        dir= msg.obs_gantry_position_e + msg.obs_gantry_position_w
+        self.gantry_posy = dir/2
+
 
     def traj_mode_start(self):
         self.path_msg = Path()
@@ -106,8 +112,13 @@ class GantryCommand(Node):
                 rclpy.spin_once(self, timeout_sec=2.0)
 
                 self.goto_pub.publish(first)
-                rclpy.spin_once(self, timeout_sec=5.0)
-                time.sleep(3)
+
+                tolerance = .02
+
+                while (self.gantry_posx-first.x) >= tolerance and (self.gantry_posy-first.y) >= tolerance: 
+                    rclpy.spin_once(self, timeout_sec=5.0)
+                    self.get_logger().info("waiting for goto position")
+                
             else:
                 
                 pose = PoseStamped()
