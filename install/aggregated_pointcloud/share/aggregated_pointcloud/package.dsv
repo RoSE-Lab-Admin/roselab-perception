@@ -1,6 +1,0 @@
-source;share/aggregated_pointcloud/hook/pythonpath.ps1
-source;share/aggregated_pointcloud/hook/pythonpath.dsv
-source;share/aggregated_pointcloud/hook/pythonpath.sh
-source;share/aggregated_pointcloud/hook/ament_prefix_path.ps1
-source;share/aggregated_pointcloud/hook/ament_prefix_path.dsv
-source;share/aggregated_pointcloud/hook/ament_prefix_path.sh
