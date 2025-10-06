@@ -1,0 +1,156 @@
+[0.347s] Invoking command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp -- -j22 -l22
+[0.391s] [  2%] Built target realsense_bag_recorder_cpp__rosidl_generator_type_description
+[0.407s] [  2%] Built target ament_cmake_python_copy_realsense_bag_recorder_cpp
+[0.410s] [ 11%] Built target realsense_bag_recorder_cpp__cpp
+[0.410s] [ 19%] Built target realsense_bag_recorder_cpp__rosidl_generator_c
+[0.433s] [ 27%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_introspection_c
+[0.433s] [ 36%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_c
+[0.436s] [ 44%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cpp
+[0.436s] [ 52%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_c
+[0.438s] [ 61%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_cpp
+[0.439s] [ 69%] Built target realsense_bag_recorder_cpp__rosidl_typesupport_introspection_cpp
+[0.458s] [ 69%] Built target realsense_bag_recorder_cpp
+[0.474s] [ 75%] Built target bag_recorder_service
+[0.482s] [ 77%] Built target realsense_bag_recorder_cpp__py
+[0.503s] [ 83%] Built target realsense_bag_recorder_cpp__rosidl_generator_py
+[0.523s] [ 88%] Built target realsense_bag_recorder_cpp_s__rosidl_typesupport_introspection_c
+[0.527s] [ 94%] Built target realsense_bag_recorder_cpp_s__rosidl_typesupport_c
+[0.530s] [100%] Built target realsense_bag_recorder_cpp_s__rosidl_typesupport_fastrtps_c
+[0.608s] running egg_info
+[0.625s] writing realsense_bag_recorder_cpp.egg-info/PKG-INFO
+[0.626s] writing dependency_links to realsense_bag_recorder_cpp.egg-info/dependency_links.txt
+[0.626s] writing top-level names to realsense_bag_recorder_cpp.egg-info/top_level.txt
+[0.668s] reading manifest file 'realsense_bag_recorder_cpp.egg-info/SOURCES.txt'
+[0.669s] writing manifest file 'realsense_bag_recorder_cpp.egg-info/SOURCES.txt'
+[0.698s] [100%] Built target ament_cmake_python_build_realsense_bag_recorder_cpp_egg
+[1.015s] Invoked command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --build /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp -- -j22 -l22
+[1.017s] Invoking command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp
+[1.025s] -- Install configuration: ""
+[1.025s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/ament_index/resource_index/rosidl_interfaces/realsense_bag_recorder_cpp
+[1.025s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/srv/RecordBag.json
+[1.026s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.026s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg
+[1.026s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg/rosidl_generator_c__visibility_control.h
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/record_bag.h
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__functions.h
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__type_support.c
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__struct.h
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__functions.c
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__type_support.h
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__description.c
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/library_path.sh
+[1.027s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/library_path.dsv
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_generator_c.so
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.028s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.029s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__rosidl_typesupport_fastrtps_c.h
+[1.029s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_c.so
+[1.029s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg/rosidl_generator_cpp__visibility_control.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/record_bag.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__traits.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__type_support.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__struct.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__builder.hpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.030s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/dds_fastrtps
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__rosidl_typesupport_fastrtps_cpp.hpp
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cpp.so
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg
+[1.031s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[1.032s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.032s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.032s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__type_support.c
+[1.032s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__rosidl_typesupport_introspection_c.h
+[1.032s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_introspection_c.so
+[1.033s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_c.so
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__rosidl_typesupport_introspection_cpp.hpp
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/include/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp/srv/detail/record_bag__type_support.cpp
+[1.034s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_introspection_cpp.so
+[1.036s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_typesupport_cpp.so
+[1.036s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/pythonpath.sh
+[1.036s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/pythonpath.dsv
+[1.036s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp-0.0.0-py3.12.egg-info
+[1.036s] -- Installing: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp-0.0.0-py3.12.egg-info/top_level.txt
+[1.036s] -- Installing: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp-0.0.0-py3.12.egg-info/PKG-INFO
+[1.036s] -- Installing: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp-0.0.0-py3.12.egg-info/dependency_links.txt
+[1.036s] -- Installing: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp-0.0.0-py3.12.egg-info/SOURCES.txt
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/_realsense_bag_recorder_cpp_s.ep.rosidl_typesupport_fastrtps_c.c
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/__init__.py
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_c.so
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/_realsense_bag_recorder_cpp_s.ep.rosidl_typesupport_c.c
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/_realsense_bag_recorder_cpp_s.ep.rosidl_typesupport_introspection_c.c
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_fastrtps_c.so
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/srv
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/srv/_record_bag.py
+[1.037s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/srv/_record_bag_s.c
+[1.038s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/srv/__init__.py
+[1.038s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_introspection_c.so
+[1.080s] Listing '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp'...
+[1.080s] Listing '/home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/srv'...
+[1.084s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_fastrtps_c.so
+[1.085s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_introspection_c.so
+[1.086s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/python3.12/site-packages/realsense_bag_recorder_cpp/realsense_bag_recorder_cpp_s__rosidl_typesupport_c.so
+[1.087s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/librealsense_bag_recorder_cpp__rosidl_generator_py.so
+[1.087s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/srv/RecordBag.idl
+[1.087s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/srv/RecordBag.srv
+[1.088s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/lib/realsense_bag_recorder_cpp/bag_recorder_service
+[1.088s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/srv
+[1.088s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/srv/RecordBag.srv
+[1.089s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/ament_index/resource_index/package_run_dependencies/realsense_bag_recorder_cpp
+[1.089s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/ament_index/resource_index/parent_prefix_path/realsense_bag_recorder_cpp
+[1.089s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/ament_prefix_path.sh
+[1.089s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/ament_prefix_path.dsv
+[1.089s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/path.sh
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/environment/path.dsv
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/local_setup.bash
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/local_setup.sh
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/local_setup.zsh
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/local_setup.dsv
+[1.090s] -- Installing: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.dsv
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/ament_index/resource_index/packages/realsense_bag_recorder_cpp
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_generator_cExport.cmake
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_generator_cExport-noconfig.cmake
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cExport.cmake
+[1.090s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[1.091s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_generator_cppExport.cmake
+[1.091s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cppExport.cmake
+[1.091s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[1.092s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_introspection_cExport.cmake
+[1.092s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[1.093s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_cExport.cmake
+[1.093s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_cExport-noconfig.cmake
+[1.093s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_introspection_cppExport.cmake
+[1.094s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[1.094s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_cppExport.cmake
+[1.094s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cpp__rosidl_typesupport_cppExport-noconfig.cmake
+[1.095s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_generator_pyExport.cmake
+[1.095s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/export_realsense_bag_recorder_cpp__rosidl_generator_pyExport-noconfig.cmake
+[1.095s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/rosidl_cmake-extras.cmake
+[1.095s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/ament_cmake_export_dependencies-extras.cmake
+[1.095s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/ament_cmake_export_include_directories-extras.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/ament_cmake_export_libraries-extras.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/ament_cmake_export_targets-extras.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cppConfig.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/cmake/realsense_bag_recorder_cppConfig-version.cmake
+[1.096s] -- Up-to-date: /home/lexij/roselab-perception/install/realsense_bag_recorder_cpp/share/realsense_bag_recorder_cpp/package.xml
+[1.100s] Invoked command in '/home/lexij/roselab-perception/build/realsense_bag_recorder_cpp' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/lexij/roselab-perception/install/scan_automation:/home/lexij/roselab-perception/install/mastcam_pointcloud:/home/lexij/roselab-perception/install/gantry_services:/home/lexij/roselab-perception/install/aggregated_pointcloud:/opt/ros/jazzy /usr/bin/cmake --install /home/lexij/roselab-perception/build/realsense_bag_recorder_cpp

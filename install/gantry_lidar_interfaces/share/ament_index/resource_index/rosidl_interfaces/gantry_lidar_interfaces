@@ -1,0 +1,10 @@
+srv/Capture.idl
+srv/Capture.srv
+srv/DeleteName.idl
+srv/DeleteName.srv
+srv/DeleteTimeRange.idl
+srv/DeleteTimeRange.srv
+srv/DownloadName.idl
+srv/DownloadName.srv
+srv/DownloadTimeRange.idl
+srv/DownloadTimeRange.srv

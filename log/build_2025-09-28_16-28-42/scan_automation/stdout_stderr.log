@@ -1,0 +1,20 @@
+running egg_info
+writing ../../../build/scan_automation/scan_automation.egg-info/PKG-INFO
+writing dependency_links to ../../../build/scan_automation/scan_automation.egg-info/dependency_links.txt
+writing entry points to ../../../build/scan_automation/scan_automation.egg-info/entry_points.txt
+writing requirements to ../../../build/scan_automation/scan_automation.egg-info/requires.txt
+writing top-level names to ../../../build/scan_automation/scan_automation.egg-info/top_level.txt
+reading manifest file '../../../build/scan_automation/scan_automation.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file '../../../build/scan_automation/scan_automation.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+running install_egg_info
+removing '/home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages/scan_automation-0.0.0-py3.12.egg-info' (and everything under it)
+Copying ../../../build/scan_automation/scan_automation.egg-info to /home/lexij/roselab-perception/install/scan_automation/lib/python3.12/site-packages/scan_automation-0.0.0-py3.12.egg-info
+running install_scripts
+Installing gantry_command script to /home/lexij/roselab-perception/install/scan_automation/lib/scan_automation
+writing list of installed files to '/home/lexij/roselab-perception/build/scan_automation/install.log'

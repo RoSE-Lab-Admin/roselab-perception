@@ -1,0 +1,39 @@
+[1.743s] Invoking command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data
+[2.134s] running egg_info
+[2.135s] creating ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info
+[2.160s] writing ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/PKG-INFO
+[2.160s] writing dependency_links to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/dependency_links.txt
+[2.161s] writing entry points to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/entry_points.txt
+[2.161s] writing requirements to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/requires.txt
+[2.161s] writing top-level names to ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/top_level.txt
+[2.161s] writing manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+[2.211s] reading manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+[2.211s] writing manifest file '../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info/SOURCES.txt'
+[2.212s] running build
+[2.212s] running build_py
+[2.212s] creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build
+[2.213s] creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib
+[2.213s] creating /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+[2.213s] copying aggregated_pointcloud/aggregated_pointcloud_node.py -> /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+[2.213s] copying aggregated_pointcloud/__init__.py -> /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud
+[2.214s] running install
+[2.222s] running install_lib
+[2.245s] creating /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+[2.245s] copying /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud/aggregated_pointcloud_node.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+[2.246s] copying /home/lexij/roselab-perception/build/aggregated_pointcloud/build/lib/aggregated_pointcloud/__init__.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud
+[2.247s] byte-compiling /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud/aggregated_pointcloud_node.py to aggregated_pointcloud_node.cpython-312.pyc
+[2.250s] byte-compiling /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud/__init__.py to __init__.cpython-312.pyc
+[2.250s] running install_data
+[2.250s] creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index
+[2.250s] creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index
+[2.251s] creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index/packages
+[2.251s] copying resource/aggregated_pointcloud -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/ament_index/resource_index/packages
+[2.251s] copying package.xml -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud
+[2.252s] creating /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/launch
+[2.252s] copying launch/aggregated_pointcloud.launch.py -> /home/lexij/roselab-perception/install/aggregated_pointcloud/share/aggregated_pointcloud/launch
+[2.253s] running install_egg_info
+[2.279s] Copying ../../../build/aggregated_pointcloud/aggregated_pointcloud.egg-info to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages/aggregated_pointcloud-0.0.0-py3.12.egg-info
+[2.281s] running install_scripts
+[2.451s] Installing aggregated_pointcloud_node script to /home/lexij/roselab-perception/install/aggregated_pointcloud/lib/aggregated_pointcloud
+[2.452s] writing list of installed files to '/home/lexij/roselab-perception/build/aggregated_pointcloud/install.log'
+[2.504s] Invoked command in '/home/lexij/roselab-perception/ros/src/aggregated_pointcloud' returned '0': PYTHONPATH=/home/lexij/roselab-perception/build/aggregated_pointcloud/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/lexij/roselab-perception/install/aggregated_pointcloud/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../../build/aggregated_pointcloud build --build-base /home/lexij/roselab-perception/build/aggregated_pointcloud/build install --record /home/lexij/roselab-perception/build/aggregated_pointcloud/install.log --single-version-externally-managed install_data

@@ -1,0 +1,4 @@
+string outname
+float32 duration
+---
+string outdata

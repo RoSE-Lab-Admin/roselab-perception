@@ -1,0 +1,19 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from realsense_bag_recorder_cpp/srv/RecordBag.srv
+// generated code does not contain a copyright notice
+
+
+module realsense_bag_recorder_cpp {
+  module srv {
+    struct RecordBag_Request {
+      double duration;
+
+      string bag_name;
+    };
+    struct RecordBag_Response {
+      boolean success;
+
+      string message;
+    };
+  };
+};

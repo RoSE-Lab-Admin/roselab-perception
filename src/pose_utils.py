@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import pandas as pd
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 import cv2
 from tqdm import tqdm
@@ -86,7 +87,7 @@ def get_average_pose(bag_path: str, topic:str):
             pos_x_sum += frame["pose.position.x"]
             pos_y_sum += frame["pose.position.y"]
             pos_z_sum += frame["pose.position.z"]
-            
+
             # First quat
             if first_q is None:
                 first_q = q.copy()
@@ -95,4 +96,74 @@ def get_average_pose(bag_path: str, topic:str):
             avg_orientation = average_quaternion(avg_orientation, q, first_q, i)
         avg_position = np.array([pos_x_sum/len(conn), pos_y_sum/len(conn), pos_z_sum/len(conn)])
     return avg_position, avg_orientation
+
+def load_trajectory(bag_path: str, topic:str):
+    """
+    Given a bag path, returns time samples and corresponding transforms as numpy arrays
+    Args:
+    bag_path: string path to bag
+    topic: string, topic name (unused currently)
+
+    Returns:
+    times:np.array(N,1), transforms:np.array(N,4,4)
+    """
+    bag_path = Path(bag_path)
+    all_data = []
+    times = []
+    N = 0
+    # Extract poses
+    with AnyReader([bag_path]) as reader:
+        for conn in reader.connections:
+            if conn.topic != topic:
+                # If topic is not the topic specified, skip
+                continue
+
+            rows = []
+            desc = f"{bag_path.name}:{conn.topic}"
+            N = conn.msgcount
+            for _, ts, raw in tqdm(reader.messages(connections=[conn]),
+                                   total=conn.msgcount, desc=desc):
+                msg = reader.deserialize(raw, conn.msgtype)
+                row = {'stamp_ns': ts}
+                row.update(pd.json_normalize(asdict(msg)).iloc[0].to_dict())
+                rows.append(row)
+            all_data.append(rows)
+
+    # Convert to numpy matrices
+    tfs = np.tile(np.eye(4), (N,1,1))
+    print(f"Processing {N} transforms...")
+    for conn in all_data:
+        for i, frame in enumerate(tqdm(conn)):
+            tfs[i,:3,:3] = R.from_quat([
+                frame["pose.orientation.x"],
+                frame["pose.orientation.y"],
+                frame["pose.orientation.z"],
+                frame["pose.orientation.w"]
+            ]).as_matrix()
+
+            tfs[i,:3,3] = np.r_[
+                frame["pose.position.x"],
+                frame["pose.position.y"],
+                frame["pose.position.z"]
+            ]
+
+    # Return 4x4 transforms extracted from pose message stream
+    return np.asarray(times), np.asarray(tfs)
+
+
+def plot_trajectory(tfs, show_frames=False):
+    pass
+
+
 #get_average_pose(Path("/home/ryan/lidarcalibrations/Trial_4cm_infradius_0.0slope_Trial3_07232025_10_37_30/mocap_bag"), "/CubeRover_V1/pose")
+
+if __name__=="__main__":
+    # Load pose bag
+    import sys
+    times, transforms = load_trajectory(sys.argv[1], sys.argv[2])
+
+    # Visualize
+    print(times[0::1000])
+    print(transforms[0::1000])
+
+

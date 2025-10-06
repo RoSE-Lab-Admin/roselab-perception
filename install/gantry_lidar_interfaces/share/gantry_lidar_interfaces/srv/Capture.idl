@@ -1,0 +1,19 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from gantry_lidar_interfaces/srv/Capture.srv
+// generated code does not contain a copyright notice
+
+
+module gantry_lidar_interfaces {
+  module srv {
+    struct Capture_Request {
+      string outname;
+
+      sequence<string> sensors;
+
+      float duration;
+    };
+    struct Capture_Response {
+      string outdata;
+    };
+  };
+};
