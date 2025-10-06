@@ -11,7 +11,7 @@ from pathlib import Path
 import json
 import time
 
-DATA_DIR = Path.home() / "RoSE_Perception_Bags"
+DATA_DIR = "D:/perception_data"
 TIME_STR = "%Y-%m-%dT%H-%M-%S"
 
 def start_http_server():

@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-GantryCommand:
-  ros__parameters:
-    data_file: "D:/perception_data"
-    trajectory_file: "ros/src/scan_automation/scan_automation/path_files/RH_test.yaml"
-    panda_file: "lidar_bags"
-=======
+
 GantryCommand:
   ros__parameters:
     data_file: "D:/perception_data"
     trajectory_file: "goto_cont_test.yaml"
     panda_file: "lidar_bags"
     movement_mode: "TRAJECTORY"
->>>>>>> e2ee3a80240ad5d4819854ded9de48c0eda937ab
