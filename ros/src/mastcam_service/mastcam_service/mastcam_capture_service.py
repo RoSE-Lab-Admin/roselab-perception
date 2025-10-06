@@ -1,172 +1,270 @@
+# mastcam_capture_service.py
+# Adds explicit START (no duration) and STOP services alongside your existing timed Capture.
+# START uses the same Capture.srv (ignores duration) so you can still pass sensors + outname.
+# STOP uses std_srvs/Trigger to end the active recording gracefully.
+
 import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Trigger
 from mastcam_interfaces.srv import Capture, DownloadName, DeleteName
-import subprocess # For running ROS bag commands
-import signal # For sending shutdown sig
+import subprocess
+import signal
 import shutil
 
-from datetime import datetime # For parsing by time range
+from datetime import datetime
 from pathlib import Path
 import json
 import time
 
-DATA_DIR = "D:/perception_data"
+# --- Config ---
+DATA_DIR = Path("D:/perception_data")  # Use Path consistently
 TIME_STR = "%Y-%m-%dT%H-%M-%S"
+HTTP_BIND_IP = "192.168.2.4"
+HTTP_PORT = "8000"
 
 def start_http_server():
+    # Serves DATA_DIR over HTTP for simple downloads
     subprocess.Popen([
-        "python3", "-m", "http.server", "8000",
+        "python3", "-m", "http.server", HTTP_PORT,
         "--directory", str(DATA_DIR),
-        "--bind", "192.168.2.4"
+        "--bind", HTTP_BIND_IP
     ])
 
 def parse_time(timestr):
-        return datetime.strptime(timestr, TIME_STR)
+    return datetime.strptime(timestr, TIME_STR)
 
 class MastcamCaptureService(Node):
     def __init__(self):
         super().__init__('mastcam_capture_service')
 
+        # Ensure data directory exists
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+        # Runtime state for recording lifecycle
+        self.record_process = None         # subprocess.Popen handle
+        self.filename = None               # "outname_timestamp"
+        self.active_topics = []            # list[str] recorded in the current session
+
+        # --- Service Endpoints ---
         # Info
         self.create_service(Trigger, 'mastcam_capture_service/info', self.info_callback)
-        
-        # Capture sensor data
+
+        # Timed capture (your existing API)
         self.create_service(Capture, 'mastcam_capture_service/capture', self.capture_callback)
 
-        # Download
-        self.create_service(DownloadName, 'mastcam_capture_service/download/name', self.download_name_callback)
-        #self.create_service(DownloadTimeRange, 'mastcam_capture_service/download/timeRange', self.download_time_range_callback)
+        # Start (no duration): begins recording until STOP is called
+        # Reuse Capture.srv so caller can pass outname + sensors, we IGNORE duration here.
+        self.create_service(Capture, 'mastcam_capture_service/start', self.start_no_duration_callback)
 
-        # Delete
+        # Stop: ends any active recording started by START
+        self.create_service(Trigger, 'mastcam_capture_service/stop', self.stop_callback)
+
+        # Download (by name)
+        self.create_service(DownloadName, 'mastcam_capture_service/download/name', self.download_name_callback)
+        # self.create_service(DownloadTimeRange, 'mastcam_capture_service/download/timeRange', self.download_time_range_callback)
+
+        # Delete (by name)
         self.create_service(DeleteName, 'mastcam_capture_service/delete/name', self.delete_name_callback)
-        #self.create_service(DeleteTimeRange, 'mastcam_capture_service/delete/timeRange', self.delete_time_range_callback)
-        
-        # Start HTTP server
+        # self.create_service(DeleteTimeRange, 'mastcam_capture_service/delete/timeRange', self.delete_time_range_callback)
+
+        # Start HTTP server for simple file serving
         start_http_server()
 
-        self.get_logger().info("Gantry capture service running")
+        self.get_logger().info("MastCam capture service running")
 
+    # ----------------------------
+    # Helpers
+    # ----------------------------
+    def _build_topics(self, sensors):
+        """
+        Construct the topic list from sensor names.
+        """
+        topics = ["/tf", "/tf_static"]
+        for sensor in sensors:
+            # Adjust to your camera topic names
+            topics.append(f"/{sensor}/aligned_depth_to_color/image_raw")
+            topics.append(f"/{sensor}/color/image_raw")
+            topics.append(f"/{sensor}/aligned_depth_to_color/camera_info")
+            topics.append(f"/{sensor}/extrinsics/depth_to_color")
+        return topics
+
+    def _start_bag(self, outname, sensors):
+        """
+        Start a ros2 bag record subprocess. Stores handle + filename + topics.
+        """
+        # Format filename: "outname_timestamp"
+        ts = datetime.now().strftime(TIME_STR)
+        self.filename = f"{outname}_{ts}"
+
+        # Build topics and bag path
+        self.active_topics = self._build_topics(sensors)
+        bag_path = (DATA_DIR / self.filename).resolve()
+
+        # Launch ros2 bag record
+        cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + self.active_topics
+        self.get_logger().info(f"Recording to: {bag_path}")
+        self.get_logger().info("Topics:\n  " + "\n  ".join(self.active_topics))
+
+        # Start process; suppress stdout/stderr to keep node logs clean
+        self.record_process = subprocess.Popen(
+            cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+
+    def _stop_bag(self):
+        """
+        Stop the active ros2 bag record, if any, and wait for exit.
+        """
+        if not self.record_process:
+            return False
+
+        try:
+            # Send SIGINT for clean closure (ros2 bag handles ctrl-c)
+            self.record_process.send_signal(signal.SIGINT)
+            self.record_process.wait(timeout=15)
+        except Exception:
+            # Escalate if needed
+            try:
+                self.record_process.terminate()
+                self.record_process.wait(timeout=5)
+            except Exception:
+                self.record_process.kill()
+                self.record_process.wait()
+
+        # Clear state
+        self.record_process = None
+        self.active_topics = []
+        return True
+
+    # ----------------------------
+    # Services
+    # ----------------------------
     def info_callback(self, request, response):
         response.success = True
-        response.message = "idk what to put here"
+        response.message = "MastCam service ready (endpoints: capture, start, stop, download/name, delete/name)"
         return response
 
     def capture_callback(self, request, response):
         """
-        Capture a bag for a set time and saves it locally, zipped
-        Service Arguments
-        - duration: how long to capture for
-        - sensors: list of str names of sensors
-        - outname: name of bag to save. bag will be saved as "outname_timestamp"
+        Timed capture: start bag, sleep for duration, then stop, return JSON with info.
+        Request:
+          - float32 duration
+          - string[] sensors
+          - string outname
+        Response:
+          - string outdata (JSON)
         """
-        self.get_logger().info(str(DATA_DIR))
         try:
-            #self.get_logger().info(request)
-            #req_data = json.loads(request.data)
-            duration = request.duration #req_data.get("duration", 10.0)
-            sensors = request.sensors #req_data.get("sensors", [])
-            outname = request.outname #req_data.get("outname", "")
+            duration = float(request.duration)
+            sensors = list(request.sensors)
+            outname = str(request.outname)
 
-            # Match directories like: "outname_*"
-            #matches = list(DATA_DIR.glob(f"{outname}_*"))
-            
-            # If file exists 
-            # if matches:
-            #     self.get_logger().info(f"Filename already exists: {self.outname}")
-            #     response.outdata = json.dumps({"status": "ERROR", "reason": "filename already exists"})
-            #     return response
-            
-            # Format filename
-            timestamp = datetime.now().strftime(TIME_STR)
-            self.filename = f"{outname}_{timestamp}"
+            if self.record_process is not None:
+                # Prevent overlapping sessions
+                msg = {"status": "ERROR", "reason": "Recording already active. Stop first."}
+                response.outdata = json.dumps(msg)
+                return response
 
-            # Set Topics
-            topics = []
-            topics.append("/tf")
-            topics.append("/tf_static")
-            
-            for sensor in sensors:
-            #    if (sensor == "l515_center") or (sensor == "l515_west") or (sensor == "l515_east"):
-                #topics.append("/"+sensor+"/depth/image_rect_raw")
-                topics.append("/"+sensor+"/aligned_depth_to_color/image_raw")
-                topics.append("/"+sensor+"/color/image_raw")
-                #topics.append("/"+sensor+"/depth/camera_info")
-                topics.append("/"+sensor+"/aligned_depth_to_color/camera_info")
-                #topics.append("/"+sensor+"/color/camera_info")
-                topics.append("/"+sensor+"/extrinsics/depth_to_color")
-                #topics.append("/"+sensor+"/imu")
-                    
+            self._start_bag(outname, sensors)
+            self.get_logger().info(f"Started timed recording: {self.filename} for {duration}s")
 
-            # Capture Bag
-            bag_path = (DATA_DIR / self.filename).resolve()
-            self.get_logger().info(f"Capturing data: {duration}s from {topics}, output: {str(bag_path)}")
-            cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
-            self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            self.get_logger().info(f"Started recording bag: {self.filename}")
+            time.sleep(duration)  # Blocking wait (simple)
 
-            time.sleep(duration) # Delay
-
-            # End capture
-            self.record_process.send_signal(signal.SIGINT)
-            self.record_process.wait()
-            self.record_process = None
-
-            self.get_logger().info(f"Stopped recording bag: {self.filename}")
-           
+            stopped = self._stop_bag()
+            self.get_logger().info(f"Stopped timed recording: {self.filename}")
 
             response.outdata = json.dumps({
                 "status": "ACK",
+                "mode": "timed",
                 "duration": duration,
                 "sensors": sensors,
-                "outname": self.filename
+                "outname": self.filename,
+                "stopped": stopped
             })
 
         except Exception as e:
             response.outdata = json.dumps({"status": "ERROR", "reason": str(e)})
         return response
-    
-    def download_name_callback(self, request, response):
+
+    def start_no_duration_callback(self, request, response):
         """
-        Download bags by name. All bags with matching name will be downloaded (although there should only be one)
+        START (no duration): begins recording until STOP is called.
+        We reuse Capture.srv so the caller can pass outname.
+        The 'duration' field is IGNORED.
         """
         try:
-            #data = json.loads(request.data)
-            outname = request.name
+            sensors = list(request.sensors)
+            outname = str(request.outname)
 
-            # Get matches (Should only have one)
+            if self.record_process is not None:
+                msg = {"status": "ERROR", "reason": "Recording already active. Stop first."}
+                response.outdata = json.dumps(msg)
+                return response
+
+            self._start_bag(outname, sensors)
+            self.get_logger().info(f"Started continuous recording: {self.filename}")
+
+            response.outdata = json.dumps({
+                "status": "ACK",
+                "mode": "continuous",
+                "sensors": sensors,
+                "outname": self.filename
+            })
+        except Exception as e:
+            response.outdata = json.dumps({"status": "ERROR", "reason": str(e)})
+        return response
+
+    def stop_callback(self, request, response):
+        """
+        STOP: ends the active recording started by START (or any active capture).
+        Uses std_srvs/Trigger.
+        """
+        try:
+            if self.record_process is None:
+                response.success = False
+                response.message = json.dumps({"status": "ERROR", "reason": "No active recording"})
+                return response
+
+            current_name = self.filename  # capture for the response before clearing
+            stopped = self._stop_bag()
+            self.get_logger().info(f"Stopped recording: {current_name}")
+
+            response.success = True
+            response.message = json.dumps({
+                "status": "ACK",
+                "stopped": stopped,
+                "outname": current_name
+            })
+        except Exception as e:
+            response.success = False
+            response.message = json.dumps({"status": "ERROR", "reason": str(e)})
+        return response
+
+    def download_name_callback(self, request, response):
+        """
+        Download bags by exact folder name (e.g., 'mytrial_2025-10-06T12-34-56').
+        Returns a URL served by the local HTTP server.
+        """
+        try:
+            outname = request.name
             matches = sorted(DATA_DIR.glob(f"{outname}"), reverse=True)
             if not matches:
-                self.get_logger().info(f"Download name request failed, file not found.")
+                self.get_logger().info("Download name request failed, file not found.")
                 response.outdata = json.dumps({"success": False, "error": "Not found"})
                 return response
 
-            # Figure out what the http path to the zip is
             folder = matches[0].name
-            ip = "192.168.2.4"
-            url = f"http://{ip}:8000/{folder}"
+            url = f"http://{HTTP_BIND_IP}:{HTTP_PORT}/{folder}"
+            self.get_logger().info(f"Download name request: {url}")
 
-            self.get_logger().info(f"Download name request with: {url}")
-
-            # Return the zip path for wget by client
-            response.outdata = json.dumps({
-                "success": True,
-                "url": url
-            })
-
+            response.outdata = json.dumps({"success": True, "url": url})
         except Exception as e:
             response.outdata = json.dumps({"success": False, "error": str(e)})
         return response
 
     def download_time_range_callback(self, request, response):
-        """
-        Download bags by time range. All bags between start and end will be downloaded.
-        Time stamp should be formated like "yyyy-mm-ddThh-mm-ss" in 24hr time
-        """
         try:
-            #data = json.loads(request.data)
-            start = request.start #data.get("start")
-            end = request.end #data.get("end")
+            start = request.start
+            end = request.end
             response.outdata = f"Downloaded files from {start} to {end}"
         except Exception as e:
             response.outdata = f"Error parsing request: {str(e)}"
@@ -174,27 +272,20 @@ class MastcamCaptureService(Node):
 
     def delete_name_callback(self, request, response):
         """
-        Delete bags by name. All bags with matching name will be deleted (although there should only be one)
+        Delete a bag folder by name.
         """
         try:
-            #data = json.loads(request.data)
-            outname = request.name#data.get("name")
+            outname = request.name
             if outname == "":
-                self.get_logger().info(f"Must delete a named file if deleting by name. Delete by time range instead.")
-                response.outdata = json.dumps({"status": "ERROR", "reason": "Can't delete unnamed file. Delete by time range instead."})
-                return response
-            # Match directories like: "outname"
-            matches = list(DATA_DIR.glob(f"{outname}"))
-            
-            # No matches
-            if not matches:
-                response.outdata = json.dumps({
-                    "success": False,
-                    "error": f"No bag found with name '{outname}'"
-                })
+                msg = {"status": "ERROR", "reason": "Empty name. Delete by time range instead."}
+                response.outdata = json.dumps(msg)
                 return response
 
-            # Get list of files to be deleted (should only be one)
+            matches = list(DATA_DIR.glob(f"{outname}"))
+            if not matches:
+                response.outdata = json.dumps({"success": False, "error": f"No bag found with name '{outname}'"})
+                return response
+
             deleted = []
             for path in matches:
                 if path.is_dir():
@@ -202,26 +293,17 @@ class MastcamCaptureService(Node):
                     deleted.append(path.name)
 
             self.get_logger().info(f"Deleted {outname}")
-                
-
-            response.outdata = json.dumps({
-                "success": True,
-                "deleted": deleted
-            })
-
+            response.outdata = json.dumps({"success": True, "deleted": deleted})
         except Exception as e:
             response.outdata = json.dumps({"success": False, "error": str(e)})
         return response
 
-
-
     def delete_time_range_callback(self, request, response):
         """
-        Delete bags by time range. All bags between start and end will be deleted.
-        Time stamp should be formated like yyyy-mm-ddThh-mm-ss" in 24hr time
+        Delete all bag folders whose timestamp suffix lies within [start, end].
+        Folder name format expected: "<prefix>_<YYYY-mm-ddTHH-MM-SS>"
         """
         try:
-            #data = json.loads(request.data)
             start = datetime.strptime(request.start, TIME_STR)
             end = datetime.strptime(request.end, TIME_STR)
 
@@ -230,7 +312,6 @@ class MastcamCaptureService(Node):
                 if not path.is_dir():
                     continue
                 try:
-                    # Extract timestamp from last underscore
                     ts_str = path.name.split('_')[-1]
                     ts = datetime.strptime(ts_str, TIME_STR)
                     if start <= ts <= end:
@@ -239,11 +320,7 @@ class MastcamCaptureService(Node):
                 except Exception:
                     continue
 
-            response.outdata = json.dumps({
-                "success": True,
-                "deleted": deleted
-            })
-
+            response.outdata = json.dumps({"success": True, "deleted": deleted})
         except Exception as e:
             response.outdata = json.dumps({"success": False, "error": str(e)})
         return response
