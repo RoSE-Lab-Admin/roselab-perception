@@ -1,5 +1,0 @@
-string outname
-string[] sensors
-float32 duration
----
-string outdata

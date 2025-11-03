@@ -3,7 +3,6 @@
 #   1) converter.py on each bag (pre, post)
 #   2) characterize_surface.py (pre, post)
 #   3) 
-
 set -euo pipefail
 
 source ~/roselab-perception/venv/bin/activate
