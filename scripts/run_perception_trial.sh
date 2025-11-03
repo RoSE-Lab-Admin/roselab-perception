@@ -20,7 +20,7 @@ set -e
 ENABLE_IMU=false
 RESOLUTION="1280x720x15"   # Default: max resolution @ 30 fps
 TAG=""                     # Optional prefix for bag name
-USE_ALIGNED_DEPTH=false    # Default: raw depth
+USE_ALIGNED_DEPTH=true    # Default: raw depth
 
 # Parse flags
 for arg in "$@"; do
@@ -37,8 +37,8 @@ for arg in "$@"; do
             TAG="${arg#*=}_"
             shift
             ;;
-        --align)
-            USE_ALIGNED_DEPTH=true
+        --no-align)
+            USE_ALIGNED_DEPTH=false
             shift
             ;;
         *)
@@ -93,12 +93,8 @@ fi
 POSE_TOPICS=$(ros2 topic list | grep '/pose$' | tr '\n' ' ')
 
 
-ROVER_TOPICS="/roseybot_base_controller/cmd_vel_out
-              /roseybot_base_controller/odom
-              /robot_description
-              /cmd_vel
-              /dynamic_joint_states
-              /joint_states
+# RYAN + CAM : PUT ALL ROVER CONTROL AND TELEMETRY TOPICS HERE
+ROVER_TOPICS="/odom
               /tf
               /tf_static"
 

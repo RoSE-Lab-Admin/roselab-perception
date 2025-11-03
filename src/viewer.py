@@ -19,4 +19,5 @@ if __name__=="__main__":
       filtered_pcd.points = o3d.utility.Vector3dVector(pts[mask])
       filtered_pcd.colors = o3d.utility.Vector3dVector(np.asarray(pcd.colors)[mask])
 
-      o3d.visualization.draw_geometries([filtered_pcd])
+      o3d.visualization.draw([filtered_pcd], show_ui=True)
+#      o3d.visualization.draw_geometries([filtered_pcd])
