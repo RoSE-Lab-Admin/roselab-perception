@@ -26,7 +26,7 @@ class LidarScan(Node):
         self.duration = 0.0
         self.future_cap = None
 
-        # ---- OUTPUT FOLDER SETUP ----
+        # output folder
         self.declare_parameter("data_file")
         data_base = pth(self.get_parameter("data_file").value).expanduser().resolve()
         self.day = datetime.now().strftime("%m%d%Y")
