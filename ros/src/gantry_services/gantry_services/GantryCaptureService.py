@@ -11,6 +11,13 @@ from pathlib import Path
 import json
 import time
 
+import socket
+
+def get_local_ip():
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    return local_ip
+
 DATA_DIR = Path.home() / "RoSE_Bags"
 TIME_STR = "%Y-%m-%dT%H-%M-%S"
 
@@ -18,7 +25,7 @@ def start_http_server():
     subprocess.Popen([
         "python3", "-m", "http.server", "8000",
         "--directory", str(DATA_DIR),
-        "--bind", "192.168.2.4"
+        "--bind", get_local_ip()
     ])
 
 def parse_time(timestr):
