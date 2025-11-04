@@ -22,11 +22,7 @@ class LidarScan(Node):
     def __init__(self):
         super().__init__('lidar_scan')
 
-        # ---- STATE VARIABLES ----
-        self.duration = 0.0
-        self.future_cap = None
-
-        # output folder
+        # slade output folder
         self.declare_parameter("data_file")
         data_base = pth(self.get_parameter("data_file").value).expanduser().resolve()
         self.day = datetime.now().strftime("%m%d%Y")
@@ -34,26 +30,23 @@ class LidarScan(Node):
         self.data_file = pth(data_base) / self.day / hour
         self.data_file.mkdir(parents=True, exist_ok=True)
 
-        # ---- LATTEPANDA BAG FILE NAME ----
+        # lattepanda folder
         self.declare_parameter("panda_file", "lidar_bags")
         self.panda_file = self.get_parameter("panda_file").value
 
-        #duration paramater
+        # duration paramater
         self.declare_parameter("duration", 60.0)
         self.duration = self.get_parameter("duration").value
 
-        # ---- SERVICE CLIENTS ----
+        # setting up service clients
         self.gant_capture = self.create_client(Capture, "gantry_capture_service/capture")
         self.gant_download = self.create_client(DownloadName, "gantry_capture_service/download/name")
         self.gant_delete = self.create_client(DeleteName, "gantry_capture_service/delete/name")
 
-        # ---- STATE VARS ----
+        # state variables
         self.tolerance = .02
-        self.gantry_mode = None
-        self.gantry_posx = None
-        self.gantry_posy = None
 
-        # ---- WAIT FOR SERVICES ----
+        # wait for services to be available
         
         self.get_logger().info("Waiting for required services...")
         while not self.gant_capture.wait_for_service(timeout_sec=1.0):
@@ -66,9 +59,9 @@ class LidarScan(Node):
 
         self.start_lidar()
 
-
-    # ---- START LIDAR ----
     def start_lidar(self):
+        input("Press enter to start lidar scan")
+
         capture_request = Capture.Request()
         capture_request.outname = self.panda_file
         capture_request.sensors = ["p_l515_center", "p_l515_west", "p_l515_east"]
@@ -79,8 +72,8 @@ class LidarScan(Node):
 
         self.end_scan()
 
-    # ---- END SCAN ----
     def end_scan(self):
+
         if self.future_cap and not self.future_cap.done():
             self.get_logger().info("Waiting for LIDAR capture to finish...")
             rclpy.spin_until_future_complete(self, self.future_cap)
@@ -111,46 +104,18 @@ class LidarScan(Node):
         # rclpy.spin_until_future_complete(self, future_delete)
         # self.get_logger().info("Deleted bag from LattePanda.")
 
-    # ---- MAIN LOOP ----
-    # def interactive_loop(self):
-    #     while True:
-    #         try:
-    #             duration_str = input("\nEnter scan duration: ")
-    #             if duration_str.lower() == 'q':
-    #                 self.get_logger().info("Exiting lidar scan node.")
-    #                 break
-
-    #             try:
-    #                 self.duration = float(duration_str)
-    #             except ValueError:
-    #                 self.get_logger().warn("Invalid input. Please enter a number.")
-    #                 continue
-
-    #             # Start scan
-    #             self.start_lidar()
-    #             start_time = time.time()
-    #             while time.time() - start_time < self.duration:
-    #                 elapsed = time.time() - start_time
-    #                 remaining = self.duration - elapsed
-    #                 print(f"\rScanning... {remaining:.1f}s remaining", end="")
-    #                 time.sleep(0.5)
-
-    #             self.end_scan()
-
-    #         except KeyboardInterrupt:
-    #             self.get_logger().info("Interrupted by user.")
-    #             break
+        input("Press enter to start lidar scan")
+        
+        self.start_lidar()
 
 
 def main(args=None):
     rclpy.init(args=args)
-    rclpy.spin(LidarScan())
     node = LidarScan()
-    try:
-        node.interactive_loop()
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
+    rclpy.spin(node)
+
+    node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
