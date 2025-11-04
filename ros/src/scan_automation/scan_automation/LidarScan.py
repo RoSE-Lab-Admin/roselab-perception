@@ -38,13 +38,14 @@ class LidarScan(Node):
         self.declare_parameter("panda_file", "lidar_bags")
         self.panda_file = self.get_parameter("panda_file").value
 
+        #duration paramater
+        self.declare_parameter("duration", 60.0)
+        self.duration = self.get_parameter("duration").value
+
         # ---- SERVICE CLIENTS ----
         self.gant_capture = self.create_client(Capture, "gantry_capture_service/capture")
         self.gant_download = self.create_client(DownloadName, "gantry_capture_service/download/name")
         self.gant_delete = self.create_client(DeleteName, "gantry_capture_service/delete/name")
-
-        # ---- SUBSCRIBERS ----
-        self.mode_sub = self.create_subscription(GantryState, '/gantry/gantry_status/gantry_state', self.read_mode, 10)
 
         # ---- STATE VARS ----
         self.tolerance = .02
@@ -53,9 +54,7 @@ class LidarScan(Node):
         self.gantry_posy = None
 
         # ---- WAIT FOR SERVICES ----
-        self.wait_for_services()
-
-    def wait_for_services(self):
+        
         self.get_logger().info("Waiting for required services...")
         while not self.gant_capture.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for capture service...")
@@ -65,15 +64,20 @@ class LidarScan(Node):
             self.get_logger().info("Waiting for delete service...")
         self.get_logger().info("All services ready.")
 
+        self.start_lidar()
+
+
     # ---- START LIDAR ----
     def start_lidar(self):
         capture_request = Capture.Request()
         capture_request.outname = self.panda_file
-        capture_request.sensors = ["l515_center"]
+        capture_request.sensors = ["p_l515_center", "p_l515_west", "p_l515_east"]
         capture_request.duration = float(self.duration) + 10.0
 
         self.get_logger().info(f"Starting LIDAR capture for {self.duration} seconds.")
         self.future_cap = self.gant_capture.call_async(capture_request)
+
+        self.end_scan()
 
     # ---- END SCAN ----
     def end_scan(self):
@@ -101,45 +105,46 @@ class LidarScan(Node):
         self.get_logger().info("Download complete.")
         self.get_logger().info(f"Bag saved to {self.data_file}")
 
-        delete_req = DeleteName.Request()
-        delete_req.name = lidar_cap_data["outname"]
-        future_delete = self.gant_delete.call_async(delete_req)
-        rclpy.spin_until_future_complete(self, future_delete)
-        self.get_logger().info("Deleted bag from LattePanda.")
+        # delete_req = DeleteName.Request()
+        # delete_req.name = lidar_cap_data["outname"]
+        # future_delete = self.gant_delete.call_async(delete_req)
+        # rclpy.spin_until_future_complete(self, future_delete)
+        # self.get_logger().info("Deleted bag from LattePanda.")
 
     # ---- MAIN LOOP ----
-    def interactive_loop(self):
-        while rclpy.ok():
-            try:
-                duration_str = input("\nEnter scan duration: ")
-                if duration_str.lower() == 'q':
-                    self.get_logger().info("Exiting lidar scan node.")
-                    break
+    # def interactive_loop(self):
+    #     while True:
+    #         try:
+    #             duration_str = input("\nEnter scan duration: ")
+    #             if duration_str.lower() == 'q':
+    #                 self.get_logger().info("Exiting lidar scan node.")
+    #                 break
 
-                try:
-                    self.duration = float(duration_str)
-                except ValueError:
-                    self.get_logger().warn("Invalid input. Please enter a number.")
-                    continue
+    #             try:
+    #                 self.duration = float(duration_str)
+    #             except ValueError:
+    #                 self.get_logger().warn("Invalid input. Please enter a number.")
+    #                 continue
 
-                # Start scan
-                self.start_lidar()
-                start_time = time.time()
-                while time.time() - start_time < self.duration:
-                    elapsed = time.time() - start_time
-                    remaining = self.duration - elapsed
-                    print(f"\rScanning... {remaining:.1f}s remaining", end="")
-                    time.sleep(0.5)
+    #             # Start scan
+    #             self.start_lidar()
+    #             start_time = time.time()
+    #             while time.time() - start_time < self.duration:
+    #                 elapsed = time.time() - start_time
+    #                 remaining = self.duration - elapsed
+    #                 print(f"\rScanning... {remaining:.1f}s remaining", end="")
+    #                 time.sleep(0.5)
 
-                self.end_scan()
+    #             self.end_scan()
 
-            except KeyboardInterrupt:
-                self.get_logger().info("Interrupted by user.")
-                break
+    #         except KeyboardInterrupt:
+    #             self.get_logger().info("Interrupted by user.")
+    #             break
 
 
 def main(args=None):
     rclpy.init(args=args)
+    rclpy.spin(LidarScan())
     node = LidarScan()
     try:
         node.interactive_loop()

@@ -21,6 +21,13 @@ def generate_launch_description():
         description="Where bagged data is stored on slade"
     )
 
+    duration_arg = DeclareLaunchArgument(
+        "duration",
+        default_value="60.0",
+        
+        description="time to scan"
+    )
+
     trajectory_file_arg = DeclareLaunchArgument(
         "trajectory_file",
         default_value="cont_rast.yaml",
@@ -42,6 +49,7 @@ def generate_launch_description():
             "data_file": LaunchConfiguration("data_file"),
             "trajectory_file": LaunchConfiguration("trajectory_file"),
             "panda_file": LaunchConfiguration("panda_file"),
+            "duration": LaunchConfiguration("duration")
         }]
     )
 
@@ -49,5 +57,6 @@ def generate_launch_description():
         data_file_arg,
         trajectory_file_arg,
         panda_file_arg,
+        duration_arg,
         node
     ])

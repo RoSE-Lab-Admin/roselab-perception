@@ -18,7 +18,7 @@ def start_http_server():
     subprocess.Popen([
         "python3", "-m", "http.server", "8000",
         "--directory", str(DATA_DIR),
-        "--bind", "192.168.2.4"
+        "--bind", "192.168.2.99" # TEMP STATIC IP, will return to 192.168.2.4 once miniforum is sole gantry computer
     ])
 
 def parse_time(timestr):
@@ -85,9 +85,10 @@ class GantryCaptureService(Node):
             topics = []
             topics.append("/tf")
             topics.append("/tf_static")
+	    topics.append("/gantry/gantry_status/gantry_state")
             
             for sensor in sensors:
-                if (sensor == "l515_center") or (sensor == "l515_west") or (sensor == "l515_east"):
+                if (sensor == "p_l515_center") or (sensor == "p_l515_west") or (sensor == "p_l515_east"):
                     #topics.append("/"+sensor+"/depth/image_rect_raw")
                     topics.append("/"+sensor+"/aligned_depth_to_color/image_raw")
                     topics.append("/"+sensor+"/color/image_raw")
@@ -150,7 +151,7 @@ class GantryCaptureService(Node):
 
             # Figure out what the http path to the zip is
             folder = matches[0].name
-            ip = "192.168.2.4"
+            ip = "192.168.2.99" # TEMP STATIC IP
             url = f"http://{ip}:8000/{folder}"
 
             self.get_logger().info(f"Download name request with: {url}")
