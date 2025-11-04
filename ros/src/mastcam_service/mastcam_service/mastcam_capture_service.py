@@ -19,15 +19,21 @@ import time
 # --- Config ---
 DATA_DIR = Path("D:/perception_data")  # Use Path consistently
 TIME_STR = "%Y-%m-%dT%H-%M-%S"
-HTTP_BIND_IP = "192.168.2.4"
 HTTP_PORT = "8000"
+
+import socket
+
+def get_local_ip():
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    return local_ip
 
 def start_http_server():
     # Serves DATA_DIR over HTTP for simple downloads
     subprocess.Popen([
         "python3", "-m", "http.server", HTTP_PORT,
         "--directory", str(DATA_DIR),
-        "--bind", HTTP_BIND_IP
+        "--bind", get_local_ip()
     ])
 
 def parse_time(timestr):

@@ -11,6 +11,13 @@ from pathlib import Path
 import json
 import time
 
+import socket
+
+def get_local_ip():
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    return local_ip
+
 DATA_DIR = Path.home() / "RoSE_Bags"
 TIME_STR = "%Y-%m-%dT%H-%M-%S"
 
@@ -85,7 +92,7 @@ class GantryCaptureService(Node):
             topics = []
             topics.append("/tf")
             topics.append("/tf_static")
-	    topics.append("/gantry/gantry_status/gantry_state")
+            topics.append("/gantry/gantry_status/gantry_state")
             
             for sensor in sensors:
                 if (sensor == "p_l515_center") or (sensor == "p_l515_west") or (sensor == "p_l515_east"):
