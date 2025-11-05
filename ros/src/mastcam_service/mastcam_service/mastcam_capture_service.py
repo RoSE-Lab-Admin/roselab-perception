@@ -91,8 +91,6 @@ class MastcamCaptureService(Node):
         topics.append("/MastCam/Front/extrinsics/depth_to_color")
         topics.append("/MastCam/Front/aligned_depth_to_color/image_raw")
         topics.append("/MastCam/Front/aligned_depth_to_color/camera_info")
-        topics.append("/MastCam/Front/depth/image_rect_raw")
-        topics.append("/MastCam/Front/depth/camera_info")
         
         return topics
 
