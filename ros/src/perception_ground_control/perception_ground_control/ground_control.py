@@ -192,7 +192,8 @@ class groundcontrol(Node):
             topics = ["/CubeRover_V1/pose", "/cmd_vel", 
                       "/dynamic_joint_states", "/initialpose",
                       "/joint_states", "/joy", "/robot_description",
-                      "/rosout", "/tf", "tf_static"]
+                      "/rosout", "/tf", "tf_static",
+                      "/Rover/camera/image_raw/compressed"]
             topics.append(rclpy.get_published_topics(namespace='/bno055/'))
             topics.append(rclpy.get_published_topics(namespace='/joy/'))
             topics.append(rclpy.get_published_topics(namespace='/roseybot_base_controller/'))           
