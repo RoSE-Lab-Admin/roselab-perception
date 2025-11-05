@@ -191,8 +191,8 @@ class groundcontrol(Node):
         name_json = json.loads(download_name.outdata)
         cap_url = name_json["url"]
         self.get_logger().info(f"Downloading from {cap_url}")
-        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
-        time.sleep(10)
+        process = subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
+        ret = process.wait()
 
         self.get_logger().info(f"Bag saved to {self.data_file}")
 
