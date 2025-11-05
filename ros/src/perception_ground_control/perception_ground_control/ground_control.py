@@ -152,7 +152,7 @@ class groundcontrol(Node):
         capture_request.outname = self.pi_file
         capture_request.duration = 60.0 # dummy val
         self.cap_future = self.mast_start.call_async(capture_request)
-        rclpy.spin_until_future_complete(self,self.cap_future)
+        
 
         self.get_logger().info("Mastcam capture started")
 
