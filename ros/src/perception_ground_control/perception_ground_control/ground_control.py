@@ -1,5 +1,7 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 
 from gantry_lidar_interfaces.srv import (
     Capture as LidarCapture, 
@@ -32,6 +34,10 @@ class groundcontrol(Node):
         self.started = False
         self.ended = True
 
+        # callback groups
+        self.subscriber_group = ReentrantCallbackGroup()
+        self.service_group = ReentrantCallbackGroup()
+
         # parameters
         # output file for slade slade
         self.declare_parameter('slade_root', "/mnt/d/perception-data")
@@ -52,25 +58,25 @@ class groundcontrol(Node):
 
         # setting up services
         # lidar services
-        self.lidar_capture = self.create_client(LidarCapture, "gantry_capture_service/capture")
-        self.lidar_download = self.create_client(LidarDownloadName, "gantry_capture_service/download/name")
-        self.lidar_delete = self.create_client(LidarDeleteName, "gantry_capture_service/delete/name")
+        self.lidar_capture = self.create_client(LidarCapture, "gantry_capture_service/capture", callback_group=self.service_group)
+        self.lidar_download = self.create_client(LidarDownloadName, "gantry_capture_service/download/name", callback_group=self.service_group)
+        self.lidar_delete = self.create_client(LidarDeleteName, "gantry_capture_service/delete/name", callback_group=self.service_group)
         # mastcam services
-        self.mast_download = self.create_client(MastDownloadName, "mastcam_capture_service/download/name")
-        self.mast_delete = self.create_client(MastDeleteName, "mastcam_capture_service/delete/name")
-        self.mast_stop = self.create_client(Trigger, "mastcam_capture_service/stop")
-        self.mast_start = self.create_client(MastCapture, "mastcam_capture_service/start")
+        self.mast_download = self.create_client(MastDownloadName, "mastcam_capture_service/download/name", callback_group=self.service_group)
+        self.mast_delete = self.create_client(MastDeleteName, "mastcam_capture_service/delete/name", callback_group=self.service_group)
+        self.mast_stop = self.create_client(Trigger, "mastcam_capture_service/stop", callback_group=self.service_group)
+        self.mast_start = self.create_client(MastCapture, "mastcam_capture_service/start", callback_group=self.service_group)
 
         # command line subscriptions
-        self.create_subscription(Bool, '/start_lidar', self.start_lidar, 10)
+        self.create_subscription(Bool, '/start_lidar', self.start_lidar, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /start_lidar std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/start_mastcam', self.recieve_mast_start, 10)
+        self.create_subscription(Bool, '/start_mastcam', self.recieve_mast_start, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/stop_mastcam', self.recieve_mast_stop, 10)
+        self.create_subscription(Bool, '/stop_mastcam', self.recieve_mast_stop, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10)
+        self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/stop_rosey_bag', self.stop_rosey_bags, 10)
+        self.create_subscription(Bool, '/stop_rosey_bag', self.stop_rosey_bags, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /stop_rosey_bag std_msgs/msgs/Bool "{data: true}"
 
         # wait for services
@@ -230,7 +236,10 @@ class groundcontrol(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = groundcontrol()
-    rclpy.spin(node)
+    executor = MultiThreadedExecutor(num_threads=8)
+    executor.add_node(node)
+    executor.spin()
+    executor.shutdown()
     node.destroy_node()
     rclpy.shutdown()
 
