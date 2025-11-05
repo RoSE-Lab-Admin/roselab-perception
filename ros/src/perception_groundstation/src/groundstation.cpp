@@ -134,3 +134,23 @@ public:
   //    If you have a stop srv, call it here. Then download results.
   node->mastcam_download(mast_name);
 }
+
+// Start mastcam
+// Start wheelcams
+// Start rover control
+// Start controller code
+// LOOP START
+  // Wait for press enter
+  // Run Lidar scan (w/ ROS service)
+  // Wait for press enter
+  // Stop LiDAR Scan
+  // Download lidar bag
+  // Wait for press enter
+  // Start mast cam (w/ ROS service)
+  // Start bagging rosey stuff
+  // Wait for press enter
+  // Stop mast cam
+  // Download mastcam bag
+  // Stop bagging rosey stuff
+  // Park rover
+// LOOP END

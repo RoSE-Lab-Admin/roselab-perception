@@ -19,6 +19,7 @@ from datetime import datetime
 import subprocess
 import json
 import time
+import signal
 
 '''
 Process flow:
@@ -26,6 +27,7 @@ Process flow:
 - mastcam + bagging other needed topics
 - another lidar scan at end of session
 '''
+
 
 class groundcontrol(Node):
     def __init__(self):
@@ -67,6 +69,10 @@ class groundcontrol(Node):
         # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msgs/Bool "{data: true}"
         self.create_subscription(Bool, '/stop_mastcam', self.stop_mast, 10)
         # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msgs/Bool "{data: true}"
+        self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10)
+        # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msgs/Bool "{data: true}"
+        self.create_subscription(Bool, '/stop_rosey_bag', self.stop_rosey_bags, 10)
+        # call from cli: ros2 topic pub --once /stop_rosey_bag std_msgs/msgs/Bool "{data: true}"
 
         # wait for services
         self.get_logger().info("Waiting for services...")
@@ -101,7 +107,7 @@ class groundcontrol(Node):
         self.end_lidar()
 
 
-    def end_lidar(self):
+    def end_lidar(self, msg: Bool):
         self.get_logger().info("Stopping LIDAR capture")
         # get outname from service repsonse
         lidar_response = self.future_lidar.result()
@@ -177,6 +183,34 @@ class groundcontrol(Node):
         delete_future = self.mast_delete.call_async(delete_req)
         rclpy.spin_until_future_complete(self, delete_future)
         self.get_logger().info("Deleted bag from pi")
+
+    def start_rosey_bags(self, msg: Bool):
+            # Format filename
+            self.filename = f"RoseyBag"
+
+            # Set Topics
+            topics = ["/CubeRover_V1/pose", "/cmd_vel", 
+                      "/dynamic_joint_states", "/initialpose",
+                      "/joint_states", "/joy", "/robot_description",
+                      "/rosout", "/tf", "tf_static"]
+            topics.append(rclpy.get_published_topics(namespace='/bno055/'))
+            topics.append(rclpy.get_published_topics(namespace='/joy/'))
+            topics.append(rclpy.get_published_topics(namespace='/roseybot_base_controller/'))           
+
+            # Capture Bag
+            bag_path = (self.data_file / self.filename).resolve()
+            self.get_logger().info(f"Capturing data from {topics}, output: {str(bag_path)}")
+            cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
+            self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self.get_logger().info(f"Started recording bag: {self.filename}")
+
+    def stop_rosey_bags(self, msg: Bool):
+            # End capture
+            self.record_process.send_signal(signal.SIGINT)
+            self.record_process.wait()
+            self.record_process = None
+
+            self.get_logger().info(f"Stopped recording bag: {self.filename}")
 
 
 def main(args=None):
