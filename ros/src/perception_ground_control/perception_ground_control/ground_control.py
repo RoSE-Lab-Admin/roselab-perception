@@ -185,33 +185,33 @@ class groundcontrol(Node):
         self.get_logger().info("Deleted bag from pi")
 
     def start_rosey_bags(self, msg: Bool):
-            # Format filename
-            self.filename = f"RoseyBag"
+        # Format filename
+        self.filename = f"RoseyBag"
 
-            # Set Topics
-            topics = ["/CubeRover_V1/pose", "/cmd_vel", 
-                      "/dynamic_joint_states", "/initialpose",
-                      "/joint_states", "/joy", "/robot_description",
-                      "/rosout", "/tf", "tf_static",
-                      "/Rover/camera/image_raw/compressed"]
-            topics.append(rclpy.get_published_topics(namespace='/bno055/'))
-            topics.append(rclpy.get_published_topics(namespace='/joy/'))
-            topics.append(rclpy.get_published_topics(namespace='/roseybot_base_controller/'))           
+        # Set Topics
+        topics = ["/CubeRover_V1/pose", "/cmd_vel", 
+                    "/dynamic_joint_states", "/initialpose",
+                    "/joint_states", "/joy", "/robot_description",
+                    "/rosout", "/tf", "tf_static",
+                    "/Rover/camera/image_raw/compressed"]
+        topics.append(rclpy.get_published_topics(namespace='/bno055/'))
+        topics.append(rclpy.get_published_topics(namespace='/joy/'))
+        topics.append(rclpy.get_published_topics(namespace='/roseybot_base_controller/'))           
 
-            # Capture Bag
-            bag_path = (self.data_file / self.filename).resolve()
-            self.get_logger().info(f"Capturing data from {topics}, output: {str(bag_path)}")
-            cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
-            self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            self.get_logger().info(f"Started recording bag: {self.filename}")
+        # Capture Bag
+        bag_path = (self.data_file / self.filename).resolve()
+        self.get_logger().info(f"Capturing data from {topics}, output: {str(bag_path)}")
+        cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
+        self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.get_logger().info(f"Started recording bag: {self.filename}")
 
     def stop_rosey_bags(self, msg: Bool):
-            # End capture
-            self.record_process.send_signal(signal.SIGINT)
-            self.record_process.wait()
-            self.record_process = None
+        # End capture
+        self.record_process.send_signal(signal.SIGINT)
+        self.record_process.wait()
+        self.record_process = None
 
-            self.get_logger().info(f"Stopped recording bag: {self.filename}")
+        self.get_logger().info(f"Stopped recording bag: {self.filename}")
 
 
 def main(args=None):
