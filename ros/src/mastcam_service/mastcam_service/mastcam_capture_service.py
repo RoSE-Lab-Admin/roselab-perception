@@ -81,29 +81,32 @@ class MastcamCaptureService(Node):
     # ----------------------------
     # Helpers
     # ----------------------------
-    def _build_topics(self, sensors):
+    def _build_topics(self):
         """
         Construct the topic list from sensor names.
         """
         topics = ["/tf", "/tf_static"]
-        for sensor in sensors:
-            # Adjust to your camera topic names
-            topics.append(f"/{sensor}/aligned_depth_to_color/image_raw")
-            topics.append(f"/{sensor}/color/image_raw")
-            topics.append(f"/{sensor}/aligned_depth_to_color/camera_info")
-            topics.append(f"/{sensor}/extrinsics/depth_to_color")
+        topics.append("/MastCam/Front/color/image_raw")
+        topics.append("/MastCam/Front/color/camera_info")
+        topics.append("/MastCam/Front/extrinsics/depth_to_color")
+        topics.append("/MastCam/Front/aligned_depth_to_color/image_raw")
+        topics.append("/MastCam/Front/aligned_depth_to_color/camera_info")
+        topics.append("/MastCam/Front/depth/image_rect_raw")
+        topics.append("/MastCam/Front/depth/camera_info")
+        
         return topics
 
-    def _start_bag(self, outname, sensors):
+    def _start_bag(self, outname):
         """
         Start a ros2 bag record subprocess. Stores handle + filename + topics.
         """
+
         # Format filename: "outname_timestamp"
         ts = datetime.now().strftime(TIME_STR)
         self.filename = f"{outname}_{ts}"
 
         # Build topics and bag path
-        self.active_topics = self._build_topics(sensors)
+        self.active_topics = self._build_topics()
         bag_path = (DATA_DIR / self.filename).resolve()
 
         # Launch ros2 bag record
@@ -197,14 +200,15 @@ class MastcamCaptureService(Node):
         We reuse Capture.srv so the caller can pass outname.
         The 'duration' field is IGNORED.
         """
+        sensors = ["mastcam"]
         try:
-            sensors = list(request.sensors)
             outname = str(request.outname)
 
             if self.record_process is not None:
                 msg = {"status": "ERROR", "reason": "Recording already active. Stop first."}
                 response.outdata = json.dumps(msg)
                 return response
+        
 
             self._start_bag(outname, sensors)
             self.get_logger().info(f"Started continuous recording: {self.filename}")
@@ -259,7 +263,7 @@ class MastcamCaptureService(Node):
                 return response
 
             folder = matches[0].name
-            url = f"http://{HTTP_BIND_IP}:{HTTP_PORT}/{folder}"
+            url = f"http://192.168.2.104:{HTTP_PORT}/{folder}"
             self.get_logger().info(f"Download name request: {url}")
 
             response.outdata = json.dumps({"success": True, "url": url})
