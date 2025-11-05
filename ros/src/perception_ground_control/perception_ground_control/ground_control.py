@@ -29,6 +29,9 @@ class groundcontrol(Node):
     def __init__(self):
         super().__init__('ground_control')
 
+        self.started = False
+        self.ended = True
+
         # parameters
         # output file for slade slade
         self.declare_parameter('slade_root', "/mnt/d/perception-data")
@@ -61,9 +64,9 @@ class groundcontrol(Node):
         # command line subscriptions
         self.create_subscription(Bool, '/start_lidar', self.start_lidar, 10)
         # call from cli: ros2 topic pub --once /start_lidar std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/start_mastcam', self.start_mast, 10)
+        self.create_subscription(Bool, '/start_mastcam', self.recieve_mast_start, 10)
         # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msgs/Bool "{data: true}"
-        self.create_subscription(Bool, '/stop_mastcam', self.stop_mast, 10)
+        self.create_subscription(Bool, '/stop_mastcam', self.recieve_mast_stop, 10)
         # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msgs/Bool "{data: true}"
         self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10)
         # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msgs/Bool "{data: true}"
@@ -87,6 +90,15 @@ class groundcontrol(Node):
         while not self.lidar_delete.wait_for_service(timeout_sec=1.0):
             pass
         self.get_logger().info("Services ready")
+
+    def recieve_mast_start(self, msg: Bool):
+        if not self.started:
+            self.started = True
+            self.start_mast()
+    
+    def recieve_mast_stop(self, msg: Bool):
+        if self.started:
+            self.stop_mast()
 
     # do first scan for lidar
     def start_lidar(self, msg: Bool):
@@ -134,7 +146,7 @@ class groundcontrol(Node):
 
         # if session is over, terminate, else start mast cam
 
-    def start_mast(self, msg: Bool):
+    def start_mast(self):
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
@@ -145,7 +157,7 @@ class groundcontrol(Node):
         self.get_logger().info("Mastcam capture started")
 
 
-    def stop_mast(self, msg: Bool):
+    def stop_mast(self):
 
         self.get_logger().info("stop requested")
 
@@ -157,16 +169,17 @@ class groundcontrol(Node):
         
         # process capture json result with outname
         self.cap_rep = stop_future.result()
-        cap_json = json.loads(self.cap_rep.outdata)
+        cap_json = json.loads(self.cap_rep.message)
 
         # call download name service
         download_request = MastDownloadName.Request()
         download_request.name = cap_json["outname"]
         self.get_logger().info(f"Bag name: {download_request.name}")
-        download_future = self.mast_download.call(download_request)
+        download_future = self.mast_download.call_async(download_request)
+        rclpy.spin_until_future_complete(self, download_future)
     
         self.get_logger().info("Download info received")
-        download_name = download_future
+        download_name = download_future.result()
 
         # download from https
         name_json = json.loads(download_name.outdata)
