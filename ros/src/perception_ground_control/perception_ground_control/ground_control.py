@@ -6,11 +6,7 @@ from gantry_lidar_interfaces.srv import (
     DownloadName as LidarDownloadName, 
     DeleteName as LidarDeleteName
     )
-from mastcam_interfaces.srv import (
-    Capture as MastCapture,
-    DeleteName as MastDeleteName,
-    DownloadName as MastDownloadName
-    )
+from mastcam_interfaces.srv import Capture as MastCapture, DeleteName as MastDeleteName, DownloadName as MastDownloadName
 from std_srvs.srv import Trigger
 from std_msgs.msg import Bool
 
@@ -144,29 +140,33 @@ class groundcontrol(Node):
         capture_request.outname = self.pi_file
         capture_request.duration = 60.0 # dummy val
         self.cap_future = self.mast_start.call_async(capture_request)
+        rclpy.spin_until_future_complete(self,self.cap_future)
 
         self.get_logger().info("Mastcam capture started")
 
 
     def stop_mast(self, msg: Bool):
 
+        self.get_logger().info("stop requested")
+
         stop_request = Trigger.Request()
         stop_future = self.mast_stop.call_async(stop_request)
-        rclpy.spin_until_future_complete(self, stop_future)
+        rclpy.spin_until_future_complete(self,stop_future)
 
         self.get_logger().info("Bagging stopped")
         
         # process capture json result with outname
-        self.cap_rep = self.cap_future.result()
+        self.cap_rep = stop_future.result()
         cap_json = json.loads(self.cap_rep.outdata)
 
         # call download name service
         download_request = MastDownloadName.Request()
         download_request.name = cap_json["outname"]
         self.get_logger().info(f"Bag name: {download_request.name}")
-        download_future = self.mast_download.call_async(download_request)
-        rclpy.spin_until_future_complete(self, download_future)
-        download_name = download_future.result()
+        download_future = self.mast_download.call(download_request)
+    
+        self.get_logger().info("Download info received")
+        download_name = download_future
 
         # download from https
         name_json = json.loads(download_name.outdata)
@@ -218,6 +218,8 @@ def main(args=None):
     rclpy.init(args=args)
     node = groundcontrol()
     rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
