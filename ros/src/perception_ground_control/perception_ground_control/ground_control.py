@@ -26,7 +26,6 @@ Process flow:
 - another lidar scan at end of session
 '''
 
-
 class groundcontrol(Node):
     def __init__(self):
         super().__init__('ground_control')
@@ -69,15 +68,15 @@ class groundcontrol(Node):
 
         # command line subscriptions
         self.create_subscription(Bool, '/start_lidar', self.start_lidar, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /start_lidar std_msgs/msgs/Bool "{data: true}"
+        # call from cli: ros2 topic pub --once /start_lidar std_msgs/msg/Bool "{data: true}"
         self.create_subscription(Bool, '/start_mastcam', self.recieve_mast_start, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msgs/Bool "{data: true}"
+        # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msg/Bool "{data: true}"
         self.create_subscription(Bool, '/stop_mastcam', self.recieve_mast_stop, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msgs/Bool "{data: true}"
+        # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msg/Bool "{data: true}"
         self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msgs/Bool "{data: true}"
+        # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msg/Bool "{data: true}"
         self.create_subscription(Bool, '/stop_rosey_bag', self.stop_rosey_bags, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /stop_rosey_bag std_msgs/msgs/Bool "{data: true}"
+        # call from cli: ros2 topic pub --once /stop_rosey_bag std_msgs/msg/Bool "{data: true}"
 
         # wait for services
         self.get_logger().info("Waiting for services...")
