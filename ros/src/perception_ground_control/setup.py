@@ -23,7 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ground_control=perception_ground_control.ground_control:main'
+            'ground_control=perception_ground_control.ground_control:main',
+            'ground_control_service=perception_ground_control.ground_control_service:main'
         ],
     },
 )
