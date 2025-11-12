@@ -37,15 +37,17 @@ class groundcontrolService(Node):
         # callback groups
         self.service_host_group = ReentrantCallbackGroup()
         self.service_group = ReentrantCallbackGroup()
+        self.rosey_group = ReentrantCallbackGroup()
+        self.gantry_group = ReentrantCallbackGroup()
 
         # parameters
         # output file for slade slade
         self.declare_parameter('slade_root', "/mnt/d/perception-data")
-        slade_root = Path(self.get_parameter('slade_root').value).expanduser().resolve()
-        self.day = datetime.now().strftime("%m%d%Y")
-        hour = datetime.now().strftime("%H-%M-%S")
-        self.data_file = Path(slade_root) / self.day / hour
-        self.data_file.mkdir(parents=True, exist_ok=True)
+        self.slade_root = Path(self.get_parameter('slade_root').value).expanduser().resolve()
+
+        # update save directory
+        self._update_savedir()
+
         # output file for lattepanda
         self.declare_parameter('panda_file', "lidar_bags")
         self.panda_file = self.get_parameter("panda_file").value
@@ -68,12 +70,12 @@ class groundcontrolService(Node):
         self.mast_start = self.create_client(MastCapture, "mastcam_capture_service/start", callback_group=self.service_group)
 
         # setting up service servers
-        self.create_service(Duration, 'gantry_control_service/lidar/start', self.start_lidar, callback_group=self.service_host_group)
-        self.create_service(Trigger, 'gantry_control_service/start/mastcam', self.start_mast, callback_group=self.service_host_group)
-        self.create_service(Trigger, 'gantry_control_service/stop/mastcam', self.stop_mast, callback_group=self.service_host_group)
-        self.create_service(Trigger, 'gantry_control_service/start/rosey_bag', self.start_rosey_bags, callback_group=self.service_host_group)
-        self.create_service(Trigger, 'gantry_control_service/stop/rosey_bag', self.stop_rosey_bags, callback_group=self.service_host_group)
-        
+        self.create_service(Duration, 'ground_control_service/lidar/start', self.start_lidar, callback_group=self.gantry_group)
+        self.create_service(Trigger, 'ground_control_service/start/mastcam', self.start_mast, callback_group=self.service_host_group)
+        self.create_service(Trigger, 'ground_control_service/stop/mastcam', self.stop_mast, callback_group=self.service_host_group)
+        self.create_service(Trigger, 'ground_control_service/start/rosey_bag', self.start_rosey_bags, callback_group=self.rosey_group)
+        self.create_service(Trigger, 'ground_control_service/stop/rosey_bag', self.stop_rosey_bags, callback_group=self.rosey_group)
+        self.create_service(Trigger, 'ground_control_service/update_savedir', self.update_savedir, callback_group=self.service_host_group)        
 
 
         # # command line subscriptions
@@ -115,6 +117,19 @@ class groundcontrolService(Node):
         if self.started:
             self.stop_mast()
 
+    def _update_savedir(self):
+        self.slade_root = Path(self.get_parameter('slade_root').value).expanduser().resolve()
+        self.day = datetime.now().strftime("%m%d%Y")
+        hour = datetime.now().strftime("%H-%M-%S")
+        self.data_file = Path(self.slade_root) / self.day / hour
+        self.data_file.mkdir(parents=True, exist_ok=True)
+
+    def update_savedir(self, request, response):
+        self.get_logger().info("Updating save directory for new session.")
+        self._update_savedir()
+        response.success = True
+        return response
+
     # do first scan for lidar
     def start_lidar(self, request, response):
 
@@ -129,8 +144,13 @@ class groundcontrolService(Node):
 
         self.end_lidar()
 
+        response.success = True
+        self.get_logger().info("got out of end lidarrr")
 
-    def end_lidar(self, msg: Bool):
+        return response
+
+
+    def end_lidar(self):
         self.get_logger().info("Stopping LIDAR capture")
         # get outname from service repsonse
         lidar_response = self.future_lidar.result()
@@ -160,8 +180,11 @@ class groundcontrolService(Node):
         # self.get_logger().info("Deleted bag from LattePanda.")
 
         # if session is over, terminate, else start mast cam
+        return
 
     def start_mast(self, request, response):
+
+        self.get_logger().info('mastcam called')
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
@@ -171,6 +194,8 @@ class groundcontrolService(Node):
 
         self.get_logger().info("Mastcam capture started")
 
+        response.success = True
+        return response
 
     def stop_mast(self, request, response):
 
@@ -212,6 +237,9 @@ class groundcontrolService(Node):
         rclpy.spin_until_future_complete(self, delete_future)
         self.get_logger().info("Deleted bag from pi")
 
+        response.success = True
+        return response
+
     def start_rosey_bags(self, request, response):
         # Format filename
         self.filename = f"RoseyBag"
@@ -233,6 +261,9 @@ class groundcontrolService(Node):
         self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.get_logger().info(f"Started recording bag: {self.filename}")
 
+        response.success = True
+        return response
+
     def stop_rosey_bags(self, reques, response):
         # End capture
         self.record_process.send_signal(signal.SIGINT)
@@ -241,6 +272,8 @@ class groundcontrolService(Node):
 
         self.get_logger().info(f"Stopped recording bag: {self.filename}")
 
+        response.success = True
+        return response
 
 def main(args=None):
     rclpy.init(args=args)
