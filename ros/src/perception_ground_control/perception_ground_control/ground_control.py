@@ -106,7 +106,7 @@ class groundcontrol(Node):
 
         lidar_request = LidarCapture.Request()
         lidar_request.outname = self.panda_file
-        lidar_request.sensors = ["p_l515_center", "p_l515_west", "p_l515_east"]
+        lidar_request.sensors = ["p_l515_center"] #, "p_l515_west", "p_l515_east"]
         lidar_request.duration = float(self.duration) 
 
         self.get_logger().info(f"Starting LIDAR capture")
@@ -149,6 +149,17 @@ class groundcontrol(Node):
 
 
     def start_mast(self):
+
+        
+
+        while not self.mast_download.wait_for_service(timeout_sec=1.0):
+            pass
+        while not self.mast_delete.wait_for_service(timeout_sec=1.0):
+            pass
+        while not self.mast_stop.wait_for_service(timeout_sec=1.0):
+            pass
+        while not self.mast_start.wait_for_service(timeout_sec=1.0):
+            pass
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
