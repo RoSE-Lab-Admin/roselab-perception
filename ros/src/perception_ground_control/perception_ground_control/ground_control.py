@@ -73,10 +73,6 @@ class groundcontrol(Node):
         # call from cli: ros2 topic pub --once /start_mastcam std_msgs/msg/Bool "{data: true}"
         self.create_subscription(Bool, '/stop_mastcam', self.recieve_mast_stop, 10, callback_group=self.subscriber_group)
         # call from cli: ros2 topic pub --once /stop_mastcam std_msgs/msg/Bool "{data: true}"
-        self.create_subscription(Bool, '/start_rosey_bag', self.start_rosey_bags, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /start_rosey_bag std_msgs/msg/Bool "{data: true}"
-        self.create_subscription(Bool, '/stop_rosey_bag', self.stop_rosey_bags, 10, callback_group=self.subscriber_group)
-        # call from cli: ros2 topic pub --once /stop_rosey_bag std_msgs/msg/Bool "{data: true}"
 
         # wait for services
         self.get_logger().info("Waiting for services...")
@@ -162,15 +158,18 @@ class groundcontrol(Node):
         # Format filename
         self.filename = f"RoseyBag"
 
+        # find all correct topics
+        all_topics = self.get_topic_names_and_types()
+
         # Set Topics
         topics = ["/CubeRover_V1/pose", "/cmd_vel", 
                     "/dynamic_joint_states", "/initialpose",
                     "/joint_states", "/joy", "/robot_description",
                     "/rosout", "/tf", "tf_static",
                     "/Rover/camera/image_raw/compressed"]
-        topics.append(rclpy.get_published_topics(namespace='/bno055/'))
-        topics.append(rclpy.get_published_topics(namespace='/joy/'))
-        topics.append(rclpy.get_published_topics(namespace='/roseybot_base_controller/'))           
+        for topic_name, topic_types in all_topics:
+            if topic_name.startswith('/bno0ff/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
+                topics.append(topic_name)     
 
         # Capture Bag
         bag_path = (self.data_file / self.filename).resolve()

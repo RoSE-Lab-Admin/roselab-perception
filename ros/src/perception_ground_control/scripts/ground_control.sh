@@ -19,15 +19,11 @@ while true; do
     read -r -p "Press Enter to START MastCam (/start_mastcam) AND RoSEy bag (/start_rosey_bag)..." _
     echo "Starting MastCam..."
     ros2 topic pub --once /start_mastcam std_msgs/msgs/Bool "{data: true}"
-    echo "Starting Rosey bag..."
-    ros2 topic pub --once /start_rosey_bag std_msgs/msgs/Bool "{data: true}"
 
     # 4. stop both
     read -r -p "Press Enter to STOP MastCam (/stop_mastcam) AND Rosey bag (/stop_rosey_bag)..." _
     echo "Stopping MastCam..."
     ros2 topic pub --once /stop_mastcam std_msgs/msgs/Bool "{data: true}"
-    echo "Stopping Rosey bag..."
-    ros2 topic pub --once /stop_rosey_bag std_msgs/msgs/Bool "{data: true}"
 
     echo
     echo "Cycle complete. Ctrl+C to exit, or it will start over."
