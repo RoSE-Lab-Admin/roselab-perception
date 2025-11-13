@@ -52,7 +52,7 @@ class groundcontrol(Node):
         self.declare_parameter('pi_file', "mastcam_bags")
         self.pi_file = self.get_parameter("pi_file").value
         # duration of lidar scan
-        self.declare_parameter('duration', 60.0)
+        self.declare_parameter('duration', 5.0)
         self.duration = self.get_parameter('duration').value
 
         # setting up services
@@ -115,12 +115,10 @@ class groundcontrol(Node):
 
         self.get_logger().info(f"Starting LIDAR capture")
         self.future_lidar = self.lidar_capture.call_async(lidar_request)
-        rclpy.spin_until_future_complete(self, self.future_lidar)
-
-        self.end_lidar()
+        self.future_lidar.add_done_callback(self.end_lidar)
 
 
-    def end_lidar(self, msg: Bool):
+    def end_lidar(self, future):
         self.get_logger().info("Stopping LIDAR capture")
         # get outname from service repsonse
         lidar_response = self.future_lidar.result()
@@ -132,16 +130,7 @@ class groundcontrol(Node):
         self.get_logger().info(f"Lidar bag name: {name_request.name}")
         # wait until return
         future_name = self.lidar_download.call_async(name_request)
-        rclpy.spin_until_future_complete(self, future_name)
-        name_response = future_name.result()
-        name_response_dict = json.loads(name_response.outdata)
-        cap_url = name_response_dict["url"]
-        self.get_logger().info(f"Downloading from {cap_url} ...")
-        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
-        time.sleep(10)
-
-        self.get_logger().info("Download complete.")
-        self.get_logger().info(f"Bag saved to {self.data_file}")
+        future_name.add_done_callback(self.download)
 
         # delete_req = LidarDeleteName.Request()
         # delete_req.name = lidar_cap_data["outname"]
@@ -151,58 +140,25 @@ class groundcontrol(Node):
 
         # if session is over, terminate, else start mast cam
 
+    def download(self, future):
+        name_response = future.result()
+        name_response_dict = json.loads(name_response.outdata)
+        cap_url = name_response_dict["url"]
+        self.get_logger().info(f"Downloading from {cap_url} ...")
+        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
+        time.sleep(10)
+
+        self.get_logger().info("Download complete.")
+        self.get_logger().info(f"Bag saved to {self.data_file}")
+
+
     def start_mast(self):
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
         capture_request.duration = 60.0 # dummy val
         self.cap_future = self.mast_start.call_async(capture_request)
-        
 
-        self.get_logger().info("Mastcam capture started")
-
-
-    def stop_mast(self):
-
-        self.get_logger().info("stop requested")
-
-        stop_request = Trigger.Request()
-        stop_future = self.mast_stop.call_async(stop_request)
-        rclpy.spin_until_future_complete(self,stop_future)
-
-        self.get_logger().info("Bagging stopped")
-        
-        # process capture json result with outname
-        self.cap_rep = stop_future.result()
-        cap_json = json.loads(self.cap_rep.message)
-
-        # call download name service
-        download_request = MastDownloadName.Request()
-        download_request.name = cap_json["outname"]
-        self.get_logger().info(f"Bag name: {download_request.name}")
-        download_future = self.mast_download.call_async(download_request)
-        rclpy.spin_until_future_complete(self, download_future)
-    
-        self.get_logger().info("Download info received")
-        download_name = download_future.result()
-
-        # download from https
-        name_json = json.loads(download_name.outdata)
-        cap_url = name_json["url"]
-        self.get_logger().info(f"Downloading from {cap_url}")
-        process = subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
-        ret = process.wait()
-
-        self.get_logger().info(f"Bag saved to {self.data_file}")
-
-        # delete from pi
-        delete_req = MastDeleteName.Request()
-        delete_req.name = cap_json["outname"]
-        delete_future = self.mast_delete.call_async(delete_req)
-        rclpy.spin_until_future_complete(self, delete_future)
-        self.get_logger().info("Deleted bag from pi")
-
-    def start_rosey_bags(self, msg: Bool):
         # Format filename
         self.filename = f"RoseyBag"
 
@@ -222,14 +178,61 @@ class groundcontrol(Node):
         cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
         self.record_process = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.get_logger().info(f"Started recording bag: {self.filename}")
+        
 
-    def stop_rosey_bags(self, msg: Bool):
+        self.get_logger().info("Mastcam and Rosey capture started")
+
+
+    def stop_mast(self):
+
+        self.get_logger().info("stop requested")
+
+        stop_request = Trigger.Request()
+        stop_future = self.mast_stop.call_async(stop_request)
+        stop_future.add_done_callback(self._on_mast_stop)
+
         # End capture
         self.record_process.send_signal(signal.SIGINT)
         self.record_process.wait()
         self.record_process = None
 
         self.get_logger().info(f"Stopped recording bag: {self.filename}")
+
+    def _on_mast_stop(self, stop_future):
+        self.get_logger().info("Bagging stopped")
+        
+        # process capture json result with outname
+        self.cap_rep = stop_future.result()
+        self.cap_json = json.loads(self.cap_rep.message)
+
+        # call download name service
+        download_request = MastDownloadName.Request()
+        download_request.name = self.cap_json["outname"]
+        self.get_logger().info(f"Bag name: {download_request.name}")
+        download_future = self.mast_download.call_async(download_request)
+        download_future.add_done_callback(self._on_mast_download)
+
+    def _on_mast_download(self, download_future):
+        self.get_logger().info("Download info received")
+        download_name = download_future.result()
+
+        # download from https
+        name_json = json.loads(download_name.outdata)
+        cap_url = name_json["url"]
+        self.get_logger().info(f"Downloading from {cap_url}")
+        process = subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
+        ret = process.wait()
+
+        self.get_logger().info(f"Bag saved to {self.data_file}")
+
+        # delete from pi
+        delete_req = MastDeleteName.Request()
+        delete_req.name = self.cap_json["outname"]
+        delete_future = self.mast_delete.call_async(delete_req)
+        delete_future.add_done_callback(self._on_mast_delete)
+
+    def _on_mast_delete(self, delete_future):
+        self.get_logger().info("Deleted bag from pi")
 
 
 def main(args=None):
