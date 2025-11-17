@@ -52,7 +52,7 @@ class groundcontrol(Node):
         self.declare_parameter('pi_file', "mastcam_bags")
         self.pi_file = self.get_parameter("pi_file").value
         # duration of lidar scan
-        self.declare_parameter('duration', 5.0)
+        self.declare_parameter('duration', 180.0)
         self.duration = self.get_parameter('duration').value
 
         # setting up services
@@ -106,7 +106,7 @@ class groundcontrol(Node):
 
         lidar_request = LidarCapture.Request()
         lidar_request.outname = self.panda_file
-        lidar_request.sensors = ["p_l515_center"] #, "p_l515_west", "p_l515_east"]
+        lidar_request.sensors = ["p_l515_center", "p_l515_west", "p_l515_east"]
         lidar_request.duration = float(self.duration) 
 
         self.get_logger().info(f"Starting LIDAR capture")
