@@ -6,7 +6,7 @@ LIDAR_SECS=30 # Change depending on trial scan length
 echo "Perception Ground Control Started!"
 
 # 1. start LiDAR
-read -r -p "Press Enter to START LiDAR (/start_lidar)..."
+read -r -p "TURN OFF MOCAP CAMERAS Press Enter to START LiDAR (/start_lidar)..."
 echo "Starting LiDAR..."
 ros2 topic pub --once /start_lidar std_msgs/msg/Bool "{data: true}"
 
@@ -16,7 +16,7 @@ sleep "${LIDAR_SECS}"
 
 while true; do
     # 3. start MastCam + Rosey bag
-    read -r -p "Press Enter to START MastCam (/start_mastcam) AND RoSEy bag (/start_rosey_bag)..."
+    read -r -p "TURN ON MOCAP CAMERAS Press Enter to START MastCam (/start_mastcam) AND RoSEy bag (/start_rosey_bag)..."
     echo "Starting MastCam..."
     ros2 topic pub --once /start_mastcam std_msgs/msg/Bool "{data: true}"
 
@@ -26,7 +26,7 @@ while true; do
     ros2 topic pub --once /stop_mastcam std_msgs/msg/Bool "{data: true}"
 
     # 5. start LiDAR
-    read -r -p "Press Enter to START LiDAR (/start_lidar)..."
+    read -r -p "TURN OFF MOCAP CAMERAS Press Enter to START LiDAR (/start_lidar)..."
     echo "Starting LiDAR..."
     ros2 topic pub --once /start_lidar std_msgs/msg/Bool "{data: true}"
 
