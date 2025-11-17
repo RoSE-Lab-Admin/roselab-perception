@@ -66,17 +66,17 @@ These startup routines result in all data streams, payloads, controls, and avion
 - In first tab:
 
     ```bash
-        cd /m3_robotics/gantry_control
-        ./roselab_perception_launch.sh
+        cd ~/gantry_control
+        ./run_roselab_perception.sh
     ```
 - In second tab:
     ```bash
-        cd /m3_robotics/gantry_control
+        cd ~/gantry_control
         ./runSystem --no-gui
     ```
 - In third tab:
     ```bash
-        cd ~/Ryan_ws/gantry_lidars
+        cd ~/roselab-perception/ros
         source /opt/ros/jazzy/setup.bash
         source install/setup.bash
         ros2 run gantry_services gantry_capture_service
@@ -146,5 +146,6 @@ Color, Aligned-depth-to-color, tfs, camera info topics, extrinsics, etc
 
 
 # PROCESS FLOW
+
 
 ![process flow](process-flow.jpg "Process Flow Diagram")
