@@ -24,8 +24,7 @@ These startup routines result in all data streams, payloads, controls, and avion
 
     ```bash
 	source CubeRover/install/setup.bash
-	ros2 launch roseybot_control ros2_control.launch.py # Ryan check syntax here
-	ros2 launch roseybot_control hardware_startup.launch.py # Ryan: not sure we need this and the IMU launch... should just have one launch for all hardware (avionics, IMU) and ros2 control
+	ros2 launch roseybot_control hardware_startup.launch.py 
     ```
 
 ### Enable controller-based teleop of Rosey
@@ -42,11 +41,19 @@ These startup routines result in all data streams, payloads, controls, and avion
 2. Run: 
 
     ```bash
-        ssh dev@192.168.2.104 -> PW: regolith 		# Ryan check this IP address
+        ssh dev@192.168.2.104 -> PW: regolith 		
+        cd roselab-perception
+        ./scripts/launch_realsense_d456.sh
+    ```
+3. Open another tab on the slade and run:
+    ```bash
+        ssh dev@192.168.2.104 -> PW: regolith 		
         cd roselab-perception
         source venv/bin/activate
-        source install/setup.bash
+        source ros/install/setup.bash
+        ros2 run mastcam_service mastcam_capture_service  
     ```
+
 
 ## WHEEL CAM - x4 RGB Cameras
 
@@ -59,9 +66,9 @@ These startup routines result in all data streams, payloads, controls, and avion
 
 ## LIDAR & GANTRY SYSTEM
 
-1. NoMachine -> PW: M3Robotics 
-2. Open NoMachine application and select the gantry computer (Latte Panda)
-3. Once window opens showing LattePanda desktop, open three terminal tabs:
+1. NoMachine -> Gantry Computer PW: M3Robotics 
+2. Open NoMachine application and select the Gantry Computer 
+3. Once window opens showing the desktop, open three terminal tabs:
         
 - In first tab:
 
@@ -71,21 +78,24 @@ These startup routines result in all data streams, payloads, controls, and avion
     ```
 - In second tab:
     ```bash
-        cd ~/gantry_control
-        ./runSystem --no-gui
-    ```
-- In third tab:
-    ```bash
-        cd ~/roselab-perception/ros
+        cd ~/roselab-perception
         source /opt/ros/jazzy/setup.bash
-        source install/setup.bash
+        source ros/install/setup.bash
         ros2 run gantry_services gantry_capture_service
     ```
 
-## OPTITRACK - Pose
+4. ssh into the lattepanda from the Nuk -> ssh gantry_lattepanda@192.168.2.4 -> PW: M3Robotics
+- Open tab:
+    ```bash
+        cd /m3_robotics/gantry_control
+        ./runSystem --no-gui
+    ```
 
-1. Open terminal on NUC
-2. Run: ./optitrack.sh
+## OPTITRACK - Pose
+1. Open motive on slade and select CubeRover from assets tab
+2. Open terminal on NUC
+3. Run: ./optitrack.sh
+4. Make sure it reads Activated! If not, restart
 
 ## FOXGLOVE - HUD
 
@@ -94,8 +104,23 @@ These startup routines result in all data streams, payloads, controls, and avion
 3. Open foxglove desktop app on NUC, select Slade address ws://... url to open perception layout
 
 ## GROUND CONTROL - Session data collection and bagging
+1. Open terminal on slade:
+    ```bash
+        cd roselab-perception/ros
+        source install/setup.bash
+        ros2 launch perception_ground_control launch_ground.py duration:='{lidar scan duration}'
+    ```
+2. Open new tab on slade:
+    ```bash
+        cd roselab-perception/ros
+        source install/setup.bash
+        ./src/perception_ground_control/scripts/ground_control.sh
 
-<RYAN M - FILL THIS IN BASED ON SESSION RUNNING MANUAL OR AUTOMATED WORKFLOWS!>
+3. Check all needed topics are being published with ros2 topic list
+4. TURN OFF MOTIVE CAMERAS FOR THE LOVE OF GOD
+5. press enter on ground_control.sh to start lidar scan
+6. TURN MOTIVE CAMERAS BACK ON FOR THE LOVE OF GOD
+7. Start and stop mastcam and rosey data collection
 
 ------------------------------------------------------------------------
 
