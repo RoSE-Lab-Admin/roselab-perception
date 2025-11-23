@@ -128,14 +128,6 @@ class groundcontrol(Node):
         future_name = self.lidar_download.call_async(name_request)
         future_name.add_done_callback(self.download)
 
-        # delete_req = LidarDeleteName.Request()
-        # delete_req.name = lidar_cap_data["outname"]
-        # future_delete = self.gant_delete.call_async(delete_req)
-        # rclpy.spin_until_future_complete(self, future_delete)
-        # self.get_logger().info("Deleted bag from LattePanda.")
-
-        # if session is over, terminate, else start mast cam
-
     def download(self, future):
         name_response = future.result()
         name_response_dict = json.loads(name_response.outdata)
