@@ -57,7 +57,7 @@ def plot_message_density(times_map):
     for v in tmp.values():
         v -= earliest_time
 
-    sns.histplot(tmp, kde=True, title="Message Density", alpha=0.5) # Times map should be a dictionary of time vectors for which a kde will be constructed for each
+    sns.histplot(tmp, kde=True, alpha=0.5) # Times map should be a dictionary of time vectors for which a kde will be constructed for each
 
 if __name__=="__main__":
     # Load trajectory

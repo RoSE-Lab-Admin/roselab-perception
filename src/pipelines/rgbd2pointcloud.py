@@ -18,6 +18,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 from std_msgs.msg import Header
+# from ..pose_utils import load_trajectory
 
 #from nav_msgs.msg import Odometry
 
@@ -52,11 +53,11 @@ def find_nearest(sorted_msgs, t_ns, nearest=True):
 
         # Otherwise, let's find nearest neighbors before and after t_ns
         # Find index of nearest, determine sooner (negative) or later (positive) than t_ns
-        nni = np.argmin(sorted_msgs, key=lambda x: abs(x[0] - t_ns))
+        nni = np.argmin([abs(x[0] - t_ns) for x in sorted_msgs])
         nn = sorted_msgs[nni]
 
         # Return (nn_sooner, nn_later)
-        return sorted([nn, sorted_msgs[int(nni+np.sign(nn[0] - t_ns)))]], key=lambda x: x[0])
+        return sorted([nn, sorted_msgs[int(nni+np.sign(nn[0] - t_ns))]], key=lambda x: x[0])
 
 def build_intrinsic(cam_info: CameraInfo):
     fx, fy = cam_info.k[0], cam_info.k[4]
@@ -98,45 +99,47 @@ def process_rgbd_pair(color_msg, depth_msg, pose_msg, bridge, intrinsic, depth_s
 
 def setup_parser():
     parser = argparse.ArgumentParser(description="Chunked offline RGBD -> Open3D point cloud aggregator")
-    parser.add_argument("--bag", required=True, help="Path to .mcap file")
+    parser.add_argument("--cam-bag", required=True, help="Path to .mcap file for RGBD camera data")
     parser.add_argument("--color", required=True, help="Color image topic")
     parser.add_argument("--depth", required=True, help="Depth image topic")
     parser.add_argument("--camera-info", required=True, help="CameraInfo topic")
+    parser.add_argument("--pose-bag", required=True, help="Path to .mcap file for pose data")
     parser.add_argument("--pose", required=True, help="PoseStamped or Odometry topic")
     parser.add_argument("--out-dir", default="./chunks", help="Directory to save chunked PLYs")
     parser.add_argument("--depth-scale", type=float, default=1000.0)
     parser.add_argument("--depth-trunc", type=float, default=15.0) # Setting default to well over operating range of D456
     parser.add_argument("--slop", type=float, default=0.05, help="Approx sync slop in seconds")
     parser.add_argument("--chunk-size", type=int, default=100, help="Frames per chunk")
-    parser.add_argument("--interp", type=bool, default=True, help="Whether to interpolate poses to aligned frames")
+    parser.add_argument("--interp", action='store_true', default=False, help="Whether to interpolate poses to aligned frames")
     return parser
 
 # Simple weighted average of two pose msgs to a target time (which should be between their timestamps)
 def interpolate_pose_msgs(pre, post, t_ns):
     # Compute weightings
-    total = np.abs(post - pre)
-    w_pre = 1. - abs(pre-t_ns) / total
-    w_post = 1. - abs(post-t_ns) / total
+    total = np.abs(post[0] - pre[0])
+    w_pre = 1. - abs(pre[0]-t_ns) / total
+    w_post = 1. - abs(post[0]-t_ns) / total
 
     # Extract rotational components and average
     # Create a Slerp object: Slerp(keyframe_times, keyframe_quats)
     pre_q = pre[1].pose.orientation
     post_q = post[1].pose.orientation
 
-    slerp = Slerp([pre[0], post[0]], [pre.pose.orientation])
+    slerp = Slerp([pre[0], post[0]], [pre_q, post_q])
 
     # Interpolate at intermediate times
     interp_q = slerp(t_ns).as_quaternion()
-
-    # Extract translational components and average
+    interp_t = w_pre * pre[1].pose.position + w_post * post[1].pose.position
 
     # Construct new pose msg
-    avg_pose_msg = PoseStamped()
-    avg_pose_msg.header = Header()
-    avg_pose_msg.header.frame_id = pre[1].header.frame_id
-    avg_pose_msg.header.stamp = t_ns * 1e9 # This needs to be formatted into a proper TimeStamp object
+    new_pose_msg = PoseStamped()
+    new_pose_msg.header = Header()
+    new_pose_msg.header.frame_id = pre[1].header.frame_id
+    new_pose_msg.header.stamp = t_ns * 1e9 # This needs to be formatted into a proper TimeStamp object
 
     # Now fill with pose info
+    new_pose_msg.pose.position = interp_t
+    new_pose_msg.pose.orientation = interp_q
 
     return new_pose_msg
 
@@ -218,47 +221,72 @@ def main():
     os.makedirs(args.out_dir, exist_ok=True)
     bridge = CvBridge()
 
-    storage_options = StorageOptions(uri=args.bag, storage_id='mcap')
+    storage_options_cam = StorageOptions(uri=args.cam_bag, storage_id='mcap')
+    storage_options_pose = StorageOptions(uri=args.pose_bag, storage_id='mcap')
     converter_options = ConverterOptions('', '')
-    reader = SequentialReader()
-    reader.open(storage_options, converter_options)
 
-    topic_types = {t.name: t.type for t in reader.get_all_topics_and_types()}
+    # Reader for cam bag
+    reader_cam = SequentialReader()
+    reader_cam.open(storage_options_cam, converter_options)
+
+    # Reader for pose bag
+    reader_pose = SequentialReader()
+    reader_pose.open(storage_options_pose, converter_options)
+
+    topic_types = {t.name: t.type for t in (reader_cam.get_all_topics_and_types() + reader_pose.get_all_topics_and_types())}
     msg_types = {t: get_message(t) for t in topic_types.values()}
+
+    # print(f"Working with\n {topic_types=} \n {msg_types=}")
 
     color_msgs, depth_msgs, pose_msgs = [], [], []
     camera_info = None
+
+    # Load pose data via ../pose_utils.py
+    # RH: This will require a refactor of functionality unfortunately...
+    # pose_times, pose_tfs = load_trajectory(args.pose_bag, args.pose)
 
     print("Reading messages...")
 
     CHUNK = args.chunk_size
     chunk_idx = 0
 
+    # Get max time of each bag, take lower of the two
+    # MAX_TIME = max()
+
     # We should probably unpack the camera info directly first
-    while reader.has_next():
-        topic, data, t = reader.read_next()
+    while reader_cam.has_next() and reader_pose.has_next():
+        topic, data, t = reader_cam.read_next()
         msg = deserialize_message(data, msg_types[topic_types[topic]])
         if topic == args.color:
             color_msgs.append((t, msg))
         elif topic == args.depth:
             depth_msgs.append((t, msg))
-        elif topic == args.pose:
-            pose_msgs.append((t, msg))
         elif topic == args.camera_info:
             camera_info = msg
+
+        # Read all of these in before hand for alignment and efficiency concerns
+        topic, data, t = reader_pose.read_next()
+        msg = deserialize_message(data, msg_types[topic_types[topic]])
+        if topic == args.pose:
+            pose_msgs.append((t, msg))
 
         # break if color and depth topics have reached limit, and pose topic's latest message is after the latest color message
         if len(color_msgs) >= CHUNK and len(depth_msgs) >= CHUNK:
             if pose_msgs[-1][0] >= color_msgs[-1][0]:
 
-                # Instead of breaking, let's turn all of the following into a chunk processing call, clear the messages, and let the while loop keep going
+                # RH: Pass in all poses for NN LUT
                 process_chunk(args, chunk_idx, color_msgs, depth_msgs, pose_msgs, camera_info, bridge) # writes out chunk to disk
+                # process_chunk(args, chunk_idx, color_msgs, depth_msgs, (pose_times, pose_tfs), camera_info, bridge) # writes out chunk to disk
 
                 # clear and continue while loop
                 color_msgs, depth_msgs, pose_msgs = [], [], []
+                #color_msgs, depth_msgs = [], []
                 chunk_idx += 1
 
                 print(f"Processed {(chunk_idx+1) * CHUNK} RGBD pairs.")
+
+    # TODO: Should actually process last partial set of color, depth, and pose messages
+    # For now ignore
 
     # Global merge
     chunk_files = sorted([Path(args.out_dir) / Path(f) for f in os.listdir(args.out_dir) if f.endswith(".ply")])

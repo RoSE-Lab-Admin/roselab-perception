@@ -121,7 +121,7 @@ def get_average_pose(bag_path: str, topic:str):
         avg_position = np.array([pos_x_sum/len(conn), pos_y_sum/len(conn), pos_z_sum/len(conn)])
     return avg_position, avg_orientation
 
-def load_trajectory(bag_path: str, topic:str):
+def load_trajectory(bag_path: str, topic:str, return_msgs:bool = False):
     """
     Given a bag path, returns time samples and corresponding transforms as numpy arrays
     Args:
@@ -134,6 +134,9 @@ def load_trajectory(bag_path: str, topic:str):
     bag_path = Path(bag_path)
     all_data = []
     N = 0
+
+    msgtype = None
+
     # Extract poses
     with AnyReader([bag_path]) as reader:
         for conn in reader.connections:
@@ -144,6 +147,7 @@ def load_trajectory(bag_path: str, topic:str):
             rows = []
             desc = f"{bag_path.name}:{conn.topic}"
             N = conn.msgcount
+            msgtype = conn.msgtype
             for _, ts, raw in tqdm(reader.messages(connections=[conn]),
                                    total=conn.msgcount, desc=desc, mininterval=1.0):
                 msg = reader.deserialize(raw, conn.msgtype)
@@ -157,22 +161,40 @@ def load_trajectory(bag_path: str, topic:str):
     times = np.zeros(N)
 
     print(f"Processing {N} transforms...")
-    for conn in all_data:
-        for i, frame in enumerate(tqdm(conn)):
-            tfs[i,:3,:3] = R.from_quat([
-                frame["pose.orientation.x"],
-                frame["pose.orientation.y"],
-                frame["pose.orientation.z"],
-                frame["pose.orientation.w"]
-            ]).as_matrix()
 
-            tfs[i,:3,3] = np.r_[
-                frame["pose.position.x"],
-                frame["pose.position.y"],
-                frame["pose.position.z"]
-            ]
+    # For now, just do this...
+    print(f"Using {msgtype=}")
+    if msgtype == 'gantry_interfaces/msg/GantryState':
+        for conn in all_data:
+            for i, frame in enumerate(tqdm(conn)):
+                # For now, assume 2D plane, orientation doesn't change
+                tfs[i,:3,:3] = np.eye(3)
 
-            times[i] = frame["stamp_ns"]
+                tfs[i,:3,3] = np.r_[
+                    frame["encoder_c"], # Carriage is x dir
+                    (frame["encoder_e"] + frame["encoder_w"]) / 2., # Take average for y dir
+                    0. # This would normally be set to the actual height (hopefully constant...) of the cart w.r.t MLSS origin
+                ]
+
+                times[i] = frame["stamp_ns"]
+
+    else: # Assume regular posestamped msgtype
+        for conn in all_data:
+            for i, frame in enumerate(tqdm(conn)):
+                tfs[i,:3,:3] = R.from_quat([
+                    frame["pose.orientation.x"],
+                    frame["pose.orientation.y"],
+                    frame["pose.orientation.z"],
+                    frame["pose.orientation.w"]
+                ]).as_matrix()
+
+                tfs[i,:3,3] = np.r_[
+                    frame["pose.position.x"],
+                    frame["pose.position.y"],
+                    frame["pose.position.z"]
+                ]
+
+                times[i] = frame["stamp_ns"]
 
     # Return 4x4 transforms extracted from pose message stream
     return np.asarray(times), np.asarray(tfs)

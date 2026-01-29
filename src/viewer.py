@@ -21,3 +21,7 @@ if __name__=="__main__":
 
       o3d.visualization.draw([filtered_pcd], show_ui=True)
 #      o3d.visualization.draw_geometries([filtered_pcd])
+   else:
+      # Mesh
+      mesh = o3d.io.read_triangle_mesh(fname)
+      o3d.visualization.draw([mesh], show_ui=True)
