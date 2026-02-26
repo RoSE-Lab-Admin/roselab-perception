@@ -60,9 +60,14 @@ These startup routines result in all data streams, payloads, controls, and avion
 1. Open WSL terminal on Slade
 2. Run: 
     ```bash
-        ssh picam@19.168.2.51 -> PW: roseycam
+        ssh picam@192.168.2.51 -> PW: roseycam
         ./boot.sh
     ```
+3. Open terminal on the slade
+4. In the home directory run:
+```bash
+	./perception_boot.sh
+```
 
 ## LIDAR & GANTRY SYSTEM
 
@@ -174,3 +179,4 @@ Color, Aligned-depth-to-color, tfs, camera info topics, extrinsics, etc
 
 
 ![process flow](process-flow.jpg "Process Flow Diagram")
+
