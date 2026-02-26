@@ -65,9 +65,9 @@ These startup routines result in all data streams, payloads, controls, and avion
     ```
 3. Open terminal on the slade
 4. In the home directory run:
-```bash
-	./perception_boot.sh
-```
+	```bash
+		./perception_boot.sh
+	```
 
 ## LIDAR & GANTRY SYSTEM
 
@@ -179,4 +179,5 @@ Color, Aligned-depth-to-color, tfs, camera info topics, extrinsics, etc
 
 
 ![process flow](process-flow.jpg "Process Flow Diagram")
+
 
