@@ -56,7 +56,7 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     color_images = []
     depth_images = []
     depth_images_highres = []
-    color_shape = None
+    color_shape = (960,540,3) # Bad practice, need to do this smarter
     with AnyReader([Path(bag_path)]) as reader:
         # Make list of color and depth images
         for connection, timestamp, rawdata in tqdm(reader.messages()):
@@ -103,19 +103,19 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     #
     #        return img_colormap
 
-    cv2.namedWindow('High-Res Depth', cv2.WINDOW_AUTOSIZE)
-    delay = int(1000//15)
-    for d in depth_images:
-        dd = d.copy()
-        dd[dd < 0] = np.median(dd)
-        im = cv2.normalize(dd.astype(np.float32) / 1000, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-        im = cv2.equalizeHist(im)
-        im = cv2.applyColorMap(im, cv2.COLORMAP_INFERNO)
+    # cv2.namedWindow('High-Res Depth', cv2.WINDOW_AUTOSIZE)
+    # delay = int(1000//15)
+    # for d in depth_images:
+       # dd = d.copy()
+       # dd[dd < 0] = np.median(dd)
+       # im = cv2.normalize(dd.astype(np.float32) / 1000, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+       # im = cv2.equalizeHist(im)
+       # im = cv2.applyColorMap(im, cv2.COLORMAP_INFERNO)
         #        im = apply_log_cmap(d)
-        cv2.imshow('High-Res Depth', im)
-        cv2.waitKey(0)
+       # cv2.imshow('High-Res Depth', im)
+       # cv2.waitKey(0)
 
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
     # THIS SHOULD NOT GO HERE!!!!!!!
     # Make stacked and median images
