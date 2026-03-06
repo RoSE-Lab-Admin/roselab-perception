@@ -172,7 +172,7 @@ def load_trajectory(bag_path: str, topic:str, return_msgs:bool = False):
 
                 tfs[i,:3,3] = np.r_[
                     frame["encoder_c"], # Carriage is x dir
-                    (frame["encoder_e"] + frame["encoder_w"]) / 2., # Take average for y dir
+                    np.nanmean([frame["encoder_e"], frame["encoder_w"]]), # Take average for y dir
                     0. # This would normally be set to the actual height (hopefully constant...) of the cart w.r.t MLSS origin
                 ]
 
