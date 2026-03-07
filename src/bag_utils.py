@@ -1,4 +1,5 @@
 # This module contains various routines for visualizing things like message density in bags
+import argparse
 import seaborn as sns
 from pose_utils import load_trajectory
 import matplotlib.pyplot as plt
@@ -7,8 +8,41 @@ from pathlib import Path
 from typing import Union, List, Any
 import numpy as np
 from tqdm import tqdm
+from datetime import datetime
 
-def load_topics_times(bag_file: Union[str, Path], topics: Union[List[str], str]):
+def _convert_filename_to_path(f: Union[List[str], str, Path]) -> List[Path]:
+    if isinstance(f, list):
+        return [Path(fi) for fi in f]
+    else:
+        return [Path(f)]
+
+def print_bag_info(bag_files: Union[List[str], str, Path]):
+    bag_paths = _convert_filename_to_path(bag_files)
+    with AnyReader(bag_paths) as reader:
+        # Times are in nanoseconds, so we divide by 1e9 to get seconds
+        start_sec = reader.start_time / 1e9
+        end_sec = reader.end_time / 1e9
+        duration = end_sec - start_sec
+
+        # Format timestamps into human-readable strings
+        start_str = datetime.fromtimestamp(start_sec).strftime('%b %d %Y %H:%M:%S.%f')[:-3]
+        end_str = datetime.fromtimestamp(end_sec).strftime('%b %d %Y %H:%M:%S.%f')[:-3]
+
+        # Print overall bag statistics
+        print(f"Start:         {start_str}")
+        print(f"End:           {end_str}")
+        print(f"Duration:      {duration:.3f} seconds")
+        print(f"Total Msgs:    {reader.message_count}")
+        print("-" * 60)
+
+        # Print a cleanly aligned table of topics
+        print("Topics:")
+        # reader.topics is a dictionary mapping topic names to TopicInfo objects
+        for topic, info in sorted(reader.topics.items()):
+            # Left-align topic name to 35 chars, right-align count to 8 chars
+            print(f"  {topic:<35} | {info.msgcount:>8} msgs | {info.msgtype}")
+
+def load_topics_times(bag_files: Union[List[str], str, Path], topics: Union[List[str], str]):
     # Use similar strategy as pose_utils or the RGBD bag reading stuff
     topics_times_map = {}
     CHECK_TOPIC = True
@@ -19,11 +53,12 @@ def load_topics_times(bag_file: Union[str, Path], topics: Union[List[str], str])
         # If None, do it for all topics
         CHECK_TOPIC = False
 
-    bag_path = Path(bag_file)
+    bag_paths = _convert_filename_to_path(bag_files)
+
     N = 0
 
     # Extract poses
-    with AnyReader([bag_path]) as reader:
+    with AnyReader(bag_paths) as reader:
         print(f"Unpacking bag message times for topics {topics}")
         for conn in reader.connections:
             if CHECK_TOPIC:
@@ -32,7 +67,7 @@ def load_topics_times(bag_file: Union[str, Path], topics: Union[List[str], str])
                     continue
 
             rows = []
-            desc = f"{bag_path.name}:{conn.topic}"
+            desc = f"{conn.topic}"
             N = conn.msgcount
             times = np.zeros(N)
 
@@ -57,19 +92,43 @@ def plot_message_density(times_map):
     for v in tmp.values():
         v -= earliest_time
 
-    sns.histplot(tmp, kde=True, alpha=0.5) # Times map should be a dictionary of time vectors for which a kde will be constructed for each
+    sns.histplot(tmp, kde=True, element="step", fill=False, alpha=0.5, linestyle='--') # Times map should be a dictionary of time vectors for which a kde will be constructed for each
+
+def _setup_parser():
+    parser = argparse.ArgumentParser(
+        description="Process multiple ROS bags and filter by specific topics.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    # --bags: Required, accepts multiple arguments
+    parser.add_argument(
+        "--bags", 
+        type=str, 
+        nargs='+', 
+        required=True, 
+        help="Path(s) to one or more ROS bag files or directories."
+    )
+
+    # --topics: Optional, accepts multiple arguments
+    parser.add_argument(
+        "--topics", 
+        type=str, 
+        nargs='+', 
+        default=[], # Defaults to an empty list if the user omits it
+        help="Specific topic(s) to extract. If omitted, processes all topics."
+    )
+
+    return parser
 
 if __name__=="__main__":
-    # Load trajectory
     import sys
 
-    # Requires bag and topic name for pose
-#    times, transforms = load_trajectory(sys.argv[1], sys.argv[2])
+    parser = _setup_parser()
+    args = parser.parse_args()
 
-    # Calculate message density via kde
-    # Setup a seaborn plot axes object
-#    plot_message_density({'Pose Message Density': times})
+    # Update with argparse for topic filtering, wildcard, and multi-bag support
+    print_bag_info(args.bags)
 
-    plot_message_density(load_topics_times(sys.argv[1], sys.argv[2:]))
+    plot_message_density(load_topics_times(args.bags, args.topics))
 
     plt.show()
