@@ -32,6 +32,8 @@ class groundcontrol(Node):
 
         self.started = False
         self.ended = True
+        self.record_process = None
+        self.filename = None
 
         # callback groups
         self.subscriber_group = ReentrantCallbackGroup()
@@ -93,13 +95,16 @@ class groundcontrol(Node):
         self.get_logger().info("Services ready")
 
     def recieve_mast_start(self, msg: Bool):
-        if not self.started:
+        if self.record_process is None:
             self.started = True
             self.start_mast()
     
     def recieve_mast_stop(self, msg: Bool):
-        if self.started:
+        if self.record_process is not None:
+            self.started = False
             self.stop_mast()
+        else:
+            self.started = False
 
     # do first scan for lidar
     def start_lidar(self, msg: Bool):
@@ -142,7 +147,7 @@ class groundcontrol(Node):
 
 
     def start_mast(self):
-	self.get_logger().info("Performing liveness check for MastCam services")
+        self.get_logger().info("Performing liveness check for MastCam services")
         while not self.mast_download.wait_for_service(timeout_sec=1.0):
             pass
         while not self.mast_delete.wait_for_service(timeout_sec=1.0):
@@ -151,7 +156,7 @@ class groundcontrol(Node):
             pass
         while not self.mast_start.wait_for_service(timeout_sec=1.0):
             pass
-	self.get_logger().info("MastCam services are stable! Starting mastcam and rosey telemetry bagging...")
+        self.get_logger().info("MastCam services are stable! Starting mastcam and rosey telemetry bagging...")
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
@@ -197,11 +202,14 @@ class groundcontrol(Node):
         stop_future.add_done_callback(self._on_mast_stop)
 
         # End capture
-        self.record_process.send_signal(signal.SIGINT)
-        self.record_process.wait()
-        self.record_process = None
+        if self.record_process is not None:
+            self.record_process.send_signal(signal.SIGINT)
+            self.record_process.wait()
+            self.record_process = None
+            self.get_logger().info(f"Stopped recording bag: {self.filename}")
 
-        self.get_logger().info(f"Stopped recording bag: {self.filename}")
+        else:
+            self.get_logger().info("record_process is None, skipping local bag stop")
 
     def _on_mast_stop(self, stop_future):
         self.get_logger().info("Bagging stopped")
