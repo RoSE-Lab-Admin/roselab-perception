@@ -16,6 +16,8 @@ These startup routines result in all data streams, payloads, controls, and avion
 2. Run: 
 
 	```bash
+ 	ssh rosey@192.168.2.50 -i ./ssh/id_rsa_ansible
+ 	OR
     ssh rosey@192.168.2.50 -> PW: roseyrover
     ```
 
