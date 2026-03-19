@@ -175,6 +175,14 @@ RH: TODO - list all topics we need here but basically already set up in the laun
 Color, Aligned-depth-to-color, tfs, camera info topics, extrinsics, etc
 
 ------------------------------------------------------------------------
+# DEBUGGING
+If ROS2 topic list is not working or services that should be available are not showing, do 
+```bash
+	ros2 daemon stop
+	ros2 daemon start
+```
+
+------------------------------------------------------------------------
 
 
 # PROCESS FLOW
