@@ -124,10 +124,11 @@ These startup routines result in all data streams, payloads, controls, and avion
         ./src/perception_ground_control/scripts/ground_control.sh
 
 3. Check all needed topics are being published with ros2 topic list
-4. TURN OFF MOTIVE CAMERAS FOR THE LOVE OF GOD
-5. press enter on ground_control.sh to start lidar scan
-6. TURN MOTIVE CAMERAS BACK ON FOR THE LOVE OF GOD
-7. Start and stop mastcam and rosey data collection
+4. Record testbed on reolink
+5. TURN OFF MOTIVE CAMERAS FOR THE LOVE OF GOD
+6. press enter on ground_control.sh to start lidar scan
+7. TURN MOTIVE CAMERAS BACK ON FOR THE LOVE OF GOD
+8. Start and stop mastcam and rosey data collection
 
 ------------------------------------------------------------------------
 
