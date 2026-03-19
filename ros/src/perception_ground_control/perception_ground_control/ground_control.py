@@ -103,6 +103,7 @@ class groundcontrol(Node):
 
     # do first scan for lidar
     def start_lidar(self, msg: Bool):
+	# RH: Should perform lidar health check here too...
 
         lidar_request = LidarCapture.Request()
         lidar_request.outname = self.panda_file
@@ -133,17 +134,15 @@ class groundcontrol(Node):
         name_response_dict = json.loads(name_response.outdata)
         cap_url = name_response_dict["url"]
         self.get_logger().info(f"Downloading from {cap_url} ...")
-        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
-        time.sleep(10)
+        process = subprocess.Popen(["wget", "-r", "-nH", "-P", f"{self.data_file}", f"{cap_url}"])
+        ret = process.wait()
 
         self.get_logger().info("Download complete.")
         self.get_logger().info(f"Bag saved to {self.data_file}")
 
 
     def start_mast(self):
-
-        
-
+	self.get_logger().info("Performing liveness check for MastCam services")
         while not self.mast_download.wait_for_service(timeout_sec=1.0):
             pass
         while not self.mast_delete.wait_for_service(timeout_sec=1.0):
@@ -152,6 +151,7 @@ class groundcontrol(Node):
             pass
         while not self.mast_start.wait_for_service(timeout_sec=1.0):
             pass
+	self.get_logger().info("MastCam services are stable! Starting mastcam and rosey telemetry bagging...")
 
         capture_request = MastCapture.Request()
         capture_request.outname = self.pi_file
@@ -171,8 +171,11 @@ class groundcontrol(Node):
                     "/rosout", "/tf", "tf_static",
                     "/Rover/camera/image_raw/compressed"]
         for topic_name, topic_types in all_topics:
-            if topic_name.startswith('/bno0ff/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
+            if topic_name.startswith('/bno055/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
                 topics.append(topic_name)     
+
+	# Liveness / Health check on topics for Rosey bagging
+	# RH: TODO - Write in a more comprehensive health checker which looks at subsets of topics and services for ease...
 
         # Capture Bag
         bag_path = (self.data_file / self.filename).resolve()
@@ -222,7 +225,7 @@ class groundcontrol(Node):
         name_json = json.loads(download_name.outdata)
         cap_url = name_json["url"]
         self.get_logger().info(f"Downloading from {cap_url}")
-        process = subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
+        process = subprocess.Popen(["wget", "-r", "-nH", "-P", f"{self.data_file}", f"{cap_url}"])
         ret = process.wait()
 
         self.get_logger().info(f"Bag saved to {self.data_file}")
