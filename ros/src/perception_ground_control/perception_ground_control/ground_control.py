@@ -163,9 +163,6 @@ class groundcontrol(Node):
         capture_request.duration = 60.0 # dummy val
         self.cap_future = self.mast_start.call_async(capture_request)
 
-        # Format filename
-        self.filename = f"RoseyBag"
-
         # find all correct topics
         all_topics = self.get_topic_names_and_types()
 
@@ -182,7 +179,11 @@ class groundcontrol(Node):
         # Liveness / Health check on topics for Rosey bagging
         # RH: TODO - Write in a more comprehensive health checker which looks at subsets of topics and services for ease...
 
-        # Capture Bag
+        # Rosey Telemetry Bag
+        TIME_STR = "%Y-%m-%dT%H-%M-%S"
+        ts = datetime.now().strftime(TIME_STR)
+        self.filename = f"roseybag_{ts}"
+
         bag_path = (self.data_file / self.filename).resolve()
         self.get_logger().info(f"Capturing data from {topics}, output: {str(bag_path)}")
         cmd = ['ros2', 'bag', 'record', '-o', str(bag_path)] + topics
