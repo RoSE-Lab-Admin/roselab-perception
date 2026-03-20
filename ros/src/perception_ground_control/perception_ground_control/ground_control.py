@@ -79,13 +79,13 @@ class groundcontrol(Node):
         # wait for services
         self.get_logger().info("Waiting for services...")
         while not self.mast_download.wait_for_service(timeout_sec=1.0):
-           pass
+            pass
         while not self.mast_delete.wait_for_service(timeout_sec=1.0):
-           pass
+            pass
         while not self.mast_stop.wait_for_service(timeout_sec=1.0):
-           pass
+            pass
         while not self.mast_start.wait_for_service(timeout_sec=1.0):
-           pass
+            pass
         while not self.lidar_capture.wait_for_service(timeout_sec=1.0):
             pass
         while not self.lidar_download.wait_for_service(timeout_sec=1.0):
@@ -177,10 +177,10 @@ class groundcontrol(Node):
                     "/Rover/camera/image_raw/compressed"]
         for topic_name, topic_types in all_topics:
             if topic_name.startswith('/bno055/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
-                topics.append(topic_name)     
+                topics.append(topic_name)
 
-	# Liveness / Health check on topics for Rosey bagging
-	# RH: TODO - Write in a more comprehensive health checker which looks at subsets of topics and services for ease...
+        # Liveness / Health check on topics for Rosey bagging
+        # RH: TODO - Write in a more comprehensive health checker which looks at subsets of topics and services for ease...
 
         # Capture Bag
         bag_path = (self.data_file / self.filename).resolve()
