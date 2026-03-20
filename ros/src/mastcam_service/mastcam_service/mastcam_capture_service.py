@@ -85,7 +85,7 @@ class MastcamCaptureService(Node):
         """
         Construct the topic list from sensor names.
         """
-        topics = ["/tf", "/tf_static"]
+        topics = [] # "/tf", "/tf_static"]
         topics.append("/MastCam/Front/color/image_raw")
         topics.append("/MastCam/Front/color/camera_info")
         topics.append("/MastCam/Front/extrinsics/depth_to_color")
