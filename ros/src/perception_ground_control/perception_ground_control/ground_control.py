@@ -78,6 +78,7 @@ class groundcontrol(Node):
 
         # wait for services
         self.get_logger().info("Waiting for services...")
+        """
         while not self.mast_download.wait_for_service(timeout_sec=1.0):
             pass
         while not self.mast_delete.wait_for_service(timeout_sec=1.0):
@@ -86,6 +87,7 @@ class groundcontrol(Node):
             pass
         while not self.mast_start.wait_for_service(timeout_sec=1.0):
             pass
+        """
         while not self.lidar_capture.wait_for_service(timeout_sec=1.0):
             pass
         while not self.lidar_download.wait_for_service(timeout_sec=1.0):

@@ -3,7 +3,8 @@ all:
     ground_control:
       hosts:
         slade:
-          ansible_host: local # 192.168.2.10
+          ansible_host: 192.168.2.10
+          ansible_connection: local
         nuc:
           ansible_host: 192.168.2.6
           ansible_user: m3robotics

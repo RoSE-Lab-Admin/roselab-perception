@@ -1,0 +1,108 @@
+---
+- name: Fall 2025 Perception Campaign Launch
+  hosts: all
+  become: yes # Required to write to /etc/systemd/system
+
+  vars:
+    local_user: "{{ lookup('env', 'USER') | default('ubuntu', true) }}"
+    ws_path: "/home/{{ local_user }}/roselab-perception/ros"
+    host_services:
+      avionics:
+        - name: roseybot_hardware
+          description: "ROSEY - Hardware Startup"
+          workdir: "/home/rosey/CubeRover"
+          source_ws: "/home/rosey/CubeRover"
+          command: "ros2 launch roseybot_control hardware_startup.launch.py"
+
+      mastcam_front:
+        - name: mastcam_realsense_launch
+          description: "MAST CAM - RGBD Forward Realsense"
+          workdir: "/home/dev/roselab-perception"
+          source_ws: "/home/dev/roselab-perception/ros"
+          command: "./scripts/launch_realsense_d456.sh"
+        - name: mastcam_capture_service
+          description: "MAST CAM - Capture Service"
+          workdir: "/home/dev/roselab-perception"
+          venv: "/home/dev/roselab-perception/venv"
+          source_ws: "/home/dev/roselab-perception/ros"
+          command: "ros2 run mastcam_service mastcam_capture_service"
+
+      wheelcam:
+        - name: wheelcam_boot
+          description: "WHEEL CAM - x4 RGB Cameras"
+          workdir: "/home/picam"
+          command: "./boot.sh"
+
+      miniforum:
+        - name: gantry_lidar_boot
+          description: "LIDAR & GANTRY - Run Roselab Perception"
+          workdir: "/home/gantry_control/gantry_control"
+          # env: "DISPLAY=:0" # Added in case the bash script requires an X-window
+          command: "./run_roselab_perception.sh"
+        - name: gantry_capture_service
+          description: "LIDAR & GANTRY - Capture Service"
+          workdir: "/home/gantry_control/roselab-perception"
+          source_ws: "/home/gantry_control/roselab-perception/ros"
+          command: "ros2 run gantry_services gantry_capture_service"
+
+      lattepanda:
+        - name: gantry_system
+          description: "LIDAR & GANTRY - Lattepanda System"
+          workdir: "/m3_robotics/gantry_control"
+          command: "./runSystem --no-gui"
+
+      nuc:
+        - name: ground_rover_control_joystick
+          description: "ROSEY - Teleop Joystick"
+          workdir: "/home/{{ ansible_user }}/CubeRover"
+          source_ws: "/home/{{ ansible_user }}/CubeRover"
+          command: "ros2 launch roseybot_control joystick.launch.py"
+
+      slade:
+        - name: ground_optitrack_pose
+          description: "OPTITRACK - Pose"
+          workdir: "/home/{{ ansible_user }}"
+          command: "./optitrack.sh"
+        - name: ground_foxglove_hud
+          description: "FOXGLOVE - HUD"
+          workdir: "/home/{{ ansible_user }}"
+          command: "./foxglove_boot.sh"
+        - name: ground_wheelcam_param_update
+          description: "WHEEL CAM - Update camera parameters, set communication buffer sizes"
+          workdir: "/home/{{ ansible_user }}"
+          command: "./perception_boot.sh"
+        - name: ground_control_launch
+          description: "GROUND CONTROL - Launch Data Collection"
+          workdir: "{{ ws_path }}"
+          source_ws: "{{ ws_path }}"
+          command: "ros2 launch perception_ground_control launch_ground.py duration:={{ lidar_duration | default('60') }}"
+# RH: NOTE - We now use individual ad-hoc scripts for data collection triggers
+#        - name: ground_control_trial_runner
+#          description: "GROUND CONTROL - Script Data Collection"
+#          workdir: "{{ ws_path }}"
+#          source_ws: "{{ ws_path }}"
+#          command: "./src/perception_ground_control/scripts/ground_control.sh"
+
+    services: "{{ host_services[inventory_hostname] | default([]) }}"
+
+  tasks:
+    - name: Deploy dynamic systemd service files (with perception- prefix)
+      ansible.builtin.template:
+        src: "ros2_node.service.j2"
+        # Adds the perception- prefix so we can wild-card shut them down later
+        dest: "/etc/systemd/system/perception-{{ item.name }}.service"
+        mode: '0644'
+      loop: "{{ services }}"
+      notify: Reload systemd
+
+    - name: Enable and start all campaign services
+      ansible.builtin.systemd_service:
+        name: "perception-{{ item.name }}.service"
+        enabled: yes
+        state: restarted
+      loop: "{{ services }}"
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: yes
