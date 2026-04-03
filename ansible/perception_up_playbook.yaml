@@ -4,7 +4,7 @@
   become: yes # Required to write to /etc/systemd/system
 
   vars:
-    local_user: "{{ lookup('env', 'USER') | default('ubuntu', true) }}"
+    local_user: "{{ lookup('env', 'USER') | default('roselab', true) }}"
     ws_path: "/home/{{ local_user }}/roselab-perception/ros"
     host_services:
       avionics:
@@ -36,13 +36,13 @@
       miniforum:
         - name: gantry_lidar_boot
           description: "LIDAR & GANTRY - Run Roselab Perception"
-          workdir: "/home/gantry_control/gantry_control"
+          workdir: "/home/gantry/gantry_control"
           # env: "DISPLAY=:0" # Added in case the bash script requires an X-window
           command: "./run_roselab_perception.sh"
         - name: gantry_capture_service
           description: "LIDAR & GANTRY - Capture Service"
-          workdir: "/home/gantry_control/roselab-perception"
-          source_ws: "/home/gantry_control/roselab-perception/ros"
+          workdir: "/home/gantry/roselab-perception"
+          source_ws: "/home/gantry/roselab-perception/ros"
           command: "ros2 run gantry_services gantry_capture_service"
 
       lattepanda:
