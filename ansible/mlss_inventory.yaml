@@ -5,31 +5,40 @@ all:
         slade:
           ansible_host: 192.168.2.10
           ansible_connection: local
+          ansible_user: roselab
+          # RH: this caused auth errors (admin group...) when trying to run services as user (even tho user has passwordless sudo enabled......)
+          # ansible_become_user: roselab
         nuc:
           ansible_host: 192.168.2.6
           ansible_user: m3robotics
+          # ansible_become_user: m3robotics
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
     rosey:
       hosts:
         avionics:
           ansible_host: 192.168.2.50
           ansible_user: rosey
+          # ansible_become_user: rosey
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         wheelcam:
           ansible_host: 192.168.2.51
           ansible_user: picam
+          # ansible_become_user: picam
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         mastcam_front:
           ansible_host: 192.168.2.104
           ansible_user: dev
+          # ansible_become_user: dev
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
     gantry:
       hosts:
         miniforum: # lidar and general computing
           ansible_host: 192.168.2.99
           ansible_user: gantry
+          # ansible_become_user: gantry
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         lattepanda: # motor and system controls
           ansible_host: 192.168.2.4
           ansible_user: gantry_lattepanda
+          # ansible_become_user: gantry_lattepanda
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible

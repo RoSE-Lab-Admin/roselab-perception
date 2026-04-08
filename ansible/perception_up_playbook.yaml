@@ -1,59 +1,68 @@
 ---
 - name: Fall 2025 Perception Campaign Launch
   hosts: all
-  become: yes # Required to write to /etc/systemd/system
+  become: true # Required to write to /etc/systemd/system
 
   vars:
     local_user: "{{ lookup('env', 'USER') | default('roselab', true) }}"
+    # become_user: "{{ local_user }}"
     ws_path: "/home/{{ local_user }}/roselab-perception/ros"
     host_services:
       avionics:
         - name: roseybot_hardware
           description: "ROSEY - Hardware Startup"
-          workdir: "/home/rosey/CubeRover"
-          source_ws: "/home/rosey/CubeRover"
+          # become_user: "{{ ansible_user }}"
+          workdir: "/home/{{ ansible_user }}/CubeRover"
+          source_ws: "/home/{{ ansible_user }}/CubeRover"
           command: "ros2 launch roseybot_control hardware_startup.launch.py"
 
       mastcam_front:
         - name: mastcam_realsense_launch
           description: "MAST CAM - RGBD Forward Realsense"
+          # become_user: "{{ ansible_user }}"
           workdir: "/home/dev/roselab-perception"
-          source_ws: "/home/dev/roselab-perception/ros"
+          source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
           command: "./scripts/launch_realsense_d456.sh"
         - name: mastcam_capture_service
           description: "MAST CAM - Capture Service"
-          workdir: "/home/dev/roselab-perception"
-          venv: "/home/dev/roselab-perception/venv"
-          source_ws: "/home/dev/roselab-perception/ros"
+          # become_user: "{{ ansible_user }}"
+          workdir: "/home/{{ ansible_user }}/roselab-perception"
+          venv: "/home/{{ ansible_user }}/roselab-perception/venv"
+          source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
           command: "ros2 run mastcam_service mastcam_capture_service"
 
       wheelcam:
         - name: wheelcam_boot
           description: "WHEEL CAM - x4 RGB Cameras"
-          workdir: "/home/picam"
+          # become_user: "{{ ansible_user }}"
+          workdir: "/home/{{ ansible_user }}"
           command: "./boot.sh"
 
       miniforum:
         - name: gantry_lidar_boot
           description: "LIDAR & GANTRY - Run Roselab Perception"
-          workdir: "/home/gantry/gantry_control"
+          # become_user: "{{ ansible_user }}"
+          workdir: "/home/{{ ansible_user }}/gantry_control"
           # env: "DISPLAY=:0" # Added in case the bash script requires an X-window
           command: "./run_roselab_perception.sh"
         - name: gantry_capture_service
           description: "LIDAR & GANTRY - Capture Service"
-          workdir: "/home/gantry/roselab-perception"
-          source_ws: "/home/gantry/roselab-perception/ros"
+          # become_user: "{{ ansible_user }}"
+          workdir: "/home/{{ ansible_user }}/roselab-perception"
+          source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
           command: "ros2 run gantry_services gantry_capture_service"
 
       lattepanda:
         - name: gantry_system
           description: "LIDAR & GANTRY - Lattepanda System"
+          # become_user: "{{ ansible_user }}"
           workdir: "/m3_robotics/gantry_control"
           command: "./runSystem --no-gui"
 
       nuc:
         - name: ground_rover_control_joystick
           description: "ROSEY - Teleop Joystick"
+          # become_user: "{{ ansible_user }}"
           workdir: "/home/{{ ansible_user }}/CubeRover"
           source_ws: "/home/{{ ansible_user }}/CubeRover"
           command: "ros2 launch roseybot_control joystick.launch.py"
