@@ -76,7 +76,9 @@ These startup routines result in all data streams, payloads, controls, and avion
 1. NoMachine -> Gantry Computer PW: M3Robotics 
 2. Open NoMachine application and select the Gantry Computer 
 3. Once window opens showing the desktop, open three terminal tabs:
-        
+or
+1. ssh gantry@192.168.2.99 -i .ssh/id_rsa_ansible
+
 - In first tab:
 
     ```bash
@@ -132,6 +134,11 @@ These startup routines result in all data streams, payloads, controls, and avion
 
 ------------------------------------------------------------------------
 
+# COLLECTION SCRIPTS
+1. In (Slade) ~/roselab_perception/scripts you can run
+   capture_lidar_once.sh
+   or
+   capture_rosey_mastcam_once.sh
 
 # DATA INVENTORY
 The ground control must bag the following topics during each *trial*. Note that the wild card (asterisk) operator is all topics underneath that topic namespace:
