@@ -9,6 +9,7 @@ from typing import Union, List, Any
 import numpy as np
 from tqdm import tqdm
 from datetime import datetime
+from collections import defaultdict
 
 def _convert_filename_to_path(f: Union[List[str], str, Path]) -> List[Path]:
     if isinstance(f, list):
@@ -44,22 +45,24 @@ def print_bag_info(bag_files: Union[List[str], str, Path]):
 
 def load_topics_times(bag_files: Union[List[str], str, Path], topics: Union[List[str], str]):
     # Use similar strategy as pose_utils or the RGBD bag reading stuff
-    topics_times_map = {}
     CHECK_TOPIC = True
 
     if isinstance(topics, str):
         topics = [topics]
-    elif topics is None:
-        # If None, do it for all topics
+    if len(topics) == 0:
+        # If empty list, do it for all topics
         CHECK_TOPIC = False
 
     bag_paths = _convert_filename_to_path(bag_files)
 
     N = 0
 
+    topics_times_map = defaultdict(list)
+
     # Extract poses
     with AnyReader(bag_paths) as reader:
-        print(f"Unpacking bag message times for topics {topics}")
+        print(f"Unpacking bag message times for topics {topics if topics else '*'}")
+        START_TIME = reader.start_time / 1e9
         for conn in reader.connections:
             if CHECK_TOPIC:
                 if conn.topic not in topics:
@@ -69,30 +72,42 @@ def load_topics_times(bag_files: Union[List[str], str, Path], topics: Union[List
             rows = []
             desc = f"{conn.topic}"
             N = conn.msgcount
-            times = np.zeros(N)
+            times = [np.nan]*N
 
             # Just care about unpacking message times, not raw data
             for i, (_, ts, _) in tqdm(enumerate(reader.messages(connections=[conn])),
                                     total=N, desc=desc):
                 times[i] = ts / 1.e9
 
-            topics_times_map[conn.topic] = (N, times)
+            topics_times_map[conn.topic].extend(times)
 
-    return topics_times_map
+    # Convert to numpy arrays
+    flagged = []
+    for k,v in topics_times_map.items():
+        if len(v)==0:
+            print(f"[INFO] Removing topic {k} due to 0 messages received.")
+            flagged.append(k)
+            continue
+        topics_times_map[k] = np.array(v)
 
-def plot_message_density(times_map):
+    for k in flagged:
+        del topics_times_map[k]
+
+    return topics_times_map, START_TIME
+
+def plot_message_density(times_map, START_TIME):
     # Extract only the table object
     # Adjust to seconds from nanoseconds
-    tmp = {k:(v[1]) for k,v in times_map.items()}
-    earliest_time = np.inf
-    for v in tmp.values():
-        earliest_time = min(v[0], earliest_time)
+    earliest_time = START_TIME
+    # for v in times_map.values():
+    #     earliest_time = min(v[0], earliest_time)
 
     print(f"{earliest_time=}")
-    for v in tmp.values():
+    for v in times_map.values():
         v -= earliest_time
 
-    sns.histplot(tmp, kde=True, element="step", fill=False, alpha=0.5, linestyle='--') # Times map should be a dictionary of time vectors for which a kde will be constructed for each
+    sns.histplot(times_map, bins=100, kde=True, element="step", fill=False, alpha=0.5, linestyle='--') # Times map should be a dictionary of time vectors for which a kde will be constructed for each
+    plt.title("Message Mass and Density (KDE) over Time")
 
 def _setup_parser():
     parser = argparse.ArgumentParser(
@@ -129,6 +144,6 @@ if __name__=="__main__":
     # Update with argparse for topic filtering, wildcard, and multi-bag support
     print_bag_info(args.bags)
 
-    plot_message_density(load_topics_times(args.bags, args.topics))
+    plot_message_density(*load_topics_times(args.bags, args.topics))
 
     plt.show()
