@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'mastcam_client=mastcam_service.mastcam_client:main'
+            'mastcam_client=mastcam_service.mastcam_client:main',
+            'mastcam_capture_service=mastcam_service.mastcam_capture_service:main',
         ],
     },
 )

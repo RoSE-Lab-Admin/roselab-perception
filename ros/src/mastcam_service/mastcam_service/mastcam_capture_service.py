@@ -91,8 +91,9 @@ class MastcamCaptureService(Node):
         topics.append("/MastCam/Front/extrinsics/depth_to_color")
         topics.append("/MastCam/Front/aligned_depth_to_color/image_raw")
         topics.append("/MastCam/Front/aligned_depth_to_color/camera_info")
-        topics.append("/MastCam/Front/depth/image_rect_raw")
-        topics.append("/MastCam/Front/depth/camera_info")
+
+	# topics.append("/MastCam/Front/depth/image_rect_raw")
+	# topics.append("/MastCam/Front/depth/camera_info")
 
         return topics
 
@@ -209,7 +210,6 @@ class MastcamCaptureService(Node):
                 response.outdata = json.dumps(msg)
                 return response
 
-
             self._start_bag(outname)
             self.get_logger().info(f"Started continuous recording: {self.filename}")
 
@@ -268,11 +268,11 @@ class MastcamCaptureService(Node):
 
             response.outdata = json.dumps({"success": True, "url": url})
         except Exception as e:
-            self.get_logger().info("Download name request failed with exception.")
+            self.get_logger().info("Download name request failed with exception.")            
             response.outdata = json.dumps({"success": False, "error": str(e)})
         self.get_logger().info(f"Provided download URL for {outname}")
         rep = json.loads(response.outdata)
-        self.get_logger().info(f"{rep}")
+        self.get_logger().info(f"{rep}")       
         return response
 
     def download_time_range_callback(self, request, response):
