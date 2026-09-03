@@ -54,8 +54,8 @@ class MastcamCaptureService(Node):
         # Define some parameters
         self.declare_parameter('compress', True)
         self.declare_parameter('align', False)
-        self.compress = self.get_parameter('compress')
-        self.align = self.get_parameter('align')
+        self.compress = self.get_parameter('compress').value
+        self.align = self.get_parameter('align').value
 
         # --- Service Endpoints ---
         # Info
