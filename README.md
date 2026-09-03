@@ -5,6 +5,7 @@
 These startup routines result in all data streams, payloads, controls, and avionics to be initialized and published.
 
 ### NOTE: RUN THE FOLLOWING IN EVERY TERMINAL IF DOING ROS STUFF, AFTER SOURCING YOUR ROS ENVIRONMENT
+
 	```bash
 	ros2 daemon start
 	```
@@ -17,8 +18,6 @@ These startup routines result in all data streams, payloads, controls, and avion
 
 	```bash
  	ssh rosey@192.168.2.50 -i ./.ssh/id_rsa_ansible
- 	OR
-    ssh rosey@192.168.2.50 -> PW: roseyrover
     ```
 
 		# If issues happen with ssh:
@@ -44,16 +43,12 @@ These startup routines result in all data streams, payloads, controls, and avion
 
     ```bash
         ssh dev@192.168.2.104 -i .ssh/id_rsa_ansible
-		*OR*
-		ssh dev@192.168.2.104 -> PW: regolith 		
         cd roselab-perception
         ./scripts/launch_realsense_d456_latest.sh
     ```
 3. Open another tab on the slade and run:
     ```bash
         ssh dev@192.168.2.104 -i .ssh/id_rsa_ansible
-		*OR*
-		ssh dev@192.168.2.104 -> PW: regolith 		
         cd roselab-perception
         source venv/bin/activate
         source ros/install/setup.bash
@@ -66,7 +61,7 @@ These startup routines result in all data streams, payloads, controls, and avion
 1. Open WSL terminal on Slade
 2. Run: 
     ```bash
-        ssh picam@192.168.2.51 -> PW: roseycam
+        ssh picam@192.168.2.51 -i .ssh/id_rsa_ansible
         ./boot.sh
     ```
 3. Open WSL terminal on the slade
@@ -79,32 +74,31 @@ These startup routines result in all data streams, payloads, controls, and avion
 
 You can either use NoMachine on the NUC for remote access, like so:
 
-1. NoMachine -> Gantry Computer PW: M3Robotics 
+1. NoMachine -> Gantry Computer PW: ********
 2. Open NoMachine application and select the Gantry Computer, wait for password prompt and desktop to show.
 
 OR via SSH:
-
-1. ```bash
-   ssh gantry@192.168.2.99 -i .ssh/id_rsa_ansible
-   ```
 
 Then:
 - Open first tab (start up the lidars):
 
     ```bash
-        cd ~/gantry_control
+	    ssh gantry@192.168.2.99 -i .ssh/id_rsa_ansible
+	    cd ~/gantry_control
         ./run_roselab_perception.sh
     ```
 - Open second tab (run gantry capture service):
     ```bash
-        cd ~/roselab-perception
+	    ssh gantry@192.168.2.99 -i .ssh/id_rsa_ansible
+		cd ~/roselab-perception
         source /opt/ros/jazzy/setup.bash
         source ros/install/setup.bash
         ros2 run gantry_services gantry_capture_service
     ```
-Finally, ssh into the lattepanda from either NUC or WSL on Slade -> ssh gantry_lattepanda@192.168.2.4 -> PW: M3Robotics
+Finally, ssh into the lattepanda from WSL on Slade (or run command on Gantry Computer Miniforum)
 - Open tab:
     ```bash
+	    ssh gantry_lattepanda@192.168.2.4 -i .ssh/id_rsa_ansible
         cd /m3_robotics/gantry_control
         ./runSystem --no-gui
     ```
@@ -161,13 +155,3 @@ If ROS2 topic list is not working or services that should be available are not s
 	ros2 daemon stop
 	ros2 daemon start
 ```
-
-------------------------------------------------------------------------
-
-
-# PROCESS FLOW
-
-
-![process flow](process-flow.jpg "Process Flow Diagram")
-
-
