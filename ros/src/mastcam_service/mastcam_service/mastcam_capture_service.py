@@ -51,6 +51,12 @@ class MastcamCaptureService(Node):
         self.filename = None               # "outname_timestamp"
         self.active_topics = []            # list[str] recorded in the current session
 
+        # Define some parameters
+        self.declare_parameter('compress', True)
+        self.declare_parameter('align', False)
+        self.compress = self.get_parameter('compress')
+        self.align = self.get_parameter('align')
+
         # --- Service Endpoints ---
         # Info
         self.create_service(Trigger, 'mastcam_capture_service/info', self.info_callback)
@@ -85,15 +91,24 @@ class MastcamCaptureService(Node):
         """
         Construct the topic list from sensor names.
         """
-        topics = [] # "/tf", "/tf_static"]
-        topics.append("/MastCam/Front/color/image_raw")
+        topics = []
+
+        suffix = ""
+        suffixDepth = ""
+        if self.compress:
+            suffix = "/compressed"
+            suffixDepth = "/compressedDepth"
+
+        topics.append("/MastCam/Front/color/image_raw"+suffix)
         topics.append("/MastCam/Front/color/camera_info")
         topics.append("/MastCam/Front/extrinsics/depth_to_color")
-        topics.append("/MastCam/Front/aligned_depth_to_color/image_raw")
-        topics.append("/MastCam/Front/aligned_depth_to_color/camera_info")
 
-	# topics.append("/MastCam/Front/depth/image_rect_raw")
-	# topics.append("/MastCam/Front/depth/camera_info")
+        if self.align:
+            topics.append("/MastCam/Front/aligned_depth_to_color/image_raw"+suffixDepth)
+            topics.append("/MastCam/Front/aligned_depth_to_color/camera_info")
+        else:
+            topics.append("/MastCam/Front/depth/image_rect_raw"+suffixDepth)
+            topics.append("/MastCam/Front/depth/camera_info")
 
         return topics
 
