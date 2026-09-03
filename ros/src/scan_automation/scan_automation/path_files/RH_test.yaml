@@ -1,0 +1,19 @@
+- time: 10
+  position_x: 5
+  position_y: 5
+- time: 15
+  position_x: 3
+  position_y: 5
+- time: 20
+  position_x: 3
+  position_y: 4
+- time: 25
+  position_x: 6
+  position_y: 5
+- time: 30
+  position_x: 6
+  position_y: 6
+- time: 35
+  position_x: 5
+  position_y: 5
+...

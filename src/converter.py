@@ -15,7 +15,7 @@ from message_filters import Subscriber, ApproximateTimeSynchronizer
 import sensor_msgs_py.point_cloud2 as pc2
 from rosbags.highlevel import AnyReader
 from rosbags.image import message_to_cvimage
-
+from tqdm import tqdm
 
 def extract_rgb_float(rgb_float):
     """Unpack float32 RGB to normalized r, g, b"""
@@ -55,22 +55,69 @@ def read_rgbd_from_bag(bag_path, depth_topic, color_topic):
     # Make list of color and depth images
     color_images = []
     depth_images = []
+    depth_images_highres = []
+    color_shape = (960,540,3) # Bad practice, need to do this smarter
     with AnyReader([Path(bag_path)]) as reader:
         # Make list of color and depth images
-        for connection, timestamp, rawdata in reader.messages():
+        for connection, timestamp, rawdata in tqdm(reader.messages()):
             # Color
             if connection.topic == color_topic:
                 msg = reader.deserialize(rawdata, connection.msgtype)
                 img = message_to_cvimage(msg, 'rgb8')
+                color_shape = img.shape
                 color_images.append(img)
+#                print("Color: ", timestamp, img.shape)
             # Depth
             if connection.topic == depth_topic:
                 msg = reader.deserialize(rawdata, connection.msgtype)
                 img = message_to_cvimage(msg, '16UC1')
-                if(img.shape == (360, 640)): depth_images.append(img) # Take only the aligned ones
+#                print("Depth: ", timestamp, img.shape)
+                # This is still a hacky fix. We should be grabbing corresponding timestamped images instead
+                if(img.shape == color_shape[:2]): depth_images.append(img) # Take only the aligned ones
+                else: depth_images_highres.append(img)
     #storage_options = StorageOptions(uri=bag_path, storage_id='mcap')
     #converter_options = ConverterOptions('', '')
 
+    # Temporary little guy for visualizing only the extra depth frames at ~15Hz
+
+    #    def apply_log_cmap(image_gray):
+    #        # Ensure image data is float32 for log calculation
+    #        img_float = image_gray.astype(np.float32)
+    #
+    #        # Logarithmic transformation: log(1 + pixel_value)
+    #        # Add 1 to avoid log(0) which is undefined/negative infinity
+    #        img_log = np.log1p(img_float)
+    #
+    #        # Normalize the log-transformed image to the range [0, 255]
+    #        # This step is crucial to utilize the full range of the colormap
+    #        min_val = np.min(img_log)
+    #        max_val = np.max(img_log)
+    #        if max_val == min_val:
+    #            # Handle case where all values are the same
+    #            img_normalized = np.zeros_like(img_log, dtype=np.uint8)
+    #        else:
+    #            img_normalized = cv2.normalize(img_log, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    #
+    #        # Apply a standard OpenCV colormap (e.g., COLORMAP_JET)
+    #        img_colormap = cv2.applyColorMap(img_normalized, cv2.COLORMAP_INFERNO)
+    #
+    #        return img_colormap
+
+    # cv2.namedWindow('High-Res Depth', cv2.WINDOW_AUTOSIZE)
+    # delay = int(1000//15)
+    # for d in depth_images:
+       # dd = d.copy()
+       # dd[dd < 0] = np.median(dd)
+       # im = cv2.normalize(dd.astype(np.float32) / 1000, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+       # im = cv2.equalizeHist(im)
+       # im = cv2.applyColorMap(im, cv2.COLORMAP_INFERNO)
+        #        im = apply_log_cmap(d)
+       # cv2.imshow('High-Res Depth', im)
+       # cv2.waitKey(0)
+
+    # cv2.destroyAllWindows()
+
+    # THIS SHOULD NOT GO HERE!!!!!!!
     # Make stacked and median images
     stacked_color = np.stack(color_images, axis=0)
     median_color_img = np.median(stacked_color, axis=0).astype(np.uint8)

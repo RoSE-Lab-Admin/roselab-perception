@@ -1,0 +1,12 @@
+To run this node, run the following commands:
+
+    # Start this node
+    ros2 launch aggregated_pointcloud aggregated_pointcloud.launch.py
+
+    # Start depth_img_proc node to convert RGBD imagery to colored points
+    ros2 run depth_image_proc point_cloud_xyz_node --ros-args --remap camera_info:=/MastCam/Front/depth/camera_info --remap image_rect:=/MastCam/Front/depth/image_rect_raw
+
+    # Start bag playback
+    ros2 bag play <path/to/perception/bag>
+
+    # Once done should output to a ply file... somewhere......

@@ -30,7 +30,7 @@ def compare_images(pre_img, post_img, crop=True):
     diff[valid_mask] = post_img[valid_mask] - pre_img[valid_mask]
     return diff
 
-def diff_viz(diff_img, name):
+def diff_viz(diff_img, name, transpose=False):
       # Edit this with correct values
 #      fig, axes = plt.subplots(2,1,figsize=(10,10))
     #   m1 = axes[0][0].imshow(np.rot90(slope_angle_array[:,::-1])
@@ -47,12 +47,18 @@ def diff_viz(diff_img, name):
 
       # Currently optimized for DEM viz....
 #      ax = plt.imshow(diff_img[::-1, ::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
-      ax = plt.imshow(diff_img.T[:,::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
+      if transpose:
+            ax = plt.imshow(diff_img.T[:,::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
+            plt.xlabel("Voxel ID in Y")
+            plt.ylabel("Voxel ID in X")
+            plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.872)
+      else:
+            ax = plt.imshow(diff_img[::-1,::-1] * 1000., cmap='inferno', vmin=-10., vmax=10., origin='lower')
+            plt.xlabel("Voxel ID in X")
+            plt.ylabel("Voxel ID in Y")
+            plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.389)
+
       plt.title(name)
-#      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.389)
-      plt.colorbar(ax, label=r"$\Delta$ Z [mm]", shrink=0.872)
-      plt.xlabel("Voxel ID in Y")
-      plt.ylabel("Voxel ID in X")
       plt.tight_layout()
 
       # Add compass rose (RH: removing for the moment until I can add proper rotation and flip of data

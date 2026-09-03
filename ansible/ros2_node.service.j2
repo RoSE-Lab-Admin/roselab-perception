@@ -1,0 +1,23 @@
+[Unit]
+Description={{ item.description }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+WorkingDirectory={{ item.workdir | default('~') }}
+
+{% if item.env is defined %}
+# Inject environment variables (e.g., DISPLAY=:0 for GUI scripts)
+Environment="{{ item.env }}"
+{% endif %}
+
+# Dynamically construct the startup command based on playbook variables
+ExecStart=/bin/bash --login -c '{% if item.venv is defined %}source {{ item.venv }}/bin/activate && {% endif %}{% if item.source_ws is defined %}source /opt/ros/{{ ros_distro | default("jazzy") }}/setup.bash && source {{ item.source_ws }}/install/setup.bash && ros2 daemon stop && ros2 daemon start && {% endif %}{{ item.command }}'
+
+# Auto-restart if the node crashes
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

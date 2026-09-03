@@ -61,7 +61,8 @@ def voxelize_and_analyze(pcd, voxel_size):
 
    print("Building voxel grid point associations...")
    for point in tqdm(np.asarray(pcd.points)):
-      voxel_idx = tuple(((point[:2] - voxel_grid.origin[:2]) / voxel_size).astype(int))
+      voxel_idx = tuple(((point[[0,2]] - voxel_grid.origin[[0,2]]) / voxel_size).astype(int))
+      # voxel_idx = tuple(((point[:2] - voxel_grid.origin[:2]) / voxel_size).astype(int))
       voxel_point_map[voxel_idx].append(point)
 
    voxel_data = []
@@ -158,8 +159,8 @@ if __name__=="__main__":
 #         print(f"Plane normal: {v['normal']}")
 #         print(f"Covariance matrix:\n{v['covariance']}\n")
 
-      # Y_UP = np.asarray([0,1,0]) # This will be read in from optitrack pose average over capture
-      Z_UP = np.array([0,0,1])
+      Y_UP = np.asarray([0,1,0]) # This will be read in from optitrack pose average over capture
+      # Z_UP = np.array([0,0,1])
 
       slope_angle_array = np.full(voxel_grid_size, np.nan)
       count_array = np.full_like(slope_angle_array, np.nan)
@@ -168,10 +169,10 @@ if __name__=="__main__":
 
       print("Constructing visualization of voxel statistics...")
       for v in tqdm(voxel_results):
-         slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Z_UP))))
+         slope_angle_array[v['voxel_index']] = np.rad2deg(np.arccos(np.abs(np.dot(v['normal'], Y_UP))))
          count_array[v['voxel_index']] = v['num_points']
          sig_array[v['voxel_index']] = np.sqrt(v['var'])
-         dem_array[v['voxel_index']] = v['centroid'][2]
+         dem_array[v['voxel_index']] = v['centroid'][1] #[2] for Z component
 
       print("Done.")
 

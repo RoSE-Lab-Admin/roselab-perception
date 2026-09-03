@@ -29,11 +29,12 @@ python3 ~/roselab-perception/src/converter.py \
     "$calibration_path" \
     /l515_center/color/image_raw \
     /l515_center/aligned_depth_to_color/image_raw \
+    ../data/tf_summer.npz \
     out.ply
 
 # 4. Characterize the surface from the generated point cloud
 echo "Characterizing surface..."
 python3 ~/roselab-perception/src/characterize_surface.py \
-    "$calibration_path"/out.ply 0 1 --local
+    "$calibration_path"/out.ply 0 1 0.01 --local
 
 echo "Pipeline completed successfully, closing."

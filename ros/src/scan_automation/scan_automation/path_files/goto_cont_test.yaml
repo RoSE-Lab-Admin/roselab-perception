@@ -1,0 +1,25 @@
+- position_x: 2
+  position_y: 2
+  time: 0
+- position_x: 8
+  position_y: 2
+  time: 0
+- position_x: 8
+  position_y: 4
+  time: 0
+- position_x: 2
+  position_y: 4
+  time: 0
+- position_x: 2
+  position_y: 6
+  time: 0
+- position_x: 8
+  position_y: 6
+  time: 0
+- position_x: 8
+  position_y: 8
+  time: 0
+- position_x: 2
+  position_y: 8
+  time: 0
+...

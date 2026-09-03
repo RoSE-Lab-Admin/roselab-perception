@@ -1,0 +1,10 @@
+- time: 0
+  position_x: 4
+  position_y: 4
+- time: 50
+  position_x: 6
+  position_y: 4
+- time: 90
+  position_x: 6
+  position_y: 6
+...
