@@ -41,7 +41,7 @@ class groundcontrol(Node):
 
         # parameters
         # output file for slade slade
-        self.declare_parameter('slade_root', "/mnt/d/perception-data")
+        self.declare_parameter('slade_root', "/mnt/e/perception-data")
         slade_root = Path(self.get_parameter('slade_root').value).expanduser().resolve()
         self.day = datetime.now().strftime("%m%d%Y")
         hour = datetime.now().strftime("%H-%M-%S")
@@ -87,13 +87,13 @@ class groundcontrol(Node):
             pass
         while not self.mast_start.wait_for_service(timeout_sec=1.0):
             pass
-        """
         while not self.lidar_capture.wait_for_service(timeout_sec=1.0):
             pass
         while not self.lidar_download.wait_for_service(timeout_sec=1.0):
             pass
         while not self.lidar_delete.wait_for_service(timeout_sec=1.0):
             pass
+	"""
         self.get_logger().info("Services ready")
 
     def recieve_mast_start(self, msg: Bool):
@@ -110,7 +110,14 @@ class groundcontrol(Node):
 
     # do first scan for lidar
     def start_lidar(self, msg: Bool):
-	# RH: Should perform lidar health check here too...
+        self.get_logger().info("Performing liveness check for Lidar services")
+        while not self.lidar_capture.wait_for_service(timeout_sec=1.0):
+            pass
+        while not self.lidar_download.wait_for_service(timeout_sec=1.0):
+            pass
+        while not self.lidar_delete.wait_for_service(timeout_sec=1.0):
+            pass
+        self.get_logger().info("Lidar services are stable! Starting Lidar and Gantry telemetry bagging...")
 
         lidar_request = LidarCapture.Request()
         lidar_request.outname = self.panda_file
@@ -169,11 +176,11 @@ class groundcontrol(Node):
         all_topics = self.get_topic_names_and_types()
 
         # Set Topics
-        topics = ["/CubeRover_V1/pose", "/cmd_vel", 
+        topics = ["/FitRosey_V1/pose", "/cmd_vel", 
                     "/dynamic_joint_states", "/initialpose",
                     "/joint_states", "/joy", "/robot_description",
                     "/rosout", "/tf", "tf_static",
-                    "/Rover/camera/image_raw/compressed"]
+                    "/Rover/camera/image_raw/compressed", "/plan", "/optimal_trajectory", "/imu/data"]
         for topic_name, topic_types in all_topics:
             if topic_name.startswith('/bno055/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
                 topics.append(topic_name)

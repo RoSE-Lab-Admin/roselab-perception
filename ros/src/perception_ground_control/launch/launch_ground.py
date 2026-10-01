@@ -8,7 +8,7 @@ def generate_launch_description():
     #launch arguments
     slade_root_arg = DeclareLaunchArgument(
         "slade_root",
-        default_value="/mnt/d/perception-data",
+        default_value="/mnt/e/perception-data",
         description="Where bagged data is stored on slade"
     )
 
