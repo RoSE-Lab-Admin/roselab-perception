@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
-# configurable delay after LiDAR start
+# Capture a single LiDAR scan (gantry) and download it. Wrapper around collect.sh.
+#   capture_lidar_once.sh [SECONDS]   (default: the duration configured in ground control)
 
-# LIDAR_SECS={$1:-30} # Change depending on trial scan length
-
-echo "Perception Ground Control Started!"
-
-# 1. start LiDAR
-read -r -p "TURN OFF MOCAP CAMERAS Press Enter to START LiDAR (/start_lidar)..."
-echo "Starting LiDAR..."
-ros2 topic pub --once /start_lidar std_msgs/msg/Bool "{data: true}"
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+read -r -p "TURN OFF MOCAP CAMERAS. Press Enter to START the LiDAR scan..."
+exec "${SCRIPT_DIR}/collect.sh" scan "$@"

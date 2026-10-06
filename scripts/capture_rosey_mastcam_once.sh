@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# configurable delay after LiDAR start
+# Record MastCam + RoSEy telemetry ("trial" group) until Enter, then download.
+# Wrapper around collect.sh.
+#   capture_rosey_mastcam_once.sh [LABEL]
 
-# 3. start MastCam + Rosey bag
-read -r -p "TURN ON MOCAP CAMERAS Press Enter to START MastCam (/start_mastcam) AND RoSEy bag (/start_rosey_bag)..."
-echo "Starting MastCam..."
-ros2 topic pub --once /start_mastcam std_msgs/msg/Bool "{data: true}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LABEL_ARGS=()
+[ -n "${1:-}" ] && LABEL_ARGS=(-l "$1")
 
-# 4. stop both
-read -r -p "Press Enter to STOP MastCam (/stop_mastcam) AND Rosey bag (/stop_rosey_bag)..."
-echo "Stopping MastCam..."
-ros2 topic pub --once /stop_mastcam std_msgs/msg/Bool "{data: true}"
-
+read -r -p "TURN ON MOCAP CAMERAS. Press Enter to START MastCam + RoSEy recording..."
+"${SCRIPT_DIR}/collect.sh" start trial "${LABEL_ARGS[@]}" || exit $?
+read -r -p "Press Enter to STOP MastCam + RoSEy recording..."
+exec "${SCRIPT_DIR}/collect.sh" stop trial

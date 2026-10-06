@@ -1,3 +1,8 @@
+> **DEPRECATED** - remote recording on the gantry is now done by `remote_data_collector`
+> (`ros2 launch remote_data_collector remote_data_collector.launch.py name:=gantry`).
+> See `ros/src/remote_data_collector/README.md` ("Migrating from the legacy capture services").
+> These services are only kept so the legacy `gantry_capture_service` can still be run for a rollback.
+
 Capture:
     Parameters
     - outname: string name of the output file. Preppended to timestamp.

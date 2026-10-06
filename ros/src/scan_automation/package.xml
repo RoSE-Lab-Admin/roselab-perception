@@ -15,7 +15,7 @@
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>builtin_interfaces</depend>
-  <depend>gantry_lidar_interfaces</depend>
+  <depend>remote_data_collector</depend>
   <depend>gantry_control_interfaces</depend>
 
   <test_depend>ament_copyright</test_depend>

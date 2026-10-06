@@ -23,13 +23,14 @@
           workdir: "/home/dev/roselab-perception"
           source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
           command: "./scripts/launch_realsense_d456.sh"
-        - name: mastcam_capture_service
-          description: "MAST CAM - Capture Service"
+        - name: mastcam_data_collector
+          description: "MAST CAM - Remote Data Collector (RecordBag action + HTTP :8000)"
           # become_user: "{{ ansible_user }}"
           workdir: "/home/{{ ansible_user }}/roselab-perception"
           venv: "/home/{{ ansible_user }}/roselab-perception/venv"
           source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
-          command: "ros2 run mastcam_service mastcam_capture_service"
+          command: "ros2 launch remote_data_collector remote_data_collector.launch.py name:=mastcam_front"
+          # Legacy (deprecated): command: "ros2 run mastcam_service mastcam_capture_service"
 
       wheelcam:
         - name: wheelcam_boot
@@ -45,12 +46,13 @@
           workdir: "/home/{{ ansible_user }}/gantry_control"
           # env: "DISPLAY=:0" # Added in case the bash script requires an X-window
           command: "./run_roselab_perception.sh"
-        - name: gantry_capture_service
-          description: "LIDAR & GANTRY - Capture Service"
+        - name: gantry_data_collector
+          description: "LIDAR & GANTRY - Remote Data Collector (RecordBag action + HTTP :8000)"
           # become_user: "{{ ansible_user }}"
           workdir: "/home/{{ ansible_user }}/roselab-perception"
           source_ws: "/home/{{ ansible_user }}/roselab-perception/ros"
-          command: "ros2 run gantry_services gantry_capture_service"
+          command: "ros2 launch remote_data_collector remote_data_collector.launch.py name:=gantry"
+          # Legacy (deprecated): command: "ros2 run gantry_services gantry_capture_service"
 
       lattepanda:
         - name: gantry_system
@@ -80,21 +82,36 @@
           description: "WHEEL CAM - Update camera parameters, set communication buffer sizes"
           workdir: "/home/{{ ansible_user }}"
           command: "./perception_boot.sh"
+        - name: ground_station_data_collector
+          description: "GROUND STATION - Remote Data Collector (rover telemetry + mocap bag)"
+          workdir: "{{ ws_path }}"
+          source_ws: "{{ ws_path }}"
+          command: "ros2 launch remote_data_collector remote_data_collector.launch.py name:=ground_station"
         - name: ground_control_launch
           description: "GROUND CONTROL - Launch Data Collection"
           workdir: "{{ ws_path }}"
           source_ws: "{{ ws_path }}"
           command: "ros2 launch perception_ground_control launch_ground.py duration:={{ lidar_duration | default('60') }}"
-# RH: NOTE - We now use individual ad-hoc scripts for data collection triggers
-#        - name: ground_control_trial_runner
-#          description: "GROUND CONTROL - Script Data Collection"
-#          workdir: "{{ ws_path }}"
-#          source_ws: "{{ ws_path }}"
-#          command: "./src/perception_ground_control/scripts/ground_control.sh"
+# RH: NOTE - Data collection is triggered at runtime with scripts/collect.sh (talks to ground control).
 
     services: "{{ host_services[inventory_hostname] | default([]) }}"
 
+    # Units replaced by the remote_data_collector ones above. They are stopped and disabled so
+    # they cannot grab HTTP port 8000 (or record) alongside the new collectors.
+    legacy_services:
+      - perception-mastcam_capture_service.service
+      - perception-gantry_capture_service.service
+
   tasks:
+    - name: Stop and disable legacy capture services (replaced by remote_data_collector)
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop: "{{ legacy_services }}"
+      failed_when: false
+
+
     - name: Deploy dynamic systemd service files (with perception- prefix)
       ansible.builtin.template:
         src: "ros2_node.service.j2"

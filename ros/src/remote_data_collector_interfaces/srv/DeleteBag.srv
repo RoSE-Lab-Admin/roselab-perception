@@ -1,0 +1,10 @@
+# Delete ONE bag folder from a remote_data_collector's data directory.
+# The name must match an existing folder exactly; wildcards and paths are rejected and a bag
+# that is currently being recorded cannot be deleted.
+
+string name
+---
+bool success
+string message
+# Bytes freed.
+uint64 freed_bytes

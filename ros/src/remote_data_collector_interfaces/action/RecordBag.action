@@ -1,0 +1,41 @@
+# Record a rosbag on a remote_data_collector.
+#
+# Lifecycle:
+#   * duration > 0  -> the collector stops by itself after `duration` seconds (status SUCCEEDED).
+#   * duration <= 0 -> the collector records until the goal is CANCELED. Canceling is the
+#                      normal way to stop an open-ended recording; the bag is finalized and the
+#                      full result (download URL, file list, ...) is still returned.
+#   * The goal is ABORTED if the recording could not be started or died unexpectedly. If a
+#     partial bag was salvaged, result.success is still true and result.bag describes it.
+
+# ---------------------------------------------------------------- Goal
+# Prefix of the bag folder. The collector appends "_<YYYY-mm-ddTHH-MM-SS>".
+# Empty -> the collector's `default_bag_name` parameter.
+string bag_name
+# Named topic profiles from the collector's configuration (union of all of them).
+# Empty -> the collector's `default_profiles` parameter.
+string[] profiles
+# Extra explicit topics to record in addition to the profiles.
+string[] topics
+# Extra regular expression (ECMAScript syntax, as used by `ros2 bag record --regex`).
+string regex
+# Seconds to record. <= 0 means "until canceled".
+float64 duration
+---
+# ---------------------------------------------------------------- Result
+# True when a finalized bag exists on the collector (also true when stopped by cancel).
+bool success
+string message
+# Description of the bag, including the HTTP download URL and file list.
+BagInfo bag
+# Wall-clock seconds the recorder ran.
+float64 recorded_sec
+# Topics the recorder reported subscribing to (best effort, parsed from the recorder log).
+string[] subscribed_topics
+# Explicitly requested topics that were never subscribed (e.g. no publisher on the network).
+string[] missing_topics
+# URL of the recorder's log file on the collector's HTTP sidecar ("" if unavailable).
+string log_url
+---
+# ---------------------------------------------------------------- Feedback
+RecordingStatus status

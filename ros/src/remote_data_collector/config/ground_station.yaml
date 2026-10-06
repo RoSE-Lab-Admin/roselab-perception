@@ -1,0 +1,44 @@
+# Ground station (Slade) - records rover telemetry + OptiTrack pose as seen from the ground.
+# Replaces: the "roseybag_<timestamp>" bag the legacy ground_control node recorded itself.
+#
+#   ros2 launch remote_data_collector remote_data_collector.launch.py name:=ground_station
+#
+# Ground control downloads from this collector over localhost, so advertise 127.0.0.1. Set
+# advertise_host to Slade's LAN IP if other machines should download from it too.
+/**:
+  ros__parameters:
+    data_dir: ~/rdc_ground_station
+    default_bag_name: roseybag
+    default_profiles: [rosey_telemetry]
+    max_concurrent_recordings: 2
+    min_free_space_mb: 2048
+    stop_free_space_mb: 512
+    http:
+      port: 8000
+      bind: 0.0.0.0
+      advertise_host: 127.0.0.1
+    profiles:
+      mocap:
+        description: "OptiTrack rigid body poses"
+        topics:
+          - /FitRosey_V1/pose
+          - /CubeRover_V1/pose
+      rosey_telemetry:
+        description: "Rover control + telemetry + wheel cam + mocap (legacy roseybag topic set)"
+        include: [mocap]
+        topics:
+          - /cmd_vel
+          - /dynamic_joint_states
+          - /initialpose
+          - /joint_states
+          - /joy
+          - /robot_description
+          - /rosout
+          - /tf
+          - /tf_static
+          - /Rover/camera/image_raw/compressed
+          - /plan
+          - /optimal_trajectory
+          - /imu/data
+        # Legacy: every topic starting with /bno055/, /joy/ or /roseybot_base_controller/.
+        regex: "^/(bno055|joy|roseybot_base_controller)/.*"

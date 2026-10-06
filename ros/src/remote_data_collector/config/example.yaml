@@ -1,0 +1,66 @@
+# remote_data_collector - annotated parameter reference.
+#
+# Copy this file, edit it, and launch with:
+#   ros2 launch remote_data_collector remote_data_collector.launch.py name:=my_box config:=/path/my_box.yaml
+#
+# "/**" applies the parameters whatever the node is named; the node NAME (launch arg `name`)
+# determines the endpoints: /<name>/record, /<name>/status, /<name>/list_bags, /<name>/delete_bag.
+#
+# NOTE: ROS parameter files cannot express an empty list ("[]" has no type). Omit a list
+# parameter instead of setting it to [].
+/**:
+  ros__parameters:
+    # Where bags (and .rdc/logs) are written. "~" is expanded. Created if missing.
+    data_dir: ~/remote_data_collector
+    # Bag folder prefix when a goal leaves bag_name empty -> "<prefix>_<YYYY-mm-ddTHH-MM-SS>".
+    default_bag_name: example_bags
+    # Profiles used when a goal names none (must exist below).
+    default_profiles: [demo]
+    # Simultaneous recordings allowed (extra goals are aborted with a "busy" message).
+    max_concurrent_recordings: 1
+    # Safety net: stop any recording after this many seconds (0 = no limit).
+    max_duration_sec: 0.0
+    # Refuse to start when less than this much space is free in data_dir.
+    min_free_space_mb: 1024
+    # Stop running recordings when free space drops below this.
+    stop_free_space_mb: 256
+    # Feedback (and stop-request polling) period.
+    feedback_period_sec: 1.0
+    # How long the recorder may take to start writing before the goal is aborted.
+    startup_timeout_sec: 20.0
+    # How long to wait for `ros2 bag record` to finalize after SIGINT before escalating.
+    stop_timeout_sec: 60.0
+    # Run `ros2 bag reindex` on bags that were not finalized (recorder crash / power loss).
+    reindex_unfinished_bags: true
+    reindex_timeout_sec: 300.0
+    # Seconds the action server keeps a finished goal's result for late `get_result` calls.
+    result_timeout_sec: 3600
+    # Executable used to record (override for testing).
+    ros2_executable: ros2
+    # Extra flags appended to every `ros2 bag record` command, e.g. storage / compression:
+    # record_args: ["--storage", "mcap", "--max-cache-size", "200000000"]
+
+    http:
+      # Sidecar `python3 -m http.server` serving data_dir for downloads.
+      enabled: true
+      port: 8000
+      bind: 0.0.0.0
+      # Host/IP put in download URLs. Empty = auto-detect the LAN IP of the default route.
+      advertise_host: ""
+
+    # Named topic selections. A goal records the union of the profiles it names, plus any
+    # explicit topics/regex in the goal. Keys: description, topics, regex, exclude_regex,
+    # exclude_topics, include (other profiles), all_topics, extra_args.
+    profiles:
+      tf:
+        description: "Transforms"
+        topics: [/tf, /tf_static]
+      demo:
+        description: "Example: a camera plus everything under /demo/, without theora streams"
+        topics: [/camera/image_raw/compressed, /camera/camera_info]
+        regex: "^/demo/.*"
+        exclude_regex: ".*/theora$"
+        include: [tf]
+      everything:
+        description: "All topics (careful with bandwidth/disk!)"
+        all_topics: true

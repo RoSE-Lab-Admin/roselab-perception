@@ -12,14 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_flake8.main import main_with_errors
+from pathlib import Path
+import subprocess
+import sys
+
 import pytest
 
 
 @pytest.mark.flake8
 @pytest.mark.linter
 def test_flake8():
-    rc, errors = main_with_errors(argv=[])
-    assert rc == 0, \
-        'Found %d code style errors / warnings:\n' % len(errors) + \
-        '\n'.join(errors)
+    # flake8 forks worker processes. Forking this pytest process after the ROS integration
+    # tests (DDS + executor threads alive) can deadlock the children, so lint in a fresh
+    # interpreter instead of calling ament_flake8's main_with_errors() in-process.
+    proc = subprocess.run(
+        [sys.executable, '-c', 'import sys; from ament_flake8.main import main; sys.exit(main())'],
+        cwd=Path(__file__).resolve().parents[1], capture_output=True, text=True, timeout=600)
+    assert proc.returncode == 0, 'Found code style errors / warnings:\n' + proc.stdout

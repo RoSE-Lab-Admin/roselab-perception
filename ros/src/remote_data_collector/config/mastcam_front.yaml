@@ -1,0 +1,47 @@
+# Rover front mast camera (RealSense D456) Pi - dev@192.168.2.104
+# Replaces: ros2 run mastcam_service mastcam_capture_service
+#   (same data dir, HTTP port and topics; legacy compress=True/align=False == profile "mastcam")
+#
+#   ros2 launch remote_data_collector remote_data_collector.launch.py name:=mastcam_front
+/**:
+  ros__parameters:
+    data_dir: /home/dev/perception_data
+    default_bag_name: mastcam_bags
+    default_profiles: [mastcam]
+    max_concurrent_recordings: 1
+    min_free_space_mb: 2048
+    stop_free_space_mb: 512
+    http:
+      port: 8000
+      bind: 0.0.0.0
+      advertise_host: 192.168.2.104
+    profiles:
+      mastcam:
+        description: "Front D456 color + depth, compressed (legacy default: compress=True, align=False)"
+        topics:
+          - /MastCam/Front/color/image_raw/compressed
+          - /MastCam/Front/color/camera_info
+          - /MastCam/Front/extrinsics/depth_to_color
+          - /MastCam/Front/depth/image_rect_raw/compressedDepth
+          - /MastCam/Front/depth/camera_info
+      mastcam_aligned:
+        description: "Front D456 color + depth aligned to color, compressed (legacy align=True)"
+        topics:
+          - /MastCam/Front/color/image_raw/compressed
+          - /MastCam/Front/color/camera_info
+          - /MastCam/Front/extrinsics/depth_to_color
+          - /MastCam/Front/aligned_depth_to_color/image_raw/compressedDepth
+          - /MastCam/Front/aligned_depth_to_color/camera_info
+      mastcam_raw:
+        description: "Front D456 uncompressed color + depth (legacy compress=False; heavy!)"
+        topics:
+          - /MastCam/Front/color/image_raw
+          - /MastCam/Front/color/camera_info
+          - /MastCam/Front/extrinsics/depth_to_color
+          - /MastCam/Front/depth/image_rect_raw
+          - /MastCam/Front/depth/camera_info
+      mastcam_imu:
+        description: "Front D456 IMU (only published when enable_gyro/enable_accel are on)"
+        topics:
+          - /MastCam/Front/gyro/sample
+          - /MastCam/Front/accel/sample

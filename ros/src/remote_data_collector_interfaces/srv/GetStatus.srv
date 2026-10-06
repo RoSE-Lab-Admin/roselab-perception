@@ -1,0 +1,20 @@
+# Health/status snapshot of a remote_data_collector. Cheap; safe to poll.
+---
+# Fully qualified node name of the collector, e.g. "/mastcam_front".
+string collector_name
+string hostname
+string data_dir
+# Base URL of the HTTP sidecar (data_dir root), "" if disabled.
+string http_url
+# True if the HTTP sidecar process is running.
+bool http_alive
+uint64 disk_free_bytes
+uint64 disk_total_bytes
+# Topic profiles defined in the collector configuration.
+string[] profiles
+# Profiles used when a goal does not name any.
+string[] default_profiles
+# Maximum number of simultaneous recordings.
+int32 max_concurrent_recordings
+# Recordings currently in progress.
+RecordingStatus[] active

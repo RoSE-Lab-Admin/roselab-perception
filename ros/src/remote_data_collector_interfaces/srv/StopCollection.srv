@@ -1,0 +1,17 @@
+# Ground-control request: stop recordings, then download (and optionally delete) the bags.
+# Served by perception_ground_control's ground_control node at ~/stop.
+
+# Remote names and/or group names. Empty -> every configured remote.
+string[] targets
+# true  -> return only after all downloads for these targets have finished (or failed).
+# false -> return once the recordings are stopped; downloads continue in the background
+#          (check progress with ~/status).
+bool wait_for_download
+---
+bool success
+# Human-readable, multi-line summary.
+string message
+# Local paths of downloaded bags (only populated when wait_for_download is true).
+string[] local_paths
+# Remote bag names that were stopped.
+string[] bags

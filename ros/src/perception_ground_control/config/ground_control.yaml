@@ -1,0 +1,52 @@
+# Perception ground control: which remote_data_collectors exist and how they are grouped.
+#
+# Each remote is a remote_data_collector node (launched with name:=<node> on its host).
+# Targets in start/stop requests can be remote names or group names ("all" = every remote).
+#
+# NOTE: ROS parameter files cannot express an empty list - omit list keys instead of "[]".
+ground_control:
+  ros__parameters:
+    # Bags are downloaded into <data_root>/<session_format> (legacy: <MMDDYYYY>/<HH-MM-SS>).
+    data_root: /mnt/e/perception-data
+    session_format: "%m%d%Y/%H-%M-%S"
+    # Targets used by ~/start when none are given.
+    default_group: trial
+    # Seconds to wait for a remote to confirm it is recording.
+    start_timeout_sec: 30.0
+    # Seconds to wait for a remote to finalize a bag after a stop.
+    stop_timeout_sec: 180.0
+    # HTTP download tuning.
+    download_socket_timeout_sec: 60.0
+    download_retries: 3
+    max_parallel_downloads: 3
+
+    remotes:
+      mastcam_front:              # Rover mast camera Pi (192.168.2.104)
+        node: /mastcam_front
+        bag_name: mastcam_bags
+        duration: 0.0             # until stopped
+        delete_after_download: true
+      ground_station:             # Rover telemetry + mocap recorded on Slade (localhost)
+        node: /ground_station
+        bag_name: roseybag
+        duration: 0.0
+        delete_after_download: true
+      gantry:                     # Gantry + three L515 lidars (192.168.2.99)
+        node: /gantry
+        bag_name: lidar_bags
+        profiles: [lidar_scan]
+        duration: 60.0            # timed scan; downloaded automatically when done
+        delete_after_download: false
+      # Uncomment to record on the rover itself instead of (or as well as) over the network:
+      # rosey_avionics:
+      #   node: /rosey_avionics
+      #   bag_name: rosey_avionics
+      #   delete_after_download: true
+      # wheelcam:
+      #   node: /wheelcam
+      #   bag_name: wheelcam
+      #   delete_after_download: true
+
+    groups:
+      trial: [mastcam_front, ground_station]   # legacy "start mastcam + rosey bag"
+      lidar: [gantry]                          # legacy "start lidar"

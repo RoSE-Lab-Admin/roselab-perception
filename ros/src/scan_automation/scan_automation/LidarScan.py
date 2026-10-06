@@ -6,12 +6,10 @@ from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped, Point
 
 from ament_index_python.packages import get_package_share_directory
-from gantry_lidar_interfaces.srv import Capture, DownloadName, DeleteName
+from scan_automation.lidar_capture import LidarCapture
 from gantry_interfaces.msg import GantryState
 
-import json
 from builtin_interfaces.msg import Time
-import subprocess
 from pathlib import Path as pth
 import time
 from datetime import datetime
@@ -38,71 +36,38 @@ class LidarScan(Node):
         self.declare_parameter("duration", 60.0)
         self.duration = self.get_parameter("duration").value
 
-        # setting up service clients
-        self.gant_capture = self.create_client(Capture, "gantry_capture_service/capture")
-        self.gant_download = self.create_client(DownloadName, "gantry_capture_service/download/name")
-        self.gant_delete = self.create_client(DeleteName, "gantry_capture_service/delete/name")
+        # lidar recording on the gantry's remote_data_collector (replaces gantry_capture_service)
+        self.declare_parameter("collector", "/gantry")
+        self.declare_parameter("lidar_profiles",
+                               ["gantry_state", "p_l515_center", "p_l515_west", "p_l515_east"])
+        self.lidar = LidarCapture(remote=self.get_parameter("collector").value,
+                                  bag_name=self.panda_file,
+                                  profiles=self.get_parameter("lidar_profiles").value,
+                                  logger=self.get_logger())
 
         # state variables
         self.tolerance = .02
 
         # wait for services to be available
         
-        self.get_logger().info("Waiting for required services...")
-        while not self.gant_capture.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for capture service...")
-        while not self.gant_download.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for download service...")
-        while not self.gant_delete.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("Waiting for delete service...")
-        self.get_logger().info("All services ready.")
+        self.get_logger().info("Waiting for the gantry data collector...")
+        self.lidar.wait_until_available()
+        self.get_logger().info("Data collector ready.")
 
         self.start_lidar()
 
     def start_lidar(self):
         input("Press enter to start lidar scan")
 
-        capture_request = Capture.Request()
-        capture_request.outname = self.panda_file
-        capture_request.sensors = ["p_l515_center", "p_l515_west", "p_l515_east"]
-        capture_request.duration = float(self.duration) + 10.0
-
         self.get_logger().info(f"Starting LIDAR capture for {self.duration} seconds.")
-        self.future_cap = self.gant_capture.call_async(capture_request)
+        self.lidar.start(float(self.duration) + 10.0)
 
         self.end_scan()
 
     def end_scan(self):
-
-        if self.future_cap and not self.future_cap.done():
-            self.get_logger().info("Waiting for LIDAR capture to finish...")
-            rclpy.spin_until_future_complete(self, self.future_cap)
-
-        cap_response = self.future_cap.result()
-        lidar_cap_data = json.loads(cap_response.outdata)
-
-        name_request = DownloadName.Request()
-        name_request.name = lidar_cap_data["outname"]
-        self.get_logger().info(f"Lidar bag name: {name_request.name}")
-
-        future_name = self.gant_download.call_async(name_request)
-        rclpy.spin_until_future_complete(self, future_name)
-        name_response = future_name.result()
-        name_response_dict = json.loads(name_response.outdata)
-
-        cap_url = name_response_dict["url"]
-        self.get_logger().info(f"Downloading from {cap_url} ...")
-        subprocess.Popen(["wget", "-r", "-P", f"{self.data_file}", f"{cap_url}"])
-        time.sleep(10)
-
+        # wait for the recording to finish and download it (kept on the gantry, as before)
+        self.lidar.finish(self.data_file, delete=False)
         self.get_logger().info("Download complete.")
-        self.get_logger().info(f"Bag saved to {self.data_file}")
-
-        # delete_req = DeleteName.Request()
-        # delete_req.name = lidar_cap_data["outname"]
-        # future_delete = self.gant_delete.call_async(delete_req)
-        # rclpy.spin_until_future_complete(self, future_delete)
-        # self.get_logger().info("Deleted bag from LattePanda.")
 
         input("Press enter to start lidar scan")
         

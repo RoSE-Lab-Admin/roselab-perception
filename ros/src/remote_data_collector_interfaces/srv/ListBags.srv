@@ -1,0 +1,8 @@
+# List bag folders in a remote_data_collector's data directory (newest first).
+
+# Optional shell-style pattern matched against folder names, e.g. "mastcam_bags_*". "" = all.
+string pattern
+---
+bool success
+string message
+BagInfo[] bags

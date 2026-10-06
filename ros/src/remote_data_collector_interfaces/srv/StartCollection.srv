@@ -1,0 +1,21 @@
+# Ground-control request: start recording on one or more remote_data_collectors.
+# Served by perception_ground_control's ground_control node at ~/start.
+
+# Remote names and/or group names from the ground control configuration.
+# Empty -> the configured `default_group`.
+string[] targets
+# Optional label prepended to each remote's bag name: "<label>_<bag_name>_<timestamp>".
+string label
+# Seconds to record:
+#    0 -> use each remote's configured default duration (0 there means "until stopped")
+#   >0 -> record for this many seconds, then stop and download automatically
+#   <0 -> record until ~/stop is called, regardless of the remote's default
+float64 duration
+---
+bool success
+# Human-readable, multi-line summary.
+string message
+# Remotes on which a recording is now running.
+string[] started
+# Remotes that failed to start (see message for reasons).
+string[] failed

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# configurable delay after LiDAR start
+# E-stop: stop every recording on every remote and download what was captured.
+# Wrapper around collect.sh.
 
-# E-stop recording
-echo "Stopping MastCam and Rosey Bagging..."
-ros2 topic pub --once /stop_mastcam std_msgs/msg/Bool "{data: true}"
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "Stopping all recordings..."
+exec "${SCRIPT_DIR}/collect.sh" stop all "$@"

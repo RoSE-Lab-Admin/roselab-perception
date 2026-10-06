@@ -1,0 +1,27 @@
+# Rover wheel camera Pi - picam@192.168.2.51
+# Records the wheel camera stream on the Pi instead of over the network.
+#
+#   ros2 launch remote_data_collector remote_data_collector.launch.py name:=wheelcam
+/**:
+  ros__parameters:
+    data_dir: ~/rdc_data
+    default_bag_name: wheelcam
+    default_profiles: [wheelcam]
+    max_concurrent_recordings: 1
+    min_free_space_mb: 1024
+    stop_free_space_mb: 256
+    http:
+      port: 8000
+      bind: 0.0.0.0
+      advertise_host: 192.168.2.51
+    profiles:
+      wheelcam:
+        description: "Wheel camera compressed image + calibration"
+        topics:
+          - /Rover/camera/image_raw/compressed
+          - /Rover/camera/camera_info
+      wheelcam_raw:
+        description: "Wheel camera uncompressed image (heavy!)"
+        topics:
+          - /Rover/camera/image_raw
+          - /Rover/camera/camera_info

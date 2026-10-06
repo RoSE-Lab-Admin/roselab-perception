@@ -1,0 +1,31 @@
+# Rover avionics computer - rosey@192.168.2.50
+# Records rover-side telemetry ON the rover, so it does not have to cross the network during a
+# trial. (Alternative to recording it on the ground station.)
+#
+#   ros2 launch remote_data_collector remote_data_collector.launch.py name:=rosey_avionics
+/**:
+  ros__parameters:
+    data_dir: ~/rdc_data
+    default_bag_name: rosey_avionics
+    default_profiles: [rover_telemetry]
+    max_concurrent_recordings: 1
+    min_free_space_mb: 1024
+    stop_free_space_mb: 256
+    http:
+      port: 8000
+      bind: 0.0.0.0
+      advertise_host: 192.168.2.50
+    profiles:
+      rover_telemetry:
+        description: "Rover control + state + IMU (locally published topics)"
+        topics:
+          - /cmd_vel
+          - /dynamic_joint_states
+          - /joint_states
+          - /robot_description
+          - /tf
+          - /tf_static
+          - /imu/data
+          - /plan
+          - /optimal_trajectory
+        regex: "^/(bno055|roseybot_base_controller)/.*"
