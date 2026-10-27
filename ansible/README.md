@@ -10,7 +10,7 @@ Run everything from Slade, in this directory. `ansible.cfg` points at `mlss_inve
 | `./zenoh_setup.sh` | Install rmw_zenoh, start a Zenoh router on every ROS 2 host at boot, make Zenoh the default RMW |
 | `./chrony_setup.sh` | Install/configure chrony (Slade serves, everyone else follows Slade) and install the health monitor |
 | `./chrony_check.sh` | Time sync report for every host; exits non-zero if a reachable host is out of sync |
-| `./pi_check.sh` | Pi report: synced to Slade, Slade is the only NTP source, UTC, apt auto-updates off; exits non-zero on any failure |
+| `./pi_check.sh` | Pi + NUC report: synced to Slade, Slade is the only NTP source, UTC, apt auto-updates off; exits non-zero on any failure |
 
 Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`, `--check --diff` (dry run), `--tags check`.
 
@@ -20,7 +20,7 @@ The Pis (`pis` inventory group) have no internet; Slade, the NUC and the gantry 
 (`roles/apt_proxy`). Each Pi gets an apt hook (`roles/apt_client`) that sends apt traffic through Slade when it is reachable and goes
 direct otherwise. So plain `apt install` works on the Pis too, with correct architecture and dependencies, and each package is
 downloaded once for all of them. Hosts outside `pis` install straight from the internet. Move a host in or out of the group and re-run
-any setup playbook to add or remove the hook. The Pis also have apt's background updates turned off (apt-daily timers,
+any setup playbook to add or remove the hook. The Pis (and the NUC, via `host_vars/nuc.yaml`) also have apt's background updates turned off (apt-daily timers,
 unattended-upgrades, `/etc/apt/apt.conf.d/99mlss-no-auto-updates`), so packages only change through these playbooks
 (`apt_disable_auto_updates`).
 
@@ -61,7 +61,7 @@ ansible-playbook packages_install.yaml -e target=mastcam_front -e '{"deb_files":
 - Slade (`lan_server` group) serves `chrony_serve_subnet` from `conf.d/serve-rover.conf`.
 - Clients use `/etc/chrony/sources.d/mlss_ntp.sources` (`server 192.168.2.10 iburst prefer minpoll 4 maxpoll 6`). The stock internet
   pools are commented out, so every host follows Slade only. The role also sets `makestep 1 -1` and keeps sync logs in `/var/log/chrony`.
-- The Pis are set to UTC (`chrony_timezone`); other hosts keep their timezone.
+- The Pis and the NUC (`host_vars/nuc.yaml`) are set to UTC (`chrony_timezone`); other hosts keep their timezone.
 - **Runtime monitoring:** `chrony-health.timer` runs `/usr/local/bin/chrony-health` every 60 s on every host. Failures are logged at
   error level and mark the unit failed:
   ```bash

@@ -1,0 +1,4 @@
+---
+# The NUC follows the Pi rules for time and updates (checked by ./pi_check.sh).
+chrony_timezone: UTC
+apt_disable_auto_updates: true

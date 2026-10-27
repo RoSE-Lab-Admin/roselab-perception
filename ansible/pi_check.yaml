@@ -1,10 +1,11 @@
 ---
-# Pi status report: time synced to Slade, Slade is the only NTP source, UTC timezone, apt auto-updates off.
-# Read-only. Fails if any reachable Pi fails a check (run after ./chrony_setup.sh).
+# Pi + NUC status report: time synced to Slade, Slade is the only NTP source, UTC timezone, apt auto-updates off.
+# Read-only. Fails if any reachable host fails a check (run after ./chrony_setup.sh).
 #   ./pi_check.sh
 #   ./pi_check.sh --limit wheelcam
-- name: Pi status check
-  hosts: pis
+#   ./pi_check.sh -e target=miniforum    # any other host or group
+- name: Pi + NUC status check
+  hosts: "{{ target | default('pis:nuc') }}"
   become: true
   gather_facts: false
   vars:
