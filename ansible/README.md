@@ -79,8 +79,16 @@ Slade runs WSL2 in mirrored networking mode. LAN hosts must reach these ports on
 - TCP 7447 (Zenoh)
 - UDP 123 (NTP)
 
-If the Hyper-V firewall blocks a port, allow it from an admin PowerShell on Windows:
+In mirrored mode, inbound LAN traffic to WSL goes through the Hyper-V firewall, which blocks it by default. Allow the ports once,
+from an admin PowerShell on Windows:
 ```powershell
+$wsl = '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}'
 New-NetFirewallHyperVRule -Name MLSS-WSL-TCP -DisplayName "MLSS apt/zenoh" -Direction Inbound `
-  -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 3142,7447
+  -VMCreatorId $wsl -Protocol TCP -LocalPorts 3142,7447 -Action Allow
+New-NetFirewallHyperVRule -Name MLSS-WSL-NTP -DisplayName "MLSS NTP" -Direction Inbound `
+  -VMCreatorId $wsl -Protocol UDP -LocalPorts 123 -Action Allow
+Get-NetFirewallHyperVRule -VMCreatorId $wsl | Format-Table Name,Protocol,LocalPorts,Action   # verify
 ```
+Windows and WSL share ports in mirrored mode. If the Windows Time service already holds UDP 123
+(`Get-NetUDPEndpoint -LocalPort 123`), chronyd on Slade can't serve NTP. Stop that service with
+`Stop-Service w32time; Set-Service w32time -StartupType Disabled`, since chrony keeps the clock in sync instead.
