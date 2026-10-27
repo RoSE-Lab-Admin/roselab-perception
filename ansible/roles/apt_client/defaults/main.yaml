@@ -1,7 +1,8 @@
 ---
 # Point apt at the Slade cache (auto-falls back to direct when Slade is unreachable).
-# Only the Pis need it; hosts with their own internet install directly.
-apt_proxy_enabled: "{{ inventory_hostname in groups['pis'] }}"
+# The Pis need it (no internet). ROS 2 hosts use it too, so every host installs the same cached packages
+# (e.g. one rmw_zenoh release); the rest install directly.
+apt_proxy_enabled: "{{ inventory_hostname in groups['pis'] + groups['ros2'] }}"
 apt_cache_valid_time: 3600
 # Turn off apt's background updates (apt-daily timers, unattended-upgrades) so packages only change through Ansible.
 apt_disable_auto_updates: "{{ inventory_hostname in groups['pis'] }}"

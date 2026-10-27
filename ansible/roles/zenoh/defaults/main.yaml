@@ -1,6 +1,13 @@
 ---
 # Hosts that get a Zenoh router (inventory group).
 zenoh_group: ros2
+# rmw_zenoh release every host runs, installed through Slade's cache and held there. Only the upstream part:
+# the build-date suffix (".20260915.171026") differs between amd64 and arm64 builds of the same release.
+# To upgrade: change this, re-run ./zenoh_setup.sh, then restart running ROS nodes.
+zenoh_rmw_version: 0.2.11-1noble
+zenoh_packages:
+  - ros-{{ ros_distro }}-rmw-zenoh-cpp
+  - ros-{{ ros_distro }}-zenoh-cpp-vendor  # the Zenoh library itself; rmw-zenoh-cpp depends on it unversioned
 # rmw_zenoh sessions always look for their router on localhost:7447, so only change this
 # if every host also overrides its session config.
 zenoh_router_port: 7447

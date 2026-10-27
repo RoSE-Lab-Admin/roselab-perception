@@ -20,8 +20,9 @@ Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`
 The Pis (`pis` inventory group) have no internet; Slade, the NUC and the gantry PCs do. Slade runs **apt-cacher-ng** on port 3142
 (`roles/apt_proxy`). Each Pi gets an apt hook (`roles/apt_client`) that sends apt traffic through Slade when it is reachable and goes
 direct otherwise. So plain `apt install` works on the Pis too, with correct architecture and dependencies, and each package is
-downloaded once for all of them. Hosts outside `pis` install straight from the internet. Move a host in or out of the group and re-run
-any setup playbook to add or remove the hook. The Pis (and the NUC, via `host_vars/nuc.yaml`) also have apt's background updates turned off (apt-daily timers,
+downloaded once for all of them. The `ros2` hosts (including Slade itself and the NUC) use the hook too, so every ROS host gets the
+same cached packages; other hosts install straight from the internet. Move a host in or out of these groups and re-run any setup
+playbook to add or remove the hook. The Pis (and the NUC, via `host_vars/nuc.yaml`) also have apt's background updates turned off (apt-daily timers,
 unattended-upgrades, `/etc/apt/apt.conf.d/99mlss-no-auto-updates`), so packages only change through these playbooks
 (`apt_disable_auto_updates`).
 
@@ -51,7 +52,11 @@ ansible-playbook packages_install.yaml -e target=mastcam_front -e '{"deb_files":
 - `RMW_IMPLEMENTATION=rmw_zenoh_cpp` is set in `/etc/profile.d/ros2_rmw.sh` (login shells, SSH, and the `perception-*` services, which
   use `bash --login`) and in `/etc/environment` (desktop sessions).
 - Router config: `/etc/zenoh/rmw_zenoh_router.env` sets `ZENOH_CONFIG_OVERRIDE` on top of the rmw_zenoh package defaults.
-- Health: `./zenoh_setup.sh --tags check` prints, for each host, which routers it is linked to, and warns about mixed rmw_zenoh versions.
+- **One release everywhere:** every host installs rmw_zenoh and the Zenoh library (`zenoh-cpp-vendor`) at `zenoh_rmw_version`
+  (`roles/zenoh/defaults/main.yaml`) through Slade's cache, and both packages are held (`apt-mark showhold`). amd64 and arm64 builds of
+  a release differ only in the build-date suffix. To upgrade: change the version, re-run `./zenoh_setup.sh`, restart running ROS nodes.
+- Health: `./zenoh_setup.sh --tags check` waits up to 20 s for links, then prints, for each host, which routers it is linked to, and
+  warns about hosts not on `zenoh_rmw_version`.
   On a host: `systemctl status zenoh-router`, `journalctl -u zenoh-router -f`.
 - **Cutover:** Zenoh and FastDDS nodes can't see each other. Switch every ROS host in one run, and restart running nodes.
 - **Roll back to FastDDS:** set `rmw_implementation: rmw_fastrtps_cpp` in `group_vars/all.yaml` and re-run `./zenoh_setup.sh`.
