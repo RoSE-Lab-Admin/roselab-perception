@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""Check this host's time sync against the LAN NTP server (Slade).
+
+Managed by Ansible (roles/chrony). Defaults come from /etc/chrony/health.conf and
+command-line flags override them. Run as root (chronyc ntpdata/clients need it).
+
+Exit codes: 0 = OK or WARN, 1 = FAIL, 2 = chronyd not responding.
+"""
+import argparse
+import json
+import os
+import socket
+import subprocess
+import sys
+
+CONFIG = "/etc/chrony/health.conf"
+NEVER = 4294967295  # chronyc's "no sample yet" marker
+
+
+def load_config(path):
+    conf = {}
+    try:
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    conf[key.strip()] = value.strip()
+    except OSError:
+        pass
+    return conf
+
+
+def chronyc(*args):
+    result = subprocess.run(["chronyc", "-n", *args], stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, universal_newlines=True, timeout=10)
+    if result.returncode != 0:
+        raise RuntimeError((result.stderr or result.stdout).strip())
+    return result.stdout
+
+
+def parse_report(text):
+    """Parse 'Key : value' report output (tracking, ntpdata)."""
+    report = {}
+    for line in text.splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            report[key.strip()] = value.strip()
+    return report
+
+
+def seconds(value):
+    """'0.000012 seconds slow of NTP time' -> -1.2e-05"""
+    words = value.split()
+    number = float(words[0])
+    return -number if "slow" in words else number
+
+
+def check_client(args, metrics, failures, warnings):
+    sources = [line.split(",") for line in chronyc("-c", "sources").splitlines()]
+    row = next((s for s in sources if s[2] == args.server), None)
+    selected = next((s[2] for s in sources if s[1] == "*"), None)
+    if row is None:
+        failures.append("%s is not configured as a source" % args.server)
+        return
+
+    reach = int(row[5], 8)
+    metrics.update(source_state=row[1], reach=row[5], selected_source=selected,
+                   polls_ok_of_8=bin(reach).count("1"))
+    if reach == 0:
+        failures.append("server unreachable (reach 0)")
+    elif reach != 0o377:
+        warnings.append("%d of the last 8 polls failed" % (8 - bin(reach).count("1")))
+    if row[1] != "*":
+        failures.append("not synced to %s (state '%s', synced to %s)"
+                        % (args.server, row[1], selected or "nothing"))
+
+    stats = next((s.split(",") for s in chronyc("-c", "sourcestats").splitlines()
+                  if s.split(",")[0] == args.server), None)
+    if stats:
+        metrics["jitter_ms"] = float(stats[7]) * 1e3
+
+    ntp = parse_report(chronyc("ntpdata", args.server))
+    if "Peer delay" in ntp:
+        metrics["rtt_ms"] = seconds(ntp["Peer delay"]) * 1e3
+        metrics["valid_rx"] = int(ntp.get("Total valid RX", 0))
+        if metrics["rtt_ms"] > args.max_rtt_ms:
+            failures.append("round trip %.3f ms > %.3f ms" % (metrics["rtt_ms"], args.max_rtt_ms))
+
+    if abs(metrics["offset_ms"]) > args.max_offset_ms:
+        failures.append("offset %+.3f ms exceeds +/-%.3f ms" % (metrics["offset_ms"], args.max_offset_ms))
+    if metrics["max_error_ms"] > args.max_error_ms:
+        failures.append("max error %.3f ms > %.3f ms" % (metrics["max_error_ms"], args.max_error_ms))
+
+
+def check_server(metrics):
+    clients = []
+    for line in chronyc("-c", "clients").splitlines():
+        fields = line.split(",")
+        ntp_packets, last_rx = int(fields[1]), int(fields[5])
+        if ntp_packets > 0 and last_rx != NEVER:
+            clients.append({"address": fields[0], "last_rx_s": last_rx})
+    metrics["clients"] = clients
+
+
+def main():
+    conf = load_config(CONFIG)
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--role", choices=["client", "server"], default=conf.get("role", "client"))
+    parser.add_argument("--server", default=conf.get("server"), help="LAN NTP server address")
+    parser.add_argument("--max-offset-ms", type=float, default=float(conf.get("max_offset_ms", 2.0)))
+    parser.add_argument("--max-rtt-ms", type=float, default=float(conf.get("max_rtt_ms", 10.0)))
+    parser.add_argument("--max-error-ms", type=float, default=float(conf.get("max_error_ms", 5.0)))
+    parser.add_argument("--json", action="store_true", help="print a JSON report")
+    parser.add_argument("--journal", action="store_true",
+                        help="prefix output with syslog levels for the systemd journal")
+    args = parser.parse_args()
+    if args.role == "client" and not args.server:
+        parser.error("--server is required (or set server= in %s)" % CONFIG)
+    if os.geteuid() != 0:
+        parser.error("must run as root (chronyc ntpdata/clients need it): sudo chrony-health")
+
+    metrics, failures, warnings = {}, [], []
+    try:
+        tracking = parse_report(chronyc("tracking"))
+        root_delay = seconds(tracking["Root delay"])
+        root_dispersion = seconds(tracking["Root dispersion"])
+        metrics.update(
+            reference=tracking["Reference ID"],
+            stratum=int(tracking["Stratum"]),
+            leap_status=tracking["Leap status"],
+            offset_ms=seconds(tracking["System time"]) * 1e3,
+            rms_offset_ms=seconds(tracking["RMS offset"]) * 1e3,
+            frequency_ppm=seconds(tracking["Frequency"]),
+            # chrony's bound on how far the clock can be from true (server) time
+            max_error_ms=(root_dispersion + root_delay / 2) * 1e3,
+        )
+        if metrics["leap_status"] == "Not synchronised":
+            failures.append("chronyd reports not synchronised")
+        if args.role == "client":
+            check_client(args, metrics, failures, warnings)
+        else:
+            check_server(metrics)
+        status, code = ("FAIL", 1) if failures else ("WARN", 0) if warnings else ("OK", 0)
+    except Exception as exc:  # chronyd down, permission denied, unexpected output
+        failures.append("chronyc failed: %s" % exc)
+        status, code = "FAIL", 2
+
+    report = dict(host=socket.gethostname(), role=args.role, server=args.server, status=status,
+                  failures=failures, warnings=warnings, metrics=metrics)
+    if args.json:
+        print(json.dumps(report))
+        return code
+
+    m = metrics
+    if args.role == "server":
+        summary = "%s server stratum=%s ref=%s clients=%s" % (
+            status, m.get("stratum"), m.get("reference"),
+            ",".join(c["address"] for c in m.get("clients", [])) or "none")
+    else:
+        summary = "%s offset=%+.3fms rtt=%sms err=%.3fms jitter=%sms reach=%s src=%s" % (
+            status, m.get("offset_ms", 0.0),
+            "%.3f" % m["rtt_ms"] if "rtt_ms" in m else "?", m.get("max_error_ms", 0.0),
+            "%.3f" % m["jitter_ms"] if "jitter_ms" in m else "?",
+            m.get("reach", "?"), m.get("selected_source") or "none")
+    prefix = ("<3>" if status == "FAIL" else "<4>" if status == "WARN" else "<6>") if args.journal else ""
+    print(prefix + summary)
+    for message in failures + warnings:
+        print(prefix + "  " + message)
+    return code
+
+
+if __name__ == "__main__":
+    sys.exit(main())

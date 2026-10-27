@@ -1,0 +1,19 @@
+---
+# Options for the client's "server <slade>" line: poll every 16-64 s on the LAN.
+chrony_server_options: iburst prefer minpoll 4 maxpoll 6
+# Step the clock whenever it is off by > 1 s (matches existing hosts).
+# "1 3" would only allow steps during the first 3 updates after boot (no time jumps mid-run).
+chrony_makestep: "1 -1"
+# Comment out the stock pool/server lines so every client follows Slade only.
+chrony_disable_default_sources: true
+# Log tracking/measurements/statistics to /var/log/chrony for post-campaign analysis.
+chrony_log_stats: true
+
+# Server (lan_server group) settings
+chrony_local_stratum: 10
+
+# Health-check thresholds, used by chrony_check.yaml and the chrony-health timer on each host.
+chrony_health_max_offset_ms: 2.0
+chrony_health_max_rtt_ms: 10.0
+chrony_health_max_error_ms: 5.0
+chrony_health_interval_s: 60

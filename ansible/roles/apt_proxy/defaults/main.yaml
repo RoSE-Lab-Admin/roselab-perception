@@ -1,0 +1,4 @@
+---
+apt_proxy_port: 3142
+# true = never contact upstream mirrors, serve only what is already cached (field use with no internet on Slade).
+apt_proxy_offline_mode: false

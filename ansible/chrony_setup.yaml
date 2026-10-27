@@ -1,0 +1,14 @@
+---
+# Install and configure chrony: Slade serves time to the LAN, every other host follows Slade.
+# Also installs the chrony-health timer and finishes with a sync check.
+- name: Apt proxy
+  ansible.builtin.import_playbook: apt_proxy_setup.yaml
+
+- name: Time sync (chrony)
+  hosts: all
+  become: true
+  roles:
+    - chrony
+
+- name: Time sync check
+  ansible.builtin.import_playbook: chrony_check.yaml

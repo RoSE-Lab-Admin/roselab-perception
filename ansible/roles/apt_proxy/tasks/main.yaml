@@ -1,0 +1,31 @@
+---
+# Runs on Slade (which has internet). Every other host pulls its apt packages through this cache,
+# so they never need their own internet connection.
+- name: Install apt-cacher-ng
+  ansible.builtin.apt:
+    name: apt-cacher-ng
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Configure apt-cacher-ng
+  ansible.builtin.template:
+    src: zz_mlss.conf.j2
+    dest: /etc/apt-cacher-ng/zz_mlss.conf
+    mode: '0644'
+  notify: Restart apt-cacher-ng
+
+- name: Enable and start apt-cacher-ng
+  ansible.builtin.systemd_service:
+    name: apt-cacher-ng
+    enabled: true
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"  # unit only exists after a real run
+
+- name: Flush handlers so the proxy is live before clients use it
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for the proxy port
+  ansible.builtin.wait_for:
+    port: "{{ apt_proxy_port }}"
+    timeout: 30
+  when: not ansible_check_mode

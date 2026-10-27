@@ -1,0 +1,12 @@
+---
+# Install rmw_zenoh, run a Zenoh router on every ROS 2 host at boot, and make it the default RMW.
+#   ./zenoh_setup.sh                 # install/configure + health check
+#   ./zenoh_setup.sh --tags check    # health check only
+- name: Apt proxy
+  ansible.builtin.import_playbook: apt_proxy_setup.yaml
+
+- name: Zenoh middleware for ROS 2
+  hosts: ros2
+  become: true
+  roles:
+    - zenoh

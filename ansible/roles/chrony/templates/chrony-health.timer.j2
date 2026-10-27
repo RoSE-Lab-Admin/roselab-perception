@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Periodic time sync health check (journalctl -u chrony-health)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec={{ chrony_health_interval_s }}s
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

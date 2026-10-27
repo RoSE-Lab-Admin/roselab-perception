@@ -1,0 +1,52 @@
+---
+- name: Check router service is active
+  ansible.builtin.command: systemctl is-active zenoh-router.service
+  register: zenoh_router_active
+  changed_when: false
+  check_mode: false
+  failed_when: zenoh_router_active.stdout != 'active'
+
+- name: List established router-to-router TCP links
+  ansible.builtin.shell: >-
+    ss -Htn state established '( sport = :{{ zenoh_router_port }} or dport = :{{ zenoh_router_port }} )'
+    | awk '{print $4}'
+  register: zenoh_links
+  changed_when: false
+  check_mode: false
+
+- name: Read installed rmw_zenoh version
+  ansible.builtin.command: dpkg-query -W -f='${Version}' ros-{{ ros_distro }}-rmw-zenoh-cpp
+  register: zenoh_version
+  changed_when: false
+  check_mode: false
+
+- name: Report router links
+  vars:
+    linked_ips: >-
+      {{ zenoh_links.stdout_lines | map('regex_search', '\d+\.\d+\.\d+\.\d+')
+         | select('string') | reject('match', '127\.') | unique }}
+    # mesh: everyone links to everyone. star: Slade links to everyone, others link to Slade.
+    expected_hosts: >-
+      {{ groups[zenoh_group] | difference([inventory_hostname])
+         if zenoh_topology == 'mesh' or inventory_hostname in groups['lan_server']
+         else zenoh_connect_hosts }}
+    linked_hosts: >-
+      {{ expected_hosts | map('extract', hostvars) | selectattr('ansible_host', 'in', linked_ips)
+         | map(attribute='inventory_hostname') | list }}
+  ansible.builtin.debug:
+    msg:
+      - "rmw_zenoh {{ zenoh_version.stdout }}, router {{ zenoh_router_active.stdout }}"
+      - "linked: {{ linked_hosts | join(', ') or 'none' }}"
+      - "not linked (host down or unreachable?): {{ expected_hosts | difference(linked_hosts) | join(', ') or 'none' }}"
+
+- name: Warn on mixed rmw_zenoh versions across hosts
+  run_once: true
+  vars:
+    versions: >-
+      {{ ansible_play_hosts | map('extract', hostvars, ['zenoh_version', 'stdout'])
+         | map('regex_replace', '-.*$', '') | unique }}
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: hosts run different rmw_zenoh versions ({{ versions | join(', ') }}).
+      Upgrade them to the same release to avoid incompatibilities.
+  when: versions | length > 1

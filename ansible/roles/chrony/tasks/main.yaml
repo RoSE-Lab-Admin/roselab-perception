@@ -1,0 +1,100 @@
+---
+- name: Install chrony (replaces systemd-timesyncd)
+  ansible.builtin.apt:
+    name: chrony
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+
+- name: Make sure chrony reads conf.d and sources.d
+  ansible.builtin.lineinfile:
+    path: /etc/chrony/chrony.conf
+    line: "{{ item }}"
+  loop:
+    - confdir /etc/chrony/conf.d
+    - sourcedir /etc/chrony/sources.d
+  notify: Restart chrony
+
+- name: Set clock stepping policy
+  ansible.builtin.lineinfile:
+    path: /etc/chrony/chrony.conf
+    regexp: '^makestep\s'
+    line: "makestep {{ chrony_makestep }}"
+  notify: Restart chrony
+
+- name: Log sync statistics to /var/log/chrony
+  ansible.builtin.copy:
+    content: "log tracking measurements statistics\n"
+    dest: /etc/chrony/conf.d/mlss-logging.conf
+    mode: '0644'
+  when: chrony_log_stats | bool
+  notify: Restart chrony
+
+- name: Configure NTP server (Slade)
+  ansible.builtin.template:
+    src: serve-rover.conf.j2
+    dest: /etc/chrony/conf.d/serve-rover.conf
+    mode: '0644'
+  when: inventory_hostname in groups['lan_server']
+  notify: Restart chrony
+
+- name: Configure NTP clients
+  when: inventory_hostname not in groups['lan_server']
+  block:
+    - name: Point chrony at Slade
+      ansible.builtin.template:
+        src: mlss_ntp.sources.j2
+        dest: /etc/chrony/sources.d/mlss_ntp.sources
+        mode: '0644'
+      notify: Reload chrony sources
+
+    - name: Disable the stock internet pools/servers
+      ansible.builtin.replace:
+        path: /etc/chrony/chrony.conf
+        regexp: '^(pool|server|peer)(\s)'
+        replace: '# Disabled by Ansible (chrony role): \1\2'
+      when: chrony_disable_default_sources | bool
+      notify: Restart chrony
+
+- name: Enable and start chrony
+  ansible.builtin.systemd_service:
+    name: chrony
+    enabled: true
+    state: started
+
+- name: Install chrony-health
+  ansible.builtin.copy:
+    src: chrony-health
+    dest: /usr/local/bin/chrony-health
+    mode: '0755'
+
+- name: Configure chrony-health defaults
+  ansible.builtin.template:
+    src: health.conf.j2
+    dest: /etc/chrony/health.conf
+    mode: '0644'
+
+- name: Deploy chrony-health service and timer
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: '0644'
+  loop:
+    - chrony-health.service
+    - chrony-health.timer
+  notify: Reload systemd
+
+- name: Apply config changes now
+  ansible.builtin.meta: flush_handlers
+
+- name: Run chrony-health every {{ chrony_health_interval_s }} s
+  ansible.builtin.systemd_service:
+    name: chrony-health.timer
+    enabled: true
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"  # unit only exists after a real run
+
+- name: Wait up to 60 s for the first sync
+  ansible.builtin.command: chronyc waitsync 6
+  changed_when: false
+  failed_when: false
+  when: inventory_hostname not in groups['lan_server']

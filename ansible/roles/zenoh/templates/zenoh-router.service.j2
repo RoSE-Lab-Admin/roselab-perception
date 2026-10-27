@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Zenoh router for ROS 2 {{ ros_distro }} (rmw_zenoh)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+EnvironmentFile=/etc/zenoh/rmw_zenoh_router.env
+ExecStart=/bin/bash -c 'source /opt/ros/{{ ros_distro }}/setup.bash && exec /opt/ros/{{ ros_distro }}/lib/rmw_zenoh_cpp/rmw_zenohd'
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

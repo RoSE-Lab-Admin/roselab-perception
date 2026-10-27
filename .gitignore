@@ -58,3 +58,6 @@ CATKIN_IGNORE
 
 # Python
 venv
+
+# Claude
+.claude/worktrees

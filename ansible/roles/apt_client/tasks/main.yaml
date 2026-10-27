@@ -1,0 +1,61 @@
+---
+- name: Configure apt to use the LAN proxy on Slade
+  when: apt_proxy_enabled | bool
+  block:
+    - name: Install proxy auto-detect hook
+      ansible.builtin.template:
+        src: apt-proxy-detect.j2
+        dest: /usr/local/bin/apt-proxy-detect
+        mode: '0755'
+
+    - name: Point apt at the hook
+      ansible.builtin.template:
+        src: 01mlss-proxy.j2
+        dest: /etc/apt/apt.conf.d/01mlss-proxy
+        mode: '0644'
+
+    - name: Check this host can reach the apt proxy
+      ansible.builtin.wait_for:
+        host: "{{ apt_proxy_url | urlsplit('hostname') }}"
+        port: "{{ apt_proxy_url | urlsplit('port') }}"
+        timeout: 3
+      register: apt_proxy_reach
+      ignore_errors: true
+
+    - name: Warn when the apt proxy is unreachable
+      ansible.builtin.debug:
+        msg: >-
+          {{ apt_proxy_url }} is unreachable from {{ inventory_hostname }}; apt will try to go direct.
+          Check apt-cacher-ng on Slade and the Windows/Hyper-V firewall (see README.md).
+      when: apt_proxy_reach is failed
+
+- name: Remove the proxy hook from hosts that no longer use it
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/apt.conf.d/01mlss-proxy
+    - /usr/local/bin/apt-proxy-detect
+  when: not apt_proxy_enabled | bool
+
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ packages.split() if packages is string else packages }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  when: packages | length > 0
+
+- name: Install local .deb files
+  when: deb_files | length > 0
+  block:
+    - name: Copy .deb files to the host
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/var/cache/mlss-debs/"
+        mode: '0644'
+      loop: "{{ deb_files }}"
+
+    - name: Install .deb files (dependencies come through the proxy)
+      ansible.builtin.apt:
+        deb: "/var/cache/mlss-debs/{{ item | basename }}"
+      loop: "{{ deb_files }}"
