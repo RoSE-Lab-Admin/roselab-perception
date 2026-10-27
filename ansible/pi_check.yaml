@@ -1,0 +1,109 @@
+---
+# Pi status report: time synced to Slade, Slade is the only NTP source, UTC timezone, apt auto-updates off.
+# Read-only. Fails if any reachable Pi fails a check (run after ./chrony_setup.sh).
+#   ./pi_check.sh
+#   ./pi_check.sh --limit wheelcam
+- name: Pi status check
+  hosts: pis
+  become: true
+  gather_facts: false
+  vars:
+    pi_check_max_offset_ms: 2.0
+  tasks:
+    - name: Probe chrony, timezone and apt update settings
+      ansible.builtin.shell: |
+        # Selected source and offset (CSV: refid,ref address,stratum,ref time,system time offset,...,leap status)
+        IFS=, read -r _ ref_addr _ _ offset_s _ _ _ _ _ _ _ _ leap <<< "$(chronyc -c -n tracking)"
+        echo "ref_addr=$ref_addr"
+        echo "offset_s=$offset_s"
+        echo "leap=$leap"
+        echo "selected=$(chronyc -c -n sources | awk -F, '$2 == "*" {print $3}')"
+        # Every source chrony knows about at runtime, plus every server/pool/peer line it was configured with
+        echo "runtime_sources=$(chronyc -c -n sources | cut -d, -f3 | sort -u | paste -sd' ')"
+        echo "configured_sources=$(cat /etc/chrony/chrony.conf /etc/chrony/conf.d/*.conf /etc/chrony/sources.d/*.sources \
+          /run/chrony-dhcp/*.sources 2>/dev/null | awk '$1 ~ /^(server|pool|peer)$/ {print $2}' | sort -u | paste -sd' ')"
+        echo "timesyncd=$(systemctl is-active systemd-timesyncd)"
+        echo "timezone=$(timedatectl show -p Timezone --value)"
+        eval "$(apt-config shell update_lists APT::Periodic::Update-Package-Lists unattended APT::Periodic::Unattended-Upgrade)"
+        echo "periodic=${update_lists:-0}/${unattended:-0}"
+        echo "timers_enabled=$(systemctl is-enabled apt-daily.timer apt-daily-upgrade.timer 2>/dev/null | paste -sd' ')"
+        echo "timers_active=$(systemctl is-active apt-daily.timer apt-daily-upgrade.timer | paste -sd' ')"
+        echo "uu_enabled=$(systemctl is-enabled unattended-upgrades.service 2>/dev/null || true)"
+        echo "uu_active=$(systemctl is-active unattended-upgrades.service)"
+      args:
+        executable: /bin/bash
+      check_mode: false  # read-only
+      register: pi_probe
+      changed_when: false
+      failed_when: false
+      ignore_unreachable: true
+
+    - name: Evaluate checks
+      vars:
+        s: "{{ dict(pi_probe.stdout_lines | default([]) | select('search', '=') | map('split', '=', 1)) }}"
+        offset_ms: "{{ (s.offset_s | default(0) | float * 1000) | round(3) }}"
+        synced: >-
+          {{ s.selected | default('') == lan_server_ip and s.leap | default('') == 'Normal'
+             and (offset_ms | float | abs) <= pi_check_max_offset_ms }}
+        slade_only: >-
+          {{ s.configured_sources | default('') == lan_server_ip and s.runtime_sources | default('') == lan_server_ip
+             and s.timesyncd | default('') != 'active' }}
+        utc: "{{ s.timezone | default('') in ['UTC', 'Etc/UTC'] }}"
+        updates_off: >-
+          {{ s.periodic | default('') == '0/0' and 'enabled' not in s.timers_enabled | default('enabled')
+             and s.timers_active | default('active') == 'inactive inactive'
+             and s.uu_enabled | default('') != 'enabled' and s.uu_active | default('') != 'active' }}
+      ansible.builtin.set_fact:
+        pi_report:
+          reachable: "{{ not pi_probe.unreachable | default(false) and s.leap is defined }}"
+          synced: "{{ synced | bool }}"
+          slade_only: "{{ slade_only | bool }}"
+          utc: "{{ utc | bool }}"
+          updates_off: "{{ updates_off | bool }}"
+          offset_ms: "{{ offset_ms if s.leap is defined else '-' }}"
+          timezone: "{{ s.timezone | default('-') }}"
+          notes: >-
+            {{ (['unreachable' if pi_probe.unreachable | default(false)
+                 else 'probe failed: ' ~ (pi_probe.stderr | default('', true) or pi_probe.msg | default('no output'))]
+                 if s.leap is not defined else [])
+               + ([] if synced | bool or s.leap is not defined else
+                  ['not synced to Slade (selected: ' ~ (s.selected or 'none') ~ ', leap: ' ~ s.leap ~ ', offset ' ~ offset_ms ~ ' ms)'])
+               + ([] if slade_only | bool or s.leap is not defined else
+                  ['NTP sources: configured [' ~ s.configured_sources ~ '], live [' ~ s.runtime_sources ~ '], timesyncd '
+                   ~ s.timesyncd])
+               + ([] if updates_off | bool or s.leap is not defined else
+                  ['auto-updates: periodic lists/upgrade ' ~ s.periodic ~ ', timers ' ~ s.timers_enabled ~ ' / '
+                   ~ s.timers_active ~ ', unattended-upgrades ' ~ (s.uu_enabled or 'absent') ~ ' / ' ~ s.uu_active]) }}
+
+    - name: Pi status summary
+      run_once: true
+      ansible.builtin.debug:
+        msg: "{{ summary.split('\n') }}"
+      vars:
+        summary: |-
+          Slade = {{ lan_server_ip }}, max offset {{ pi_check_max_offset_ms }} ms
+          {{ '%-14s %-6s %-6s %10s %-10s %-9s %-8s  %s' | format('HOST', 'STATUS', 'SYNCED', 'OFFSET_ms', 'SLADE_ONLY', 'TIMEZONE', 'AUTO_UPD', 'NOTES') }}
+          {% for h in ansible_play_hosts_all %}
+          {% set r = hostvars[h].pi_report %}
+          {% set ok = r.reachable and r.synced and r.slade_only and r.utc and r.updates_off %}
+          {{ '%-14s %-6s %-6s %10s %-10s %-9s %-8s  %s' | format(h,
+               'PASS' if ok else ('FAIL' if r.reachable else 'DOWN'),
+               ('yes' if r.synced else 'NO') if r.reachable else '-',
+               r.offset_ms,
+               ('yes' if r.slade_only else 'NO') if r.reachable else '-',
+               r.timezone,
+               ('off' if r.updates_off else 'ON') if r.reachable else '-',
+               r.notes | join('; ')) }}
+          {% endfor %}
+
+    - name: Fail if any Pi fails a check
+      run_once: true
+      vars:
+        bad_hosts: >-
+          {{ ansible_play_hosts_all | reject('in', ansible_play_hosts_all | map('extract', hostvars)
+             | selectattr('pi_report.reachable') | selectattr('pi_report.synced') | selectattr('pi_report.slade_only')
+             | selectattr('pi_report.utc') | selectattr('pi_report.updates_off')
+             | map(attribute='inventory_hostname') | list) | list }}
+      ansible.builtin.fail:
+        msg: "Pi check failed on: {{ bad_hosts | join(', ') }}"
+      when: bad_hosts | length > 0

@@ -10,6 +10,7 @@ Run everything from Slade, in this directory. `ansible.cfg` points at `mlss_inve
 | `./zenoh_setup.sh` | Install rmw_zenoh, start a Zenoh router on every ROS 2 host at boot, make Zenoh the default RMW |
 | `./chrony_setup.sh` | Install/configure chrony (Slade serves, everyone else follows Slade) and install the health monitor |
 | `./chrony_check.sh` | Time sync report for every host; exits non-zero if a reachable host is out of sync |
+| `./pi_check.sh` | Pi report: synced to Slade, Slade is the only NTP source, UTC, apt auto-updates off; exits non-zero on any failure |
 
 Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`, `--check --diff` (dry run), `--tags check`.
 
