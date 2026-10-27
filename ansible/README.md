@@ -11,6 +11,7 @@ Run everything from Slade, in this directory. `ansible.cfg` points at `mlss_inve
 | `./chrony_setup.sh` | Install/configure chrony (Slade serves, everyone else follows Slade) and install the health monitor |
 | `./chrony_check.sh` | Time sync report for every host; exits non-zero if a reachable host is out of sync |
 | `./pi_check.sh` | Pi + NUC report: synced to Slade, Slade is the only NTP source, UTC; exits non-zero on any failure |
+| `./zenoh_comm_test.sh` | ROS 2 talker/listener test between Slade and every reachable `ros2` host, both directions; prints received/sent per host and fails if any is not bidirectional (exit 4 = a host was unreachable) |
 | `./chrony_resync.sh` | Pre-collection gate: runs `pi_check`, and while it fails restarts chrony on Slade then the Pis/NUC (`ATTEMPTS`, default 5); exits non-zero if they never all pass |
 
 Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`, `--check --diff` (dry run), `--tags check`.
