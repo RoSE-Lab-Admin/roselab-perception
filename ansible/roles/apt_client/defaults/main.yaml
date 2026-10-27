@@ -3,6 +3,10 @@
 # Only the Pis need it; hosts with their own internet install directly.
 apt_proxy_enabled: "{{ inventory_hostname in groups['pis'] }}"
 apt_cache_valid_time: 3600
+# Turn off apt's background updates (apt-daily timers, unattended-upgrades) so packages only change through Ansible.
+apt_disable_auto_updates: "{{ inventory_hostname in groups['pis'] }}"
+# Seconds a host's clock may differ from the control node (Slade) before it is stepped to match.
+apt_clock_max_offset: 300
 # Packages to install: a list, or a space-separated string (e.g. -e "packages='htop iperf3'").
 packages: []
 # .deb files on the control node to push and install (vendor debs, things not in any repo).
