@@ -22,8 +22,8 @@ all:
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         wheelcam:
           ansible_host: 192.168.2.51
-          ansible_user: picam
-          # ansible_become_user: picam
+          ansible_user: rosey
+          # ansible_become_user: rosey
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         mastcam_front:
           ansible_host: 192.168.2.104
