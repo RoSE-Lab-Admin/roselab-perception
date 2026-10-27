@@ -25,11 +25,7 @@
     linked_ips: >-
       {{ zenoh_links.stdout_lines | map('regex_search', '\d+\.\d+\.\d+\.\d+')
          | select('string') | reject('match', '127\.') | unique }}
-    # mesh: everyone links to everyone. star: Slade links to everyone, others link to Slade.
-    expected_hosts: >-
-      {{ groups[zenoh_group] | difference([inventory_hostname])
-         if zenoh_topology == 'mesh' or inventory_hostname in groups['lan_server']
-         else zenoh_connect_hosts }}
+    expected_hosts: "{{ zenoh_peer_hosts }}"
     linked_hosts: >-
       {{ expected_hosts | map('extract', hostvars) | selectattr('ansible_host', 'in', linked_ips)
          | map(attribute='inventory_hostname') | list }}

@@ -37,10 +37,13 @@ ansible-playbook packages_install.yaml -e target=mastcam_front -e '{"deb_files":
 
 - Every host in the `ros2` inventory group runs `zenoh-router.service` (`rmw_zenohd`, enabled at boot, restarts on failure).
   ROS nodes connect to their local router; routers link to each other across the LAN.
-- Topology (`zenoh_topology` in `roles/zenoh/defaults/main.yaml`):
-  - `mesh` (the default): each router connects to every `ros2` host listed above it in the inventory. Every pair gets exactly one link, and
+- Current links (set in `group_vars/all.yaml`): every router links to Slade, and nuc and avionics also link directly to each other.
+  Each link carries traffic both ways. Everything else (e.g. wheelcam to nuc) is relayed through Slade.
+- Topology (`zenoh_topology`, role default in `roles/zenoh/defaults/main.yaml`):
+  - `star` (MLSS setting): every router connects only to Slade.
+  - `mesh` (role default): each router connects to every `ros2` host listed above it in the inventory. Every pair gets exactly one link, and
     rover-to-rover traffic does not depend on Slade.
-  - `star`: every router connects only to Slade.
+  - `zenoh_extra_links`: additional direct links on top of either topology, as `[host_a, host_b]` pairs (`host_b` connects to `host_a`).
 - `RMW_IMPLEMENTATION=rmw_zenoh_cpp` is set in `/etc/profile.d/ros2_rmw.sh` (login shells, SSH, and the `perception-*` services, which
   use `bash --login`) and in `/etc/environment` (desktop sessions).
 - Router config: `/etc/zenoh/rmw_zenoh_router.env` sets `ZENOH_CONFIG_OVERRIDE` on top of the rmw_zenoh package defaults.
