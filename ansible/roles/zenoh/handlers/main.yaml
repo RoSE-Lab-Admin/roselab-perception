@@ -1,0 +1,11 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Restart zenoh-router
+  ansible.builtin.systemd_service:
+    name: zenoh-router.service
+    state: restarted
+  ignore_errors: "{{ ansible_check_mode }}"
+  when: rmw_implementation == 'rmw_zenoh_cpp'

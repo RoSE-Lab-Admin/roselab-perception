@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Loaded after acng.conf, so these settings win.
+Port: {{ apt_proxy_port }}
+BindAddress: 0.0.0.0
+# Tunnel (not cache) HTTPS repositories, e.g. apt.foxglove.dev
+PassThroughPattern: .*:443$
+Offlinemode: {{ 1 if apt_proxy_offline_mode | bool else 0 }}

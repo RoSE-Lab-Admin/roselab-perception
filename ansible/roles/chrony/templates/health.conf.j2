@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Defaults for /usr/local/bin/chrony-health (flags override these).
+role={{ 'server' if inventory_hostname in groups['lan_server'] else 'client' }}
+server={{ chrony_ntp_server }}
+max_offset_ms={{ chrony_health_max_offset_ms }}
+max_rtt_ms={{ chrony_health_max_rtt_ms }}
+max_error_ms={{ chrony_health_max_error_ms }}

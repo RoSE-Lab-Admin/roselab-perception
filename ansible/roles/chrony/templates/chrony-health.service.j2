@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Check time sync against the LAN NTP server
+After=chrony.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/chrony-health --journal

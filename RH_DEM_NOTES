@@ -1,0 +1,41 @@
+Instructions for running a lidar scan and subsequent DEM creation.
+
+Use WSL Terminals only for this routine.
+TURN ON THE GANTRY COMPUTER VIA THE BREAKER BOX NEAR GROUND CONTROL.
+TURN OFF THE OPTITRACK LEDS!!! Otherwise they interfere with the lidar.
+
+Terminal 1:
+===========
+# Start the lidar, stream them over ros2
+ssh -i .ssh/id_rsa_ansible gantry@192.168.2.99 # SSH into gantry computer
+cd gantry_control
+./run_roselab_perception.sh
+
+Terminal 2:
+===========
+# Run remote bagging service
+ssh -i .ssh/id_rsa_ansible gantry@192.168.2.99 # SSH into gantry computer
+source roselab-perception/ros/install/setup.bash
+ros2 run gantry_services gantry_capture_service
+
+Terminal 3:
+===========
+# Runs the perception ground control service, which triggers/downloads all remote bags of data
+source roselab-perception/ros/install/setup.bash
+ros2 launch perception_ground_control launch_ground.py
+
+Terminal 4:
+===========
+# Triggers and downloads a single lidar scan
+source roselab-perception/ros/install/setup.bash
+cd roselab-perception/scripts
+./run_lidar_scan.sh
+
+Terminal 4:
+===========
+# After taking a lidar scan, you will see a downloaded bag at /mnt/e/perception-data/..., which you supply below as "<PATH TO BAG>"
+source roselab-perception/ros/install/setup.bash
+cd roselab-perception/scripts
+uv run ./run_dem_pipeline.sh <PATH TO BAG>
+
+# The DEM generator will output the results IN THE BAG DIRECTORY SPECIFIED, and uses a stale "+Z UP" vector for its statistics [WARNING].

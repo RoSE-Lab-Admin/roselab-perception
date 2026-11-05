@@ -1,0 +1,59 @@
+---
+- name: Install rmw_zenoh
+  ansible.builtin.apt:
+    name: "ros-{{ ros_distro }}-rmw-zenoh-cpp"
+    update_cache: true
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  when: rmw_implementation == 'rmw_zenoh_cpp'
+
+- name: Create Zenoh config directory
+  ansible.builtin.file:
+    path: /etc/zenoh
+    state: directory
+    mode: '0755'
+
+- name: Deploy Zenoh router environment (which routers to connect to)
+  ansible.builtin.template:
+    src: rmw_zenoh_router.env.j2
+    dest: /etc/zenoh/rmw_zenoh_router.env
+    mode: '0644'
+  notify: Restart zenoh-router
+
+- name: Deploy Zenoh router systemd unit
+  ansible.builtin.template:
+    src: zenoh-router.service.j2
+    dest: /etc/systemd/system/zenoh-router.service
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart zenoh-router
+
+- name: Flush handlers so the unit is loaded before enabling it
+  ansible.builtin.meta: flush_handlers
+
+- name: Start the Zenoh router on boot (or disable it when rolling back to another RMW)
+  ansible.builtin.systemd_service:
+    name: zenoh-router.service
+    enabled: "{{ rmw_implementation == 'rmw_zenoh_cpp' }}"
+    state: "{{ 'started' if rmw_implementation == 'rmw_zenoh_cpp' else 'stopped' }}"
+  ignore_errors: "{{ ansible_check_mode }}"  # unit only exists after a real run
+
+- name: Set default RMW for login shells and perception-* services (bash --login)
+  ansible.builtin.template:
+    src: ros2_rmw.sh.j2
+    dest: /etc/profile.d/ros2_rmw.sh
+    mode: '0644'
+
+- name: Set default RMW for desktop and SSH sessions
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^RMW_IMPLEMENTATION='
+    line: "RMW_IMPLEMENTATION={{ rmw_implementation }}"
+
+- name: Check Zenoh router health
+  ansible.builtin.include_tasks:
+    file: check.yaml
+    apply:
+      tags: [check]
+  when: rmw_implementation == 'rmw_zenoh_cpp' and not ansible_check_mode
+  tags: [check]

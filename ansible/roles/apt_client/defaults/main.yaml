@@ -1,0 +1,9 @@
+---
+# Point apt at the Slade cache (auto-falls back to direct when Slade is unreachable).
+# Only the Pis need it; hosts with their own internet install directly.
+apt_proxy_enabled: "{{ inventory_hostname in groups['pis'] }}"
+apt_cache_valid_time: 3600
+# Packages to install: a list, or a space-separated string (e.g. -e "packages='htop iperf3'").
+packages: []
+# .deb files on the control node to push and install (vendor debs, things not in any repo).
+deb_files: []

@@ -1,0 +1,18 @@
+---
+# Site-wide settings for the MLSS network. Role defaults live in roles/*/defaults/main.yaml;
+# override anything here (or per host in host_vars/<host>.yaml).
+
+# Slade hosts the LAN services: NTP and Zenoh hub for everyone, apt cache for the Pis.
+lan_server_ip: "{{ hostvars[groups['lan_server'][0]]['ansible_host'] }}"
+ros_distro: jazzy
+
+# ---- Offline package installs for the Pis (apt-cacher-ng on Slade) ----
+apt_proxy_url: "http://{{ lan_server_ip }}:3142"
+
+# ---- ROS 2 middleware ----
+# Set to rmw_fastrtps_cpp and re-run zenoh_setup.sh to roll back to FastDDS.
+rmw_implementation: rmw_zenoh_cpp
+
+# ---- Time sync ----
+chrony_ntp_server: "{{ lan_server_ip }}"
+chrony_serve_subnet: 192.168.2.0/24

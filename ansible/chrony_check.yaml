@@ -1,0 +1,59 @@
+---
+# Time sync health check across all hosts: offset, round trip to Slade, error bound, reachability.
+# Fails if any reachable host is out of sync (use as a pre-flight before data collection).
+#   ./chrony_check.sh
+#   ./chrony_check.sh --limit rosey
+- name: Time sync health check
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Run chrony-health
+      ansible.builtin.command: /usr/local/bin/chrony-health --json
+      check_mode: false  # read-only
+      register: chrony_health
+      changed_when: false
+      failed_when: false
+      ignore_unreachable: true
+
+    - name: Parse result
+      ansible.builtin.set_fact:
+        chrony_report: >-
+          {{ chrony_health.stdout | from_json if (chrony_health.stdout | default('')).startswith('{')
+             else {'status': 'DOWN', 'role': '', 'warnings': [], 'metrics': {}, 'failures': ['unreachable']}
+             if chrony_health.unreachable | default(false)
+             else {'status': 'ERROR', 'role': '', 'warnings': [], 'metrics': {},
+                   'failures': [chrony_health.stderr | default('', true) or chrony_health.msg | default('no output')]} }}
+
+    - name: Time sync summary
+      run_once: true
+      ansible.builtin.debug:
+        msg: "{{ summary.split('\n') }}"
+      vars:
+        summary: |-
+          {{ '%-14s %-6s %10s %8s %8s %10s %5s  %s' | format('HOST', 'STATUS', 'OFFSET_ms', 'RTT_ms', 'ERR_ms', 'JITTER_ms', 'REACH', 'NOTES') }}
+          {% for h in ansible_play_hosts_all %}
+          {% set r = hostvars[h].chrony_report %}
+          {% set m = r.metrics %}
+          {% set notes = r.failures + r.warnings %}
+          {% if r.role == 'server' %}
+          {% set notes = ['NTP server, clients: ' ~ (m.clients | map(attribute='address') | join(' ') or 'none')] + notes %}
+          {% endif %}
+          {{ '%-14s %-6s %10s %8s %8s %10s %5s  %s' | format(h, r.status,
+               '%+.3f' | format(m.offset_ms) if m.offset_ms is defined else '-',
+               '%.3f' | format(m.rtt_ms) if m.rtt_ms is defined else '-',
+               '%.3f' | format(m.max_error_ms) if m.max_error_ms is defined else '-',
+               '%.3f' | format(m.jitter_ms) if m.jitter_ms is defined else '-',
+               m.reach | default('-'), notes | join('; ')) }}
+          {% endfor %}
+
+    - name: Fail if any reachable host is out of sync
+      run_once: true
+      vars:
+        bad_hosts: >-
+          {{ ansible_play_hosts_all | map('extract', hostvars)
+             | selectattr('chrony_report.status', 'in', ['FAIL', 'ERROR'])
+             | map(attribute='inventory_hostname') | list }}
+      ansible.builtin.fail:
+        msg: "Time sync check failed on: {{ bad_hosts | join(', ') }}"
+      when: bad_hosts | length > 0

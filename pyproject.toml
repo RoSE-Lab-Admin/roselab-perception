@@ -1,0 +1,24 @@
+[project]
+name = "roselab-perception"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ryan Hartzell", email = "ryan_hartzell@mines.edu" }
+]
+dependencies = [
+    "matplotlib>=3.11.2",
+    "open3d>=0.20.0",
+    "opencv-python>=5.0.0.93",
+    "pyyaml>=6.0.3",
+    "rosbags>=0.11.9",
+    "rosbags-image>=0.10.4",
+    "tqdm>=4.70.1",
+]
+
+[project.scripts]
+roselab-perception = "roselab_perception:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"

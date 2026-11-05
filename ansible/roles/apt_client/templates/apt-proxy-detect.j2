@@ -1,0 +1,8 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# apt Proxy-Auto-Detect hook: use the Slade apt cache when it answers, otherwise connect directly.
+if timeout 1 bash -c '</dev/tcp/{{ apt_proxy_url | urlsplit("hostname") }}/{{ apt_proxy_url | urlsplit("port") }}' 2>/dev/null; then
+  echo "{{ apt_proxy_url }}"
+else
+  echo DIRECT
+fi

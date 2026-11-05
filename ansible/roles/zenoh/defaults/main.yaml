@@ -1,0 +1,14 @@
+---
+# Hosts that get a Zenoh router (inventory group).
+zenoh_group: ros2
+# rmw_zenoh sessions always look for their router on localhost:7447, so only change this
+# if every host also overrides its session config.
+zenoh_router_port: 7447
+# mesh: each router connects to every zenoh_group host listed above it in the inventory
+#       (every pair linked once, no single point of failure).
+# star: every router connects only to Slade (all inter-host traffic goes through Slade).
+zenoh_topology: mesh
+zenoh_connect_hosts: >-
+  {{ (groups['lan_server'] | difference([inventory_hostname])) if zenoh_topology == 'star'
+     else groups[zenoh_group][:groups[zenoh_group].index(inventory_hostname)] }}
+zenoh_log_level: zenoh=info

@@ -1,0 +1,6 @@
+---
+- name: Restart apt-cacher-ng
+  ansible.builtin.systemd_service:
+    name: apt-cacher-ng
+    state: restarted
+  ignore_errors: "{{ ansible_check_mode }}"

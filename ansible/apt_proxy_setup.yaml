@@ -1,0 +1,8 @@
+---
+# Slade's apt cache: the Pis (no internet) install packages through it.
+# Imported by every playbook that installs packages.
+- name: LAN apt proxy (apt-cacher-ng on Slade)
+  hosts: lan_server
+  become: true
+  roles:
+    - apt_proxy
