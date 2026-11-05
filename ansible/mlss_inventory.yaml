@@ -22,8 +22,8 @@ all:
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         wheelcam:
           ansible_host: 192.168.2.51
-          ansible_user: picam
-          # ansible_become_user: picam
+          ansible_user: rosey
+          # ansible_become_user: rosey
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
         mastcam_front:
           ansible_host: 192.168.2.104
@@ -42,3 +42,21 @@ all:
           ansible_user: gantry_lattepanda
           # ansible_become_user: gantry_lattepanda
           ansible_ssh_private_key_file: ~/.ssh/id_rsa_ansible
+
+    # Functional groups (hosts are defined above; listing them here only adds membership)
+    lan_server: # Slade: apt cache for the Pis, NTP server, Zenoh hub
+      hosts:
+        slade:
+    pis: # No internet: apt installs go through Slade's cache (apt-cacher-ng)
+      hosts:
+        avionics:
+        wheelcam:
+        mastcam_front:
+    ros2: # Hosts that run ROS 2 nodes. Order matters: each Zenoh router connects to the routers listed above it.
+      hosts:
+        slade:
+        nuc:
+        avionics:
+        mastcam_front:
+        wheelcam:
+        miniforum:
