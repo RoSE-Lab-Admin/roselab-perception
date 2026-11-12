@@ -1,6 +1,13 @@
 ---
 # Hosts that get a Zenoh router (inventory group).
 zenoh_group: ros2
+# rmw_zenoh release every host runs, installed through Slade's cache and held there. Only the upstream part:
+# the build-date suffix (".20260915.171026") differs between amd64 and arm64 builds of the same release.
+# To upgrade: change this, re-run ./zenoh_setup.sh, then restart running ROS nodes.
+zenoh_rmw_version: 0.2.11-1noble
+zenoh_packages:
+  - ros-{{ ros_distro }}-rmw-zenoh-cpp
+  - ros-{{ ros_distro }}-zenoh-cpp-vendor  # the Zenoh library itself; rmw-zenoh-cpp depends on it unversioned
 # rmw_zenoh sessions always look for their router on localhost:7447, so only change this
 # if every host also overrides its session config.
 zenoh_router_port: 7447
@@ -8,7 +15,22 @@ zenoh_router_port: 7447
 #       (every pair linked once, no single point of failure).
 # star: every router connects only to Slade (all inter-host traffic goes through Slade).
 zenoh_topology: mesh
+# Extra direct router links on top of the topology, as [host_a, host_b] pairs. Each pair gets one
+# link (host_b connects to host_a); traffic flows both ways over it.
+zenoh_extra_links: []
+# List order is kept stable (no set filters like union/difference) so the rendered config, and the
+# router, only change when the topology does.
 zenoh_connect_hosts: >-
-  {{ (groups['lan_server'] | difference([inventory_hostname])) if zenoh_topology == 'star'
-     else groups[zenoh_group][:groups[zenoh_group].index(inventory_hostname)] }}
+  {{ (((groups['lan_server'] | reject('eq', inventory_hostname) | list) if zenoh_topology == 'star'
+       else groups[zenoh_group][:groups[zenoh_group].index(inventory_hostname)])
+      + (zenoh_extra_links | selectattr(1, 'eq', inventory_hostname) | map(attribute=0) | list))
+     | unique }}
+# Every host this router should be linked to, whichever side connects (used by the health check).
+zenoh_peer_hosts: >-
+  {{ (((groups[zenoh_group] | reject('eq', inventory_hostname) | list)
+       if zenoh_topology == 'mesh' or inventory_hostname in groups['lan_server']
+       else zenoh_connect_hosts)
+      + (zenoh_extra_links | select('contains', inventory_hostname) | flatten
+         | reject('eq', inventory_hostname) | list))
+     | unique }}
 zenoh_log_level: zenoh=info

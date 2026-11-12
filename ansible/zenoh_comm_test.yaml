@@ -1,0 +1,128 @@
+---
+# End-to-end ROS 2 test across the Zenoh star: for every reachable ros2 host H, a demo_nodes_cpp talker on H publishes
+# /mlss_test/H_to_slade (Slade listens) and a talker on Slade publishes /mlss_test/slade_to_H (H listens).
+# Listeners start first, talkers run zenoh_test_seconds at 1 Hz, then the report shows received/sent each way.
+# Fails if any reachable host is not heard in both directions. Installs ros-<distro>-demo-nodes-cpp where missing.
+#   ./zenoh_comm_test.sh
+#   ./zenoh_comm_test.sh -e zenoh_test_seconds=30 -e zenoh_test_domain_id=1
+- name: Zenoh star communication test (demo talker/listener)
+  hosts: ros2
+  gather_facts: false
+  vars:
+    zenoh_test_seconds: 20
+    # Every node in the test uses this domain, so the test checks the network rather than per-host shell setup.
+    zenoh_test_domain_id: 0
+    # Directions with fewer than this share of messages received are flagged LOSSY (the first ~1-2 s go to discovery).
+    zenoh_test_min_ratio: 0.8
+    hub: "{{ groups['lan_server'][0] }}"
+  tasks:
+    - name: Check demo_nodes_cpp is installed
+      ansible.builtin.stat:
+        path: /opt/ros/{{ ros_distro }}/lib/demo_nodes_cpp/talker
+      register: demo_nodes
+
+    - name: Install demo_nodes_cpp (through Slade's cache)
+      ansible.builtin.apt:
+        name: ros-{{ ros_distro }}-demo-nodes-cpp
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+      when: not demo_nodes.stat.exists
+
+    - name: Read the ROS_DOMAIN_ID this host's shells set (for the report)
+      ansible.builtin.shell: >-
+        grep -hoE '^\s*export\s+ROS_DOMAIN_ID=[0-9]+' ~/.bashrc /etc/environment /etc/profile.d/*.sh 2>/dev/null
+        | tail -1 | grep -oE '[0-9]+$' || echo unset
+      register: configured_domain
+      changed_when: false
+      check_mode: false
+
+    # Hosts reachable so far; Slade talks to and listens for each of these.
+    - name: Run talkers and listeners on every host at once
+      vars:
+        peers: "{{ ansible_play_hosts | reject('eq', hub) | list }}"
+        # (node, topic) pairs this host runs
+        listen_topics: "{{ peers | map('regex_replace', '$', '_to_slade') | list if inventory_hostname == hub else ['slade_to_' ~ inventory_hostname] }}"
+        talk_topics: "{{ peers | map('regex_replace', '^', 'slade_to_') | list if inventory_hostname == hub else [inventory_hostname ~ '_to_slade'] }}"
+      ansible.builtin.shell: |
+        source /opt/ros/{{ ros_distro }}/setup.bash
+        export RMW_IMPLEMENTATION=rmw_zenoh_cpp ROS_DOMAIN_ID={{ zenoh_test_domain_id }}
+        export RCUTILS_LOGGING_USE_STDOUT=1 RCUTILS_LOGGING_BUFFERED_STREAM=0
+        bin=/opt/ros/{{ ros_distro }}/lib/demo_nodes_cpp
+        dir=$(mktemp -d)
+        # Listeners start now and outlast the talkers, which start 5 s later so every listener is up first.
+        for t in {{ listen_topics | join(' ') }}; do
+          timeout -s INT {{ zenoh_test_seconds | int + 10 }} "$bin/listener" --ros-args -r chatter:=/mlss_test/$t \
+            -r __node:=mlss_listener_$t > "$dir/listener.$t" 2>&1 &
+        done
+        sleep 5
+        for t in {{ talk_topics | join(' ') }}; do
+          timeout -s INT {{ zenoh_test_seconds }} "$bin/talker" --ros-args -r chatter:=/mlss_test/$t \
+            -r __node:=mlss_talker_$t > "$dir/talker.$t" 2>&1 &
+        done
+        wait
+        for t in {{ listen_topics | join(' ') }}; do echo "received.$t=$(grep -c 'I heard' "$dir/listener.$t")"; done
+        for t in {{ talk_topics | join(' ') }}; do echo "sent.$t=$(grep -c 'Publishing' "$dir/talker.$t")"; done
+        rm -rf "$dir"
+      args:
+        executable: /bin/bash
+      async: "{{ zenoh_test_seconds | int + 60 }}"
+      poll: 0
+      register: comm_job
+      changed_when: false
+
+    - name: Wait for the test to finish
+      ansible.builtin.async_status:
+        jid: "{{ comm_job.ansible_job_id }}"
+      register: comm_result
+      until: comm_result.finished
+      retries: "{{ (zenoh_test_seconds | int + 60) // 5 }}"
+      delay: 5
+      changed_when: false
+
+    - name: Communication report
+      run_once: true
+      vars:
+        counts: >-
+          {{ dict(ansible_play_hosts | map('extract', hostvars, ['comm_result', 'stdout_lines'])
+                  | flatten | select('search', '=') | map('split', '=', 1)) }}
+        targets: "{{ ansible_play_hosts_all | reject('eq', hub) | list }}"
+        report: |-
+          Hub {{ hub }}, ROS_DOMAIN_ID {{ zenoh_test_domain_id }} for the test, {{ zenoh_test_seconds }} s at 1 Hz each way
+          {{ '%-14s %-8s %-14s %-14s %-14s  %s' | format('HOST', 'DOMAIN*', 'HOST->SLADE', 'SLADE->HOST', 'RESULT', 'NOTES') }}
+          {% for h in targets %}
+          {% if h not in ansible_play_hosts %}
+          {{ '%-14s %-8s %-14s %-14s %-14s  %s' | format(h, '-', '-', '-', 'DOWN', 'unreachable or failed before the test') }}
+          {% else %}
+          {% set up_r = counts['received.' ~ h ~ '_to_slade'] | default(0) | int %}
+          {% set up_s = counts['sent.' ~ h ~ '_to_slade'] | default(0) | int %}
+          {% set dn_r = counts['received.slade_to_' ~ h] | default(0) | int %}
+          {% set dn_s = counts['sent.slade_to_' ~ h] | default(0) | int %}
+          {% set dom = hostvars[h].configured_domain.stdout | default('unset') %}
+          {% set result = 'BIDIRECTIONAL' if up_r > 0 and dn_r > 0 else ('ONLY ->SLADE' if up_r > 0 else ('ONLY SLADE->' if dn_r > 0 else 'NO TRAFFIC')) %}
+          {% set notes = [] %}
+          {% if result == 'BIDIRECTIONAL' and (up_r < up_s * zenoh_test_min_ratio or dn_r < dn_s * zenoh_test_min_ratio) %}{% set _ = notes.append('LOSSY') %}{% endif %}
+          {% if dom not in ['unset', zenoh_test_domain_id | string] %}{% set _ = notes.append('shells use ROS_DOMAIN_ID=' ~ dom ~ ': its nodes will not see the others') %}{% endif %}
+          {{ '%-14s %-8s %-14s %-14s %-14s  %s' | format(h, dom, up_r ~ '/' ~ up_s, dn_r ~ '/' ~ dn_s, result, notes | join('; ')) }}
+          {% endif %}
+          {% endfor %}
+          * DOMAIN: ROS_DOMAIN_ID set by the host's ~/.bashrc, /etc/environment or /etc/profile.d (unset = 0). Counts are received/sent.
+        # Reachable hosts that were not heard both ways (DOWN hosts are reported but don't fail the test).
+        failed_hosts: >-
+          {% for h in targets if h in ansible_play_hosts
+               and ((counts['received.' ~ h ~ '_to_slade'] | default(0) | int) == 0
+                    or (counts['received.slade_to_' ~ h] | default(0) | int) == 0) %}{{ h }} {% endfor %}
+      ansible.builtin.set_fact:
+        comm_report: "{{ report }}"
+        comm_failed: "{{ (failed_hosts or '').split() }}"
+
+    - name: Show report
+      run_once: true
+      ansible.builtin.debug:
+        msg: "{{ comm_report.split('\n') }}"
+
+    - name: Fail unless every host is heard in both directions
+      run_once: true
+      ansible.builtin.fail:
+        msg: "Not heard in both directions: {{ comm_failed | join(', ') }}"
+      when: comm_failed | length > 0

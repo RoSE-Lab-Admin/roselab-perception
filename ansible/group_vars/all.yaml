@@ -12,6 +12,10 @@ apt_proxy_url: "http://{{ lan_server_ip }}:3142"
 # ---- ROS 2 middleware ----
 # Set to rmw_fastrtps_cpp and re-run zenoh_setup.sh to roll back to FastDDS.
 rmw_implementation: rmw_zenoh_cpp
+# Every router links to Slade; nuc and avionics also link directly to each other.
+zenoh_topology: star
+zenoh_extra_links:
+  - [nuc, avionics]
 
 # ---- Time sync ----
 chrony_ntp_server: "{{ lan_server_ip }}"

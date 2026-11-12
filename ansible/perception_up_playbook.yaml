@@ -65,7 +65,8 @@
           # become_user: "{{ ansible_user }}"
           workdir: "/home/{{ ansible_user }}/CubeRover"
           source_ws: "/home/{{ ansible_user }}/CubeRover"
-          command: "ros2 launch roseybot_control joystick.launch.py"
+          # CubeRover branch dev-fitRoseyRefactored moved the launch files from roseybot_control to rosey_bringup
+          command: "ros2 launch rosey_bringup joystick.launch.py"
 
       slade:
         - name: ground_optitrack_pose

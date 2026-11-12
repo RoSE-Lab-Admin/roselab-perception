@@ -52,7 +52,7 @@ all:
         avionics:
         wheelcam:
         mastcam_front:
-    ros2: # Hosts that run ROS 2 nodes. Order matters: each Zenoh router connects to the routers listed above it.
+    ros2: # Hosts that run ROS 2 nodes. Zenoh links are set in group_vars/all.yaml (with zenoh_topology: mesh, order matters).
       hosts:
         slade:
         nuc:

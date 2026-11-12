@@ -55,6 +55,11 @@
       when: chrony_disable_default_sources | bool
       notify: Restart chrony
 
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ chrony_timezone }}"
+  when: chrony_timezone | length > 0
+
 - name: Enable and start chrony
   ansible.builtin.systemd_service:
     name: chrony

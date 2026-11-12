@@ -1,4 +1,52 @@
 ---
+# Pis have no RTC and no internet, so until chrony is set up their clock can be weeks behind. apt then
+# rejects repo indexes from the "future" and Ansible treats a stale index as fresh, so installs 404 on
+# packages the repo has since replaced. Step the clock to the control node's (Slade's) time first.
+- name: Read this host's clock
+  ansible.builtin.command: date +%s
+  register: apt_client_host_clock
+  changed_when: false
+  check_mode: false
+
+- name: Set the clock from Slade when it is far off
+  vars:
+    control_time: "{{ lookup('pipe', 'date +%s') }}"
+  ansible.builtin.command: date -u -s "@{{ control_time }}"
+  when: (control_time | int - apt_client_host_clock.stdout | int) | abs > apt_clock_max_offset
+
+- name: Turn off automatic apt updates
+  when: apt_disable_auto_updates | bool
+  block:
+    - name: Override the APT::Periodic settings (99 sorts after 10periodic and 20auto-upgrades)
+      ansible.builtin.copy:
+        content: |
+          // Managed by Ansible (apt_client role): no background apt activity, update through Ansible.
+          APT::Periodic::Update-Package-Lists "0";
+          APT::Periodic::Download-Upgradeable-Packages "0";
+          APT::Periodic::AutocleanInterval "0";
+          APT::Periodic::Unattended-Upgrade "0";
+        dest: /etc/apt/apt.conf.d/99mlss-no-auto-updates
+        mode: '0644'
+
+    - name: Stop and disable the apt-daily timers
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - apt-daily.timer
+        - apt-daily-upgrade.timer
+
+    - name: Look for unattended-upgrades
+      ansible.builtin.service_facts:
+
+    - name: Stop and disable unattended-upgrades
+      ansible.builtin.systemd_service:
+        name: unattended-upgrades.service
+        state: stopped
+        enabled: false
+      when: "'unattended-upgrades.service' in ansible_facts.services"
+
 - name: Configure apt to use the LAN proxy on Slade
   when: apt_proxy_enabled | bool
   block:

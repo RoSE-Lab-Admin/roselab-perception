@@ -10,6 +10,9 @@ Run everything from Slade, in this directory. `ansible.cfg` points at `mlss_inve
 | `./zenoh_setup.sh` | Install rmw_zenoh, start a Zenoh router on every ROS 2 host at boot, make Zenoh the default RMW |
 | `./chrony_setup.sh` | Install/configure chrony (Slade serves, everyone else follows Slade) and install the health monitor |
 | `./chrony_check.sh` | Time sync report for every host; exits non-zero if a reachable host is out of sync |
+| `./pi_check.sh` | Pi + NUC report: synced to Slade, Slade is the only NTP source, UTC; exits non-zero on any failure |
+| `./zenoh_comm_test.sh` | ROS 2 talker/listener test between Slade and every reachable `ros2` host, both directions; prints received/sent per host and fails if any is not bidirectional (exit 4 = a host was unreachable) |
+| `./chrony_resync.sh` | Pre-collection gate: runs `pi_check`, and while it fails restarts chrony on Slade then the Pis/NUC (`ATTEMPTS`, default 5); exits non-zero if they never all pass |
 
 Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`, `--check --diff` (dry run), `--tags check`.
 
@@ -18,8 +21,11 @@ Every wrapper passes extra arguments to `ansible-playbook`, e.g. `--limit rosey`
 The Pis (`pis` inventory group) have no internet; Slade, the NUC and the gantry PCs do. Slade runs **apt-cacher-ng** on port 3142
 (`roles/apt_proxy`). Each Pi gets an apt hook (`roles/apt_client`) that sends apt traffic through Slade when it is reachable and goes
 direct otherwise. So plain `apt install` works on the Pis too, with correct architecture and dependencies, and each package is
-downloaded once for all of them. Hosts outside `pis` install straight from the internet. Move a host in or out of the group and re-run
-any setup playbook to add or remove the hook.
+downloaded once for all of them. The `ros2` hosts (including Slade itself and the NUC) use the hook too, so every ROS host gets the
+same cached packages; other hosts install straight from the internet. Move a host in or out of these groups and re-run any setup
+playbook to add or remove the hook. The Pis (and the NUC, via `host_vars/nuc.yaml`) also have apt's background updates turned off (apt-daily timers,
+unattended-upgrades, `/etc/apt/apt.conf.d/99mlss-no-auto-updates`), so packages only change through these playbooks
+(`apt_disable_auto_updates`).
 
 ```bash
 ./packages_install.sh rosey htop iperf3            # group or host name from the inventory
@@ -37,14 +43,21 @@ ansible-playbook packages_install.yaml -e target=mastcam_front -e '{"deb_files":
 
 - Every host in the `ros2` inventory group runs `zenoh-router.service` (`rmw_zenohd`, enabled at boot, restarts on failure).
   ROS nodes connect to their local router; routers link to each other across the LAN.
-- Topology (`zenoh_topology` in `roles/zenoh/defaults/main.yaml`):
-  - `mesh` (the default): each router connects to every `ros2` host listed above it in the inventory. Every pair gets exactly one link, and
+- Current links (set in `group_vars/all.yaml`): every router links to Slade, and nuc and avionics also link directly to each other.
+  Each link carries traffic both ways. Everything else (e.g. wheelcam to nuc) is relayed through Slade.
+- Topology (`zenoh_topology`, role default in `roles/zenoh/defaults/main.yaml`):
+  - `star` (MLSS setting): every router connects only to Slade.
+  - `mesh` (role default): each router connects to every `ros2` host listed above it in the inventory. Every pair gets exactly one link, and
     rover-to-rover traffic does not depend on Slade.
-  - `star`: every router connects only to Slade.
+  - `zenoh_extra_links`: additional direct links on top of either topology, as `[host_a, host_b]` pairs (`host_b` connects to `host_a`).
 - `RMW_IMPLEMENTATION=rmw_zenoh_cpp` is set in `/etc/profile.d/ros2_rmw.sh` (login shells, SSH, and the `perception-*` services, which
   use `bash --login`) and in `/etc/environment` (desktop sessions).
 - Router config: `/etc/zenoh/rmw_zenoh_router.env` sets `ZENOH_CONFIG_OVERRIDE` on top of the rmw_zenoh package defaults.
-- Health: `./zenoh_setup.sh --tags check` prints, for each host, which routers it is linked to, and warns about mixed rmw_zenoh versions.
+- **One release everywhere:** every host installs rmw_zenoh and the Zenoh library (`zenoh-cpp-vendor`) at `zenoh_rmw_version`
+  (`roles/zenoh/defaults/main.yaml`) through Slade's cache, and both packages are held (`apt-mark showhold`). amd64 and arm64 builds of
+  a release differ only in the build-date suffix. To upgrade: change the version, re-run `./zenoh_setup.sh`, restart running ROS nodes.
+- Health: `./zenoh_setup.sh --tags check` waits up to 20 s for links, then prints, for each host, which routers it is linked to, and
+  warns about hosts not on `zenoh_rmw_version`.
   On a host: `systemctl status zenoh-router`, `journalctl -u zenoh-router -f`.
 - **Cutover:** Zenoh and FastDDS nodes can't see each other. Switch every ROS host in one run, and restart running nodes.
 - **Roll back to FastDDS:** set `rmw_implementation: rmw_fastrtps_cpp` in `group_vars/all.yaml` and re-run `./zenoh_setup.sh`.
@@ -55,6 +68,7 @@ ansible-playbook packages_install.yaml -e target=mastcam_front -e '{"deb_files":
 - Slade (`lan_server` group) serves `chrony_serve_subnet` from `conf.d/serve-rover.conf`.
 - Clients use `/etc/chrony/sources.d/mlss_ntp.sources` (`server 192.168.2.10 iburst prefer minpoll 4 maxpoll 6`). The stock internet
   pools are commented out, so every host follows Slade only. The role also sets `makestep 1 -1` and keeps sync logs in `/var/log/chrony`.
+- The Pis and the NUC (`host_vars/nuc.yaml`) are set to UTC (`chrony_timezone`); other hosts keep their timezone.
 - **Runtime monitoring:** `chrony-health.timer` runs `/usr/local/bin/chrony-health` every 60 s on every host. Failures are logged at
   error level and mark the unit failed:
   ```bash
@@ -76,8 +90,16 @@ Slade runs WSL2 in mirrored networking mode. LAN hosts must reach these ports on
 - TCP 7447 (Zenoh)
 - UDP 123 (NTP)
 
-If the Hyper-V firewall blocks a port, allow it from an admin PowerShell on Windows:
+In mirrored mode, inbound LAN traffic to WSL goes through the Hyper-V firewall, which blocks it by default. Allow the ports once,
+from an admin PowerShell on Windows:
 ```powershell
+$wsl = '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}'
 New-NetFirewallHyperVRule -Name MLSS-WSL-TCP -DisplayName "MLSS apt/zenoh" -Direction Inbound `
-  -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 3142,7447
+  -VMCreatorId $wsl -Protocol TCP -LocalPorts 3142,7447 -Action Allow
+New-NetFirewallHyperVRule -Name MLSS-WSL-NTP -DisplayName "MLSS NTP" -Direction Inbound `
+  -VMCreatorId $wsl -Protocol UDP -LocalPorts 123 -Action Allow
+Get-NetFirewallHyperVRule -VMCreatorId $wsl | Format-Table Name,Protocol,LocalPorts,Action   # verify
 ```
+Windows and WSL share ports in mirrored mode. If the Windows Time service already holds UDP 123
+(`Get-NetUDPEndpoint -LocalPort 123`), chronyd on Slade can't serve NTP. Stop that service with
+`Stop-Service w32time; Set-Service w32time -StartupType Disabled`, since chrony keeps the clock in sync instead.

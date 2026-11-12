@@ -1,0 +1,59 @@
+---
+# Restart chrony on Slade, then on every reachable checked host, and wait for them to sync.
+# Run by chrony_resync.sh whenever pi_check.yaml fails; safe to run on its own.
+- name: Restart the NTP server (Slade)
+  hosts: lan_server
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Restart chrony
+      ansible.builtin.systemd_service:
+        name: chrony
+        state: restarted
+
+    # chronyd only tries to open UDP 123 at startup. If Windows holds the port (mirrored networking), it keeps
+    # running as a client but serves nobody.
+    - name: Check chronyd is serving on UDP 123
+      ansible.builtin.shell: ss -Hulpn | grep -E ':123\s.*chronyd'
+      register: ntp_socket
+      until: ntp_socket.rc == 0
+      retries: 5
+      delay: 1
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Ask Windows who holds UDP 123
+      ansible.builtin.shell: >-
+        powershell.exe -NoProfile -Command 'Get-NetUDPEndpoint -LocalPort 123 -ErrorAction SilentlyContinue |
+        ForEach-Object { (Get-Process -Id $_.OwningProcess).ProcessName }; "w32time: " + (Get-Service w32time).Status'
+      become: false  # Windows interop runs as the login user
+      register: windows_port_owner
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: ntp_socket.rc != 0
+
+    - name: Warn that Slade is not serving NTP
+      ansible.builtin.debug:
+        msg:
+          - "chronyd on Slade could not open UDP 123, so no client can sync. Windows reports: {{
+             windows_port_owner.stdout_lines | default([]) | join(', ') or 'nothing (port may have been released, will retry)' }}"
+          - "If w32time is Running, from an admin PowerShell: Stop-Service w32time; Set-Service w32time -StartupType Disabled"
+      when: ntp_socket.rc != 0
+
+- name: Restart chrony on the clients and wait for sync
+  hosts: "{{ target | default('pis:nuc') }}"
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Restart chrony
+      ansible.builtin.systemd_service:
+        name: chrony
+        state: restarted
+      ignore_unreachable: true
+
+    - name: Wait up to 60 s for the offset to drop below 2 ms
+      ansible.builtin.command: chronyc waitsync 12 0.002 0 5
+      changed_when: false
+      failed_when: false

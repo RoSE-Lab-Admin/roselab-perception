@@ -8,6 +8,8 @@ chrony_makestep: "1 -1"
 chrony_disable_default_sources: true
 # Log tracking/measurements/statistics to /var/log/chrony for post-campaign analysis.
 chrony_log_stats: true
+# Timezone to set; UTC on the Pis so their logs line up. '' leaves a host's timezone alone.
+chrony_timezone: "{{ 'UTC' if inventory_hostname in groups['pis'] else '' }}"
 
 # Server (lan_server group) settings
 chrony_local_stratum: 10

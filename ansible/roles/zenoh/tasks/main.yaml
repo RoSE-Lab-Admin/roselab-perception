@@ -1,9 +1,19 @@
 ---
-- name: Install rmw_zenoh
+- name: Install the pinned rmw_zenoh release (same on every host and architecture)
   ansible.builtin.apt:
-    name: "ros-{{ ros_distro }}-rmw-zenoh-cpp"
+    name: "{{ zenoh_packages | map('regex_replace', '$', '=' ~ zenoh_rmw_version ~ '.*') | list }}"
     update_cache: true
     cache_valid_time: "{{ apt_cache_valid_time }}"
+    allow_downgrade: true
+    allow_change_held_packages: true
+  when: rmw_implementation == 'rmw_zenoh_cpp'
+  notify: Restart zenoh-router
+
+- name: Hold the Zenoh packages so a manual apt upgrade can't move one host off the release
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ zenoh_packages }}"
   when: rmw_implementation == 'rmw_zenoh_cpp'
 
 - name: Create Zenoh config directory

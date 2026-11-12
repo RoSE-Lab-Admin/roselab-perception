@@ -6,11 +6,19 @@
   check_mode: false
   failed_when: zenoh_router_active.stdout != 'active'
 
+# Prints the peer IP of each link. Routers retry their connects every few seconds, so right after a
+# restart wait up to 20 s for every expected peer that is up (in this run and reachable) before reporting.
 - name: List established router-to-router TCP links
   ansible.builtin.shell: >-
     ss -Htn state established '( sport = :{{ zenoh_router_port }} or dport = :{{ zenoh_router_port }} )'
-    | awk '{print $4}'
+    | awk '{print $4}' | sed -E 's/^\[?(::ffff:)?//; s/\]?:[0-9]+$//'
   register: zenoh_links
+  until: >-
+    zenoh_peer_hosts | intersect(ansible_play_hosts) | map('extract', hostvars, 'ansible_host')
+    | difference(zenoh_links.stdout_lines) | length == 0
+  retries: 10
+  delay: 2
+  failed_when: false
   changed_when: false
   check_mode: false
 
@@ -25,11 +33,7 @@
     linked_ips: >-
       {{ zenoh_links.stdout_lines | map('regex_search', '\d+\.\d+\.\d+\.\d+')
          | select('string') | reject('match', '127\.') | unique }}
-    # mesh: everyone links to everyone. star: Slade links to everyone, others link to Slade.
-    expected_hosts: >-
-      {{ groups[zenoh_group] | difference([inventory_hostname])
-         if zenoh_topology == 'mesh' or inventory_hostname in groups['lan_server']
-         else zenoh_connect_hosts }}
+    expected_hosts: "{{ zenoh_peer_hosts }}"
     linked_hosts: >-
       {{ expected_hosts | map('extract', hostvars) | selectattr('ansible_host', 'in', linked_ips)
          | map(attribute='inventory_hostname') | list }}
@@ -39,14 +43,15 @@
       - "linked: {{ linked_hosts | join(', ') or 'none' }}"
       - "not linked (host down or unreachable?): {{ expected_hosts | difference(linked_hosts) | join(', ') or 'none' }}"
 
-- name: Warn on mixed rmw_zenoh versions across hosts
+- name: Warn about hosts not on the pinned rmw_zenoh release
   run_once: true
   vars:
-    versions: >-
-      {{ ansible_play_hosts | map('extract', hostvars, ['zenoh_version', 'stdout'])
-         | map('regex_replace', '-.*$', '') | unique }}
+    off_release: >-
+      {{ ansible_play_hosts | map('extract', hostvars)
+         | rejectattr('zenoh_version.stdout', 'match', (zenoh_rmw_version ~ '.') | regex_escape)
+         | map(attribute='inventory_hostname') | list }}
   ansible.builtin.debug:
     msg: >-
-      WARNING: hosts run different rmw_zenoh versions ({{ versions | join(', ') }}).
-      Upgrade them to the same release to avoid incompatibilities.
-  when: versions | length > 1
+      WARNING: not on rmw_zenoh {{ zenoh_rmw_version }}: {{ off_release | join(', ') }}.
+      Re-run ./zenoh_setup.sh so every host runs the same release.
+  when: off_release | length > 0
