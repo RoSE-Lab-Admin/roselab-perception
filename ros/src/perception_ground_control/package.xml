@@ -8,6 +8,9 @@
   <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
+  <depend>rcl_interfaces</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
   <depend>mastcam_interfaces</depend>
   <depend>gantry_lidar_interfaces</depend>
 

@@ -3,6 +3,11 @@ from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
+from perception_ground_control.rosey_bag_defaults import (
+    DEFAULT_ROSEY_TOPICS,
+    DEFAULT_ROSEY_NAMESPACES,
+)
+
 def generate_launch_description():
 
     #launch arguments
@@ -30,6 +35,32 @@ def generate_launch_description():
         description="how long to run the lidar scan"
     )
 
+    # roseybag topic selection. Each accepts a comma/space-separated string,
+    # e.g. rosey_extra_topics:="/foo,/bar", or a YAML list, e.g. "['/foo', '/bar']"
+    rosey_topics_arg = DeclareLaunchArgument(
+        "rosey_topics",
+        default_value=",".join(DEFAULT_ROSEY_TOPICS),
+        description="Master list of explicit topics to record in the roseybag (replaces the defaults)"
+    )
+
+    rosey_namespaces_arg = DeclareLaunchArgument(
+        "rosey_namespaces",
+        default_value=",".join(DEFAULT_ROSEY_NAMESPACES),
+        description="Namespaces whose topics are auto-discovered and added to the roseybag (replaces the defaults)"
+    )
+
+    rosey_extra_topics_arg = DeclareLaunchArgument(
+        "rosey_extra_topics",
+        default_value="",
+        description="Additional explicit topics appended to rosey_topics"
+    )
+
+    rosey_extra_namespaces_arg = DeclareLaunchArgument(
+        "rosey_extra_namespaces",
+        default_value="",
+        description="Additional namespaces appended to rosey_namespaces for topic auto-discovery"
+    )
+
 
     #launch node
     node = Node(
@@ -40,7 +71,11 @@ def generate_launch_description():
             "slade_root": LaunchConfiguration("slade_root"),
             "pi_file": LaunchConfiguration("pi_file"),
             "panda_file": LaunchConfiguration("panda_file"),
-            "duration":LaunchConfiguration("duration")
+            "duration":LaunchConfiguration("duration"),
+            "rosey_topics": LaunchConfiguration("rosey_topics"),
+            "rosey_namespaces": LaunchConfiguration("rosey_namespaces"),
+            "rosey_extra_topics": LaunchConfiguration("rosey_extra_topics"),
+            "rosey_extra_namespaces": LaunchConfiguration("rosey_extra_namespaces"),
         }]
     )
 
@@ -49,5 +84,9 @@ def generate_launch_description():
         pi_file_arg,
         duration_arg,
         panda_file_arg,
+        rosey_topics_arg,
+        rosey_namespaces_arg,
+        rosey_extra_topics_arg,
+        rosey_extra_namespaces_arg,
         node
     ])

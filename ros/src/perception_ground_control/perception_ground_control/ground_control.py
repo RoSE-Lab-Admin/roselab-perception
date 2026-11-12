@@ -11,6 +11,15 @@ from gantry_lidar_interfaces.srv import (
 from mastcam_interfaces.srv import Capture as MastCapture, DeleteName as MastDeleteName, DownloadName as MastDownloadName
 from std_srvs.srv import Trigger
 from std_msgs.msg import Bool
+from rcl_interfaces.msg import ParameterDescriptor
+
+from perception_ground_control.rosey_bag_defaults import (
+    DEFAULT_ROSEY_TOPICS,
+    DEFAULT_ROSEY_NAMESPACES,
+    parse_name_list,
+    normalize_topic,
+    normalize_namespace,
+)
 
 from pathlib import Path
 from datetime import datetime
@@ -56,6 +65,31 @@ class groundcontrol(Node):
         # duration of lidar scan
         self.declare_parameter('duration', 180.0)
         self.duration = self.get_parameter('duration').value
+
+        # roseybag topic selection. Each accepts either a string array or a
+        # single comma/space-separated string (dynamic typing allows both).
+        #   rosey_topics            - master list of explicit topics (replaces defaults)
+        #   rosey_namespaces        - namespaces to auto-discover topics under (replaces defaults)
+        #   rosey_extra_topics      - explicit topics appended to rosey_topics
+        #   rosey_extra_namespaces  - namespaces appended to rosey_namespaces
+        list_param = ParameterDescriptor(dynamic_typing=True)
+        self.declare_parameter('rosey_topics', DEFAULT_ROSEY_TOPICS, list_param)
+        self.declare_parameter('rosey_namespaces', DEFAULT_ROSEY_NAMESPACES, list_param)
+        self.declare_parameter('rosey_extra_topics', '', list_param)
+        self.declare_parameter('rosey_extra_namespaces', '', list_param)
+
+        self.rosey_topics = self._dedupe(
+            normalize_topic(t) for t in
+            parse_name_list(self.get_parameter('rosey_topics').value)
+            + parse_name_list(self.get_parameter('rosey_extra_topics').value)
+        )
+        self.rosey_namespaces = self._dedupe(
+            normalize_namespace(n) for n in
+            parse_name_list(self.get_parameter('rosey_namespaces').value)
+            + parse_name_list(self.get_parameter('rosey_extra_namespaces').value)
+        )
+        self.get_logger().info(f"Roseybag explicit topics: {self.rosey_topics}")
+        self.get_logger().info(f"Roseybag auto-discovery namespaces: {self.rosey_namespaces}")
 
         # setting up services
         # lidar services
@@ -172,18 +206,9 @@ class groundcontrol(Node):
         capture_request.duration = 60.0 # dummy val
         self.cap_future = self.mast_start.call_async(capture_request)
 
-        # find all correct topics
-        all_topics = self.get_topic_names_and_types()
-
-        # Set Topics
-        topics = ["/FitRosey_V1/pose", "/cmd_vel", 
-                    "/dynamic_joint_states", "/initialpose",
-                    "/joint_states", "/joy", "/robot_description",
-                    "/rosout", "/tf", "tf_static",
-                    "/Rover/camera/image_raw/compressed", "/plan", "/optimal_trajectory", "/imu/data"]
-        for topic_name, topic_types in all_topics:
-            if topic_name.startswith('/bno055/') or topic_name.startswith('/joy/') or topic_name.startswith('/roseybot_base_controller/'):
-                topics.append(topic_name)
+        # Build topic list: explicit topics + everything currently advertised
+        # under the configured namespaces
+        topics = self._resolve_rosey_topics()
 
         # Liveness / Health check on topics for Rosey bagging
         # RH: TODO - Write in a more comprehensive health checker which looks at subsets of topics and services for ease...
@@ -201,6 +226,22 @@ class groundcontrol(Node):
         
 
         self.get_logger().info("Mastcam and Rosey capture started")
+
+    @staticmethod
+    def _dedupe(items):
+        """Remove duplicates while preserving order."""
+        return list(dict.fromkeys(items))
+
+    def _resolve_rosey_topics(self):
+        """Explicit roseybag topics plus all discovered topics under rosey_namespaces."""
+        topics = list(self.rosey_topics)
+        all_topic_names = [name for name, _types in self.get_topic_names_and_types()]
+        for ns in self.rosey_namespaces:
+            matched = [name for name in all_topic_names if name.startswith(ns)]
+            if not matched:
+                self.get_logger().warn(f"No topics currently discovered under namespace '{ns}'")
+            topics.extend(matched)
+        return self._dedupe(topics)
 
 
     def stop_mast(self):
